@@ -9,16 +9,15 @@
 import re
 import nonebot
 from nonebot import on_command
-from nonebot.adapters.onebot.v11 import MessageSegment, GroupMessageEvent
-from nonebot.rule import to_me, keyword, command
+from nonebot.adapters.onebot.v11 import MessageSegment
+from nonebot.rule import keyword
 from nonebot.matcher import Matcher
 from nonebot.adapters import Message
-from nonebot.params import Arg, CommandArg, ArgPlainText
+from nonebot.params import CommandArg
 from nonebot.log import logger, default_format
-import ymbot
-import ymbot.src.jxDatas as jx3Data
-import ymbot.src.jx3_GetJJCTopRecord as jx3JJCInfo
-import ymbot.src.jx3_JJCRecord as JJCRecord
+import src.Data.jxDatas as jx3Data
+import src.jx3_GetJJCTopRecord as jx3JJCInfo
+import src.jx3_JJCRecord as JJCRecord
 import src.jx3_ServerState as ServerState
 import src.jx3_PersonHistory as PersonHistory
 import src.jx3_Daily as DailyInfo

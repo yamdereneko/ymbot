@@ -1,6 +1,6 @@
 from nonebot import require, get_bots
 from nonebot.adapters.onebot.v11 import MessageSegment
-from ymbot.src import jx3_Daily as jx3_Daily
+from src import jx3_Daily as jx3_Daily
 
 __plugin_name__ = 'timing'
 __plugin_usage__ = '用法：在规定时间触发发送的信息。'

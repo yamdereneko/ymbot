@@ -2,8 +2,8 @@ import os
 import matplotlib
 import matplotlib.pyplot as plt
 import nonebot
-from .jxDatas import jx3Data as jxData
-from .database import DataBase as database
+import src.Data.jxDatas as jxData
+from src.Data.database import DataBase as database
 import dufte
 from matplotlib.ticker import MultipleLocator
 
@@ -12,11 +12,10 @@ matplotlib.rc("font", family='PingFang HK')
 
 class GetJJCTopInfo:
     def __init__(self, table: str, weekly: int, school: str):
-        jx3Data = jxData()
         self.table = table
         self.weekly = weekly
-        self.school = jx3Data.school(school)
-        config = jx3Data.config
+        self.school = jxData.school(school)
+        config = jxData.config
         self.database = database(config)
 
     # 获取每周每个门派趋势图，返回DICT结果，并打印趋势图至相关目录

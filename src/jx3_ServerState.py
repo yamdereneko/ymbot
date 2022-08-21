@@ -15,17 +15,18 @@ import json
 
 from matplotlib import pyplot as plt
 
-from .jxDatas import jx3Data as jxData
+import src.Data.jxDatas as jxData
+
 matplotlib.rc("font", family='PingFang HK')
 
 # 请求头
 headers = jxData.headers
 
+
 class ServerState:
     def __init__(self, server=None):
-        self.jx3Data = jxData()
-        self.server = self.jx3Data.mainServer(server)
-        self.zone = self.jx3Data.mainZone(self.server)
+        self.server = jxData.mainServer(server)
+        self.zone = jxData.mainZone(self.server)
 
     async def get_xsk(self, data=None):
         data = json.dumps(data)
@@ -51,7 +52,7 @@ class ServerState:
             flag = 0
             ServerState = {}
             server = info.get("mainServer")
-            if self.jx3Data.mainServer(server) is None:
+            if jxData.mainServer(server) is None:
                 break
             for i in ServerStates:
                 if i.get("mainServer") == server:

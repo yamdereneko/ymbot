@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 import nonebot
 import requests
 import json
-from .database import DataBase as database
-from .jxDatas import jx3Data as jxData
+from src.Data.database import DataBase as database
+import src.Data.jxDatas as jxData
 import dufte
 
 # 请求头
@@ -26,9 +26,8 @@ matplotlib.rc("font", family='PingFang HK')
 class GetDaily:
     def __init__(self, server: str = "姨妈", daily_next: int = 0):
         config = jxData.config
-        jx3Data = jxData()
-        self.server = jx3Data.mainServer(server)
-        self.zone = jx3Data.mainZone(self.server)
+        self.server = jxData.mainServer(server)
+        self.zone = jxData.mainZone(self.server)
         self.daily_next = daily_next
         self.Pool = "jx3_Daily"
         self.database = database(config)

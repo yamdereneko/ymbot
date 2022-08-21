@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from src import jxDatas
+from src.Data import jxDatas
 from src import jx3_GetJJCTopRecord as GetJJCTopRecord
 from src import jx3_JJCRecord as JJCRecord
-from src import  jx3_WanBaoLouInfo as WanBaoLouInfo
+from src import jx3_WanBaoLouInfo as WanBaoLouInfo
 from src import jx3_PersonHistory as PersonInfo
 from src import jx3_ServerState as ServerState
 from src import jx3_Daily

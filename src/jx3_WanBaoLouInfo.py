@@ -1,6 +1,6 @@
 import requests
 import pymysql
-from .jxDatas import jx3Data as jxData
+import src.Data.jxDatas as jxData
 import datetime
 
 

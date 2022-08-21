@@ -12,8 +12,8 @@ import traceback
 import nonebot
 import requests
 import json
-from .jxDatas import jx3Data as jxData
-from .database import DataBase as database
+import src.Data.jxDatas  as jxData
+from src.Data.database import DataBase as database
 
 # 请求头
 headers = jxData.headers
@@ -22,10 +22,9 @@ headers = jxData.headers
 class GetJJCTop200Record:
     def __init__(self, weekly: int):
         config = jxData.config
-        jx3Data = jxData()
         self.weekly = weekly
         self.server = None
-        self.zone = jx3Data.mainZone(self.server)
+        self.zone = jxData.mainZone(self.server)
         self.database = database(config)
         self.role_id = None
         self.ts = None

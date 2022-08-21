@@ -13,8 +13,8 @@ import dufte
 import nonebot
 import matplotlib
 import matplotlib.pyplot as plt
-from .jxDatas import jx3Data as jxData
-from .database import DataBase as database
+import src.Data.jxDatas as jxData
+from src.Data.database import DataBase as database
 import requests
 import json
 
@@ -26,11 +26,10 @@ matplotlib.rc("font", family='PingFang HK')
 
 class GetPersonInfo:
     def __init__(self, role: str, server: str):
-        jx3Data = jxData()
         config = jxData.config
         self.role = role
-        self.server = jx3Data.mainServer(server)
-        self.zone = jx3Data.mainZone(self.server)
+        self.server = jxData.mainServer(server)
+        self.zone = jxData.mainZone(self.server)
         self.database = database(config)
         self.role_id = None
         self.person_id = None
