@@ -7,6 +7,7 @@
 @Time : 2021/09/29 22:39:29
 @Docs : 请求推栏战绩例子
 """
+import asyncio
 import datetime
 import os
 import matplotlib
@@ -59,6 +60,9 @@ class GetDaily:
             relief = daily_info.get("data").get("relief")
             team = ":".join(daily_info.get("data").get("team"))
             draw = daily_info.get("data").get("draw")
+            if date is not self.day:
+                nonebot.logger.warning("API接口获取日常和当前时间不符，未更新,加载当前日期日常...")
+                return daily_info.get("data")
             sql = "insert into jx3_Daily values ('%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
                 date, week, war, battle, camp, prestige, relief, team, draw)
             res = await self.database.execute(sql)
@@ -74,15 +78,18 @@ class GetDaily:
         if res is None:
             nonebot.logger.warning("连接池中不存在该数据，将进行数据同步...")
             syncResult = await self.SyncDateConnectPool()
+            continueTime = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y-%m-%d")
             if syncResult is None:
                 nonebot.logger.error("连接池同步失败...")
                 return None
+            elif syncResult.get("date") == continueTime:
+                sql = "select * from jx3_Daily where date='%s'" % continueTime
             res = await self.database.fetchone(sql)
         return res
         # 获取门派每周个数趋势图，返回DICT结果，并打印趋势图至相关目录
 
     async def QueryDailyFigure(self):
-        if os.path.exists(f"/tmp/daily{self.server}{self.day}.png"):
+        if os.path.exists(f"/tmp/daily{self.server}{self.daily_next}.png"):
             nonebot.logger.info(self.day + "日常图已经存在")
             return True
         else:
@@ -93,7 +100,7 @@ class GetDaily:
             fig, ax = plt.subplots(figsize=(8, 9), facecolor='white', edgecolor='white')
             plt.style.use(dufte.style)
             ax.axis([0, 2, 0, 4])
-            ax.set_title(f'今天是{self.day},星期{data.get("week")}', fontsize=19, color='#303030', fontweight="heavy",
+            ax.set_title(f'{data.get("date")},星期{data.get("week")}', fontsize=19, color='#303030', fontweight="heavy",
                          verticalalignment='top')
             ax.axis('off')
             ax.text(0.1, 3.5, f'「大战」:{data.get("war")}', verticalalignment='bottom', horizontalalignment='left',
