@@ -38,8 +38,9 @@ class GetJJCTopInfo:
             plt.text(x, y, '%.0f' % y, ha="center", va="bottom")
         bar_width = 0.3
         ax.bar(res_total.keys(), res_total.values(), width=bar_width)
-        plt.savefig(f"/tmp/top{self.weekly}.png")
+        plt.savefig(f"/tmp/top{self.table}.png")
         return res_total
+
 
     # 获取门派每周个数趋势图，返回DICT结果，并打印趋势图至相关目录
     async def get_JJCWeeklySchoolRecord(self):
@@ -62,6 +63,6 @@ class GetJJCTopInfo:
                 y.append(data[self.school])
                 plt.text(data["week"], data[self.school], '%.0f' % data[self.school], ha="center", va="bottom")
             ax.plot(x, y, "o-", color='#607d8b')
-            plt.savefig(f"/tmp/top{self.school}.png")
+            plt.savefig(f"/tmp/schoolTop{self.school}.png")
             nonebot.logger.info(self.school + "JJC趋势图重新创建")
         return res

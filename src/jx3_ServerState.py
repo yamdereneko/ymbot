@@ -7,15 +7,15 @@
 @Time : 2021/09/29 22:39:29
 @Docs :
 """
+import asyncio
+
 import dufte
 import matplotlib
 import nonebot
 import requests
 import json
-
-from matplotlib import pyplot as plt
-
 import src.Data.jxDatas as jxData
+from matplotlib import pyplot as plt
 
 matplotlib.rc("font", family='PingFang HK')
 
@@ -43,6 +43,7 @@ class ServerState:
         headers['X-Sk'] = xsk  # 修改请求中的xsk
         data = requests.post(url="https://m.pvp.xoyo.com/msgr-http/get-jx3-server-list", data=param,
                              headers=headers).json()
+
         if data.get("code") != 0:
             nonebot.logger.error("服务器状态有问题")
             return None
@@ -63,7 +64,10 @@ class ServerState:
             ServerState["mainServer"] = server
             ServerState["mainZone"] = info.get("mainZone")
             ServerState["connectState"] = info.get("connectState")
+            ServerState["ipAddress"] = info.get("ipAddress")
+            ServerState["ipPort"] = info.get("ipPort")
             ServerStates.append(ServerState)
+        print(ServerStates)
         return ServerStates
 
     async def get_figure(self):
@@ -87,3 +91,5 @@ class ServerState:
         plt.savefig(f"/tmp/serverState.png")
         nonebot.logger.info("区服图已重新构筑")
         return True
+state = ServerState()
+asyncio.run(state.get_server_list())

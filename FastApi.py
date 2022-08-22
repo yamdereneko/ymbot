@@ -38,8 +38,9 @@ class Transaction(BaseModel):
     School: Union[str, None] = None
 
 
-class JJCWeekly(BaseModel):
+class JJTop(BaseModel):
     Week: Union[int, None] = None
+    TopType: Union[int, None] = None
 
 
 class ServerStateModel(BaseModel):
@@ -156,34 +157,21 @@ async def jx3_Role_Api(
 
 # JJC TOP200查询
 # 入参 { "Week": 30 }
-@app.get("/jx3/jjcTop200")
+@app.get("/jx3/jjcTop")
 async def jjc_TopRecord_api(
-        weekly: Union[JJCWeekly, None] = None
+        JJTopInfo: Union[JJTop, None] = None
 ):
-    if weekly is None:
+    if JJTopInfo is None:
         raise HTTPException(status_code=500, detail="参数未填，请填入参数，如：{ 'Week': 32 }")
-    table = "JJC_rank_weekly"
-    jjcTopRecord = await get_JJCTop_Record(table, weekly.Week)
+    if JJTopInfo.TopType == 200:
+        table = "JJC_rank_weekly"
+    else:
+        table = "JJC_rank50_weekly"
+    jjcTopRecord = await get_JJCTop_Record(table, JJTopInfo.Week)
     if jjcTopRecord is None:
-        raise UnicornException(name=str(weekly.Week), content="该周竞技场信息不存在")
+        raise UnicornException(name=str(JJTopInfo.Week), content="该周竞技场信息不存在")
     nonebot.logger.info(jjcTopRecord)
-    return {"code": 0, "msg": "success", "Type": "Top200", "weekly": weekly.Week, "data": jjcTopRecord}
-
-
-# JJC TOP50查询
-# 入参 { "Week": 30 }
-@app.get("/jx3/jjcTop50")
-async def jjc_TopRecord_api(
-        weekly: Union[JJCWeekly, None] = None
-):
-    if weekly is None:
-        raise HTTPException(status_code=500, detail="参数未填，请填入参数，如：{ 'Week': 32 }")
-    table = "JJC_rank50_weekly"
-    jjcTopRecord = await get_JJCTop_Record(table, weekly.Week)
-    if jjcTopRecord is None:
-        raise UnicornException(name=str(weekly.Week), content="该周竞技场信息不存在")
-    nonebot.logger.info(jjcTopRecord)
-    return {"code": 0, "msg": "success", "Type": "Top50", "weekly": weekly.Week, "data": jjcTopRecord}
+    return {"code": 0, "msg": "success", "Type": "JJCTop", "weekly": JJTopInfo.Week, "data": jjcTopRecord}
 
 
 # 服务器状态查询

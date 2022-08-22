@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "ymProject"
+name = "ymbot"
 version = "0.1.0"
-description = "ymProject"
+description = "ymbot"
 authors = []
 readme = "README.md"
 

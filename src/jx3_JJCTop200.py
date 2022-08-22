@@ -48,11 +48,14 @@ class GetJJCTop200Record:
             data = requests.post(url="https://m.pvp.xoyo.com/role/indicator", data=param, headers=headers).json()
             if data.get("code") != 0:
                 print("获取全局role_id失败，请重试")
+                self.global_role_id = None
                 return None
             if data.get('data').get('role_info') is None:
                 print("获取角色失败，请重试")
+                self.global_role_id = None
                 return None
             if data.get("data").get("person_info") is None:
+                self.global_role_id = None
                 return None
             self.global_role_id = data.get("data").get("role_info").get("global_role_id")
         except Exception as e:
@@ -165,8 +168,3 @@ class GetJJCTop200Record:
             await self.database.execute(sql)
         else:
             print("门派汇总的人数不到正确值，请人工处理错误信息...")
-
-
-getJJCTopRecord = GetJJCTop200Record(32)
-asyncio.run(getJJCTopRecord.main())
-

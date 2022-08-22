@@ -30,6 +30,7 @@ logger.add("logs/error.log",
 
 RoleJJCRecord = on_command("RoleJJCRecord", rule=keyword("战绩", "JJC信息"), aliases={"战绩", "JJC信息"}, priority=5)
 JJCTop = on_command("JJCTop", rule=keyword("JJC趋势图"), aliases={"JJC趋势图"}, priority=5)
+JJCTop50 = on_command("JJCTop50", rule=keyword("JJC50趋势图"), aliases={"JJC50趋势图"}, priority=5)
 ServerCheck = on_command("ServerCheck", rule=keyword("开服"), aliases={"开服"}, priority=5)
 AllServerState = on_command("AllServerState", rule=keyword("区服"), aliases={"区服"}, priority=5)
 PersonInfo = on_command("PersonInfo", rule=keyword("角色"), aliases={"角色"}, priority=5)
@@ -69,17 +70,34 @@ async def onMessage_JJCTop(matcher: Matcher, args: Message = CommandArg()):
     if args.extract_plain_text() != "":
         plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
         if plain_text is not None:
-            if jx3Data.school(plain_text) in jx3Data.all_school.keys():
-                jjcInfo = jx3JJCInfo.GetJJCTopInfo("JJC_rank_weekly", 0, plain_text)
-                record_figure = await jjcInfo.get_JJCWeeklySchoolRecord()
-            else:
-                jjcInfo = jx3JJCInfo.GetJJCTopInfo("JJC_rank_weekly", int(plain_text), "")
+            if plain_text.find(" ") != -1:
+                plain_text = re.sub(r'[ ]+', ' ', plain_text)
+                topType = plain_text.split(" ")[0]
+                week = plain_text.split(" ")[1]
+                table = "JJC_rank_weekly"
+                if topType == "200":
+                    table = "JJC_rank_weekly"
+                elif topType == "50":
+                    table = "JJC_rank50_weekly"
+                jjcInfo = jx3JJCInfo.GetJJCTopInfo(table, int(week), "")
                 record_figure = await jjcInfo.get_JJCWeeklyRecord()
-            if record_figure is not None:
-                msg = MessageSegment.image(f"file:///tmp/top{plain_text}.png")
-                await JJCTop.finish(msg)
+                if record_figure is not None:
+                    msg = MessageSegment.image(f"file:///tmp/top{table}.png")
+                    await JJCTop.finish(msg)
+                else:
+                    nonebot.logger.error("创建趋势图失败，请检查报错")
             else:
-                nonebot.logger.error("创建趋势图失败，请检查报错")
+                if jx3Data.school(plain_text) in jx3Data.all_school.keys():
+                    table = "JJC_rank_weekly"
+                    jjcInfo = jx3JJCInfo.GetJJCTopInfo(table, 0, plain_text)
+                    record_figure = await jjcInfo.get_JJCWeeklySchoolRecord()
+                    if record_figure is not None:
+                        msg = MessageSegment.image(f"file:///tmp/schoolTop{jx3Data.school(plain_text)}.png")
+                        await JJCTop.finish(msg)
+                    else:
+                        nonebot.logger.error("创建趋势图失败，请检查报错")
+                else:
+                    nonebot.logger.error("输入错误，请检查报错")
         else:
             nonebot.logger.error("参数错误，请重新输入正确参数")
             await JJCTop.reject("参数错误，请重新输入正确参数")
