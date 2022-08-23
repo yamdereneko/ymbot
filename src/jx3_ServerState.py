@@ -91,5 +91,3 @@ class ServerState:
         plt.savefig(f"/tmp/serverState.png")
         nonebot.logger.info("区服图已重新构筑")
         return True
-state = ServerState()
-asyncio.run(state.get_server_list())

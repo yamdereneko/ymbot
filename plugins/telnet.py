@@ -1,11 +1,14 @@
 import asyncio
-import ctypes
 from contextlib import closing, suppress
 from datetime import datetime
 from functools import wraps
 from itertools import count
 from typing import Callable, List
 from urllib.request import urlopen
+from nonebot.adapters.onebot.v11 import MessageSegment
+from nonebot import require, get_bots
+
+monitoring = require("nonebot_plugin_apscheduler").scheduler
 
 
 def retry(attempt: int = 3) -> Callable:
@@ -55,14 +58,13 @@ def check_verson() -> str:
         return resp.read().decode("utf-8").splitlines()[1].split("=")[1]
 
 
-def msg_box(server: str) -> None:
-    ctypes.windll.user32.MessageBoxW(
-        0,
+def msg_box(server: str):
+    msg = MessageSegment.text(
         f"{datetime.now():%F %H:%M:%S}\n {server} 已开服！！\n"
-        f"当前客户端版本: {check_verson()}",
-        f"{server} 已开服！！",
-        0,
+        f"当前客户端版本: {check_verson()}\n"
+        f"{server} 已开服！！"
     )
+    return msg
 
 
 async def main(servers: List[str]) -> None:
@@ -84,14 +86,11 @@ async def main(servers: List[str]) -> None:
             tasks.append((server, host, port))
 
     await asyncio.gather(*[check(*server) for server in tasks])
+    msg = [msg_box(server) for server, _, _ in tasks]
+    bot, = get_bots().values()
+    await bot.send_group_msg(group_id=642668185, message=msg)
 
 
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser("开服监控")
-    parser.add_argument("server", type=str, nargs="*")
-
-    args = parser.parse_args()
-
-    asyncio.run(main(args.server))
+@monitoring.scheduled_job("cron", hour='7', id="send_monitoring")
+def monitoringServer():
+    asyncio.run(main(["斗转星移"]))

@@ -15,11 +15,3 @@ async def run_daily():
     await daily.QueryDailyFigure()
     msg = MessageSegment.image(f"file:///tmp/daily斗转星移0.png")
     await bot.send_group_msg(group_id=1077830347, message=msg)
-
-@timing.scheduled_job("cron", hour='7', minute='01', id="send_daily")
-async def run_daily():
-    bot, = get_bots().values()
-    daily = jx3_Daily.GetDaily()
-    await daily.QueryDailyFigure()
-    msg = MessageSegment.image(f"file:///tmp/daily斗转星移0.png")
-    await bot.send_group_msg(group_id=1077830347, message=msg)
