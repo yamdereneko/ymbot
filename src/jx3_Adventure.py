@@ -24,7 +24,7 @@ class Adventure:
             browser = await playwright.chromium.launch(headless=True)
             context = await browser.new_context()
             page = await context.new_page()
-            page.set_default_timeout(3000)
+            page.set_default_timeout(5000)
 
             await page.goto("https://www.jx3pd.com/serendipity")
             await page.locator("text=大区").click()
@@ -33,6 +33,7 @@ class Adventure:
             await page.locator(f"text={self.server}").click()
             await page.locator("[placeholder=\"在此输入角色名字，按回车键或点击查询\"]").click()
             await page.locator("[placeholder=\"在此输入角色名字，按回车键或点击查询\"]").fill(self.user)
+            await page.locator("[placeholder=\"在此输入角色名字，按回车键或点击查询\"]").press("Enter")
             await page.wait_for_load_state("domcontentloaded")
             task = await page.locator('tbody.ant-table-tbody').inner_text()
             # ---------------------
@@ -44,7 +45,7 @@ class Adventure:
         task = await self.query_user_info()
         role_info_list = [i for i in re.split("[\t\n]", str(task)) if i != ""]
         with closing(
-                open("Data/serendipity.json")
+                open("sec/Data/serendipity.json")
         ) as resp:
             serendipity_json = json.load(resp)
 
@@ -55,13 +56,12 @@ class Adventure:
 
         role_list = []
         role_set = {}
-
+        actions = ["用户名","奇遇","时间"]
         while True:
             if len(role_info_list) == 0:
                 break
-            role_set["用户名"] = role_info_list.pop(0)
-            role_set["奇遇"] = role_info_list.pop(0)
-            role_set["时间"] = role_info_list.pop(0)
+            for action in actions:
+                role_set[action] = role_info_list.pop(0)
             role_list.append(role_set)
             role_set = {}
 
@@ -69,7 +69,7 @@ class Adventure:
         for task in role_list:
             if task["奇遇"] in serendipity_Independent:
                 role_Independent.append(task)
-        print(role_Independent)
+        nonebot.logger.info(role_Independent)
         return role_Independent
 
     async def get_Fig(self):
@@ -87,10 +87,10 @@ class Adventure:
 
             ax.axis([0, 5, 0, len(task) + 2])
             ax.axis('off')
-            for floor, element in reversed(list(enumerate(task, start=1))):
+            for floor, element in enumerate(task, start=1):
                 adventure = element.get("奇遇")
                 date = element.get("时间")
-
+                floor = len(task) - floor + 1
                 ax.text(0.5, floor, f'{adventure}', horizontalalignment='left',
                         color='#404040', verticalalignment='top')
                 ax.text(2, floor, f'{date}', horizontalalignment='left',
@@ -98,14 +98,10 @@ class Adventure:
             ax.text(2, len(task) + 2, f'{self.user}', fontsize=16, color='#303030',
                     fontweight="heavy", verticalalignment='top', horizontalalignment='center')
 
-            # plt.savefig(f"/tmp/adventure{user}.png")
-            plt.show()
+            plt.savefig(f"/tmp/adventure{self.user}.png")
         except Exception as e:
             nonebot.logger.error(e)
             nonebot.logger.error("获取用户信息失败，请查看报错.")
             traceback.print_exc()
             return None
 
-
-adventures = Adventure("姨妈", "小丛兰")
-asyncio.run(adventures.get_Fig())

@@ -21,6 +21,7 @@ import src.jx3_JJCRecord as JJCRecord
 import src.jx3_ServerState as ServerState
 import src.jx3_PersonHistory as PersonHistory
 import src.jx3_Daily as DailyInfo
+import src.jx3_Adventure as jx3_Adventure
 
 logger.add("logs/error.log",
            rotation="00:00",
@@ -35,6 +36,7 @@ ServerCheck = on_command("ServerCheck", rule=keyword("开服"), aliases={"开服
 AllServerState = on_command("AllServerState", rule=keyword("区服"), aliases={"区服"}, priority=5)
 PersonInfo = on_command("PersonInfo", rule=keyword("角色"), aliases={"角色"}, priority=5)
 Daily = on_command("Daily", rule=keyword("日常"), aliases={"日常"}, priority=5)
+Adventure = on_command("Adventure", rule=keyword("奇遇"), aliases={"奇遇"}, priority=5)
 
 
 @RoleJJCRecord.handle()
@@ -153,8 +155,8 @@ async def onMessage_ServerCheck(matcher: Matcher, args: Message = CommandArg()):
         else:
             nonebot.logger.error("开服数据未得到，请检查")
     else:
-        nonebot.logger.error("请求错误,请参考:区服 ")
-        await ServerCheck.reject("请求错误,请参考:区服 ")
+        nonebot.logger.error("请求错误,请参考:开服 姨妈 ")
+        await ServerCheck.reject("请求错误,请参考:开服 姨妈 ")
 
 
 @AllServerState.handle()
@@ -203,6 +205,28 @@ async def onMessage_Daily(matcher: Matcher, args: Message = CommandArg()):
         msg = MessageSegment.image(f"file:///tmp/daily斗转星移0.png")
         await Daily.finish(msg)
 
+
+@Adventure.handle()
+async def onMessage_Adventure(matcher: Matcher, args: Message = CommandArg()):
+    if args.extract_plain_text() != "":
+        plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
+        if plain_text.find(" ") != -1:
+            server = jx3Data.mainServer(re.split('[ ]+', plain_text)[0])
+            if server is not None:
+                user = re.split('[ ]+', plain_text)[1]
+                adventure = jx3_Adventure.Adventure(server,user)
+                await adventure.get_Fig()
+                msg = MessageSegment.image(f"file:///tmp/adventure{user}.png")
+                await Adventure.finish(msg)
+            else:
+                nonebot.logger.error("奇遇获取大区信息填写失败，请重试")
+                await Adventure.reject("奇遇获取大区信息填写失败，请重试")
+        else:
+            nonebot.logger.error("奇遇获取输入错误，请重试，参考：奇遇 区服 角色名")
+            await Adventure.reject("奇遇获取输入错误，请重试，参考：奇遇 区服 角色名")
+    else:
+        nonebot.logger.error("请求错误,请参考: 奇遇 区服 角色名")
+        await Adventure.reject("请求错误,请参考: 奇遇 区服 角色名")
 #
 # @roleJJCRecord.got("role", prompt="你想查询哪个角色信息呢？")
 # async def handle_city(role: Message = Arg(), roleName: str = ArgPlainText("role")):

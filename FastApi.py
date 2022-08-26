@@ -7,6 +7,7 @@ from src import jx3_WanBaoLouInfo as WanBaoLouInfo
 from src import jx3_PersonHistory as PersonInfo
 from src import jx3_ServerState as ServerState
 from src import jx3_Daily
+from src import jx3_Adventure as Adventure
 from pydantic import BaseModel
 from typing import Union
 import nonebot
@@ -52,6 +53,12 @@ class Daily(BaseModel):
     Next: Union[int, None] = None
 
 
+class AdventureModel(BaseModel):
+    server: Union[str, None] = None
+    role: Union[str, None] = None
+
+
+
 # ************************************************
 # 代码实现部分 实际代码为异步
 
@@ -88,6 +95,12 @@ def get_Daily(server=None, daily_next=None):
     daily = jx3_Daily.GetDaily(server, daily_next)
     daily_info = daily.QueryTodayDaily()
     return daily_info
+
+
+def get_adventure(server, role_name):
+    adventure = Adventure.Adventure(server, role_name)
+    info = adventure.check_serendipity()
+    return info
 
 
 # ***************************************
@@ -203,3 +216,17 @@ async def daily_api(
     if dailyInfo is None:
         raise UnicornException(name=str(), content="日常查询失败")
     return {"code": 0, "msg": "success", "data": dailyInfo}
+
+# 奇遇信息查询
+@app.get("/jx3/adventure")
+async def adventure_api(
+        adventure: AdventureModel = None
+):
+    if adventure is None:
+        raise UnicornException(name=str(), content="请输入正确参数")
+    else:
+        adventure_info = await get_adventure(jxDatas.mainServer(adventure.server), adventure.role)
+        if adventure_info is None:
+            raise UnicornException(name=str(), content="奇遇查询失败")
+        return {"code": 0, "msg": "success", "data": adventure_info}
+

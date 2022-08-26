@@ -162,89 +162,83 @@ import asyncio
 import json
 import re
 from contextlib import closing, suppress
-
-text = """芋泥泥	万灵当歌
-2022-08-23 13:41:59
-
-芋泥泥	黑白路
-2022-08-01 19:56:10
-
-芋泥泥	兔江湖
-2022-07-13 16:58:54
-
-芋泥泥	劝学记
-2022-07-07 10:06:58
-
-芋泥泥	谜书生
-2021-06-19 02:02:53
-
-芋泥泥	尘网中
-2021-01-16 00:13:16
-
-芋泥泥	白月皎
-2021-01-15 23:54:05
-
-芋泥泥	太行道
-2020-11-24 21:13:04
-
-芋泥泥	瀛洲梦
-2020-11-12 04:24:35
-
-芋泥泥	沧海笛
-2020-11-03 20:08:51
-
-芋泥泥	滴水恩
-2020-10-14 20:26:53
-
-芋泥泥	秘宝图
-2020-09-24 05:32:05
-
-芋泥泥	莫贪杯
-2020-09-17 04:10:21
-
-芋泥泥	露园事
-2020-07-27 14:10:49
-
-芋泥泥	一念间
-2020-05-13 11:03:39
-
-芋泥泥	江湖录
-2020-03-06 10:41:36
-
-芋泥泥	北行镖
-2020-01-31 17:12:36"""
+#
+# text = """金鸾喻情	老猹子@梦江南	小卫兰@梦江南	侠客岛
+# 2022-08-18 22:43:06
+#
+# 真橙之心	小卫兰@梦江南	老猹子@梦江南	成都
+# 2022-08-11 21:13:03
+#
+# 慕佳期	小焦迈奇	老猹子@梦江南	苍云
+# 2022-08-06 18:06:34
+#
+# 吹落心雨	小焦迈奇	老猹子@梦江南	苍云
+# 2022-08-06 18:06:14
+#
+# 此间心同	小焦迈奇	老猹子@梦江南	苍云
+# 2022-08-06 18:06:11
+#
+# 岁星流金	小焦迈奇	老猹子@梦江南	苍云
+# 2022-08-06 18:06:07
+#
+# 山河回响	老猹子@梦江南	小焦迈奇	苍云
+# 2022-08-06 18:01:39
+#
+# 任行逍遥	老猹子@梦江南	小焦迈奇	苍云
+# 2022-08-06 18:01:37
+#
+# 任行逍遥	老猹子@梦江南	小焦迈奇	苍云
+# 2022-08-06 18:01:35
+#
+# 鹊桥引仙	老猹子@梦江南	小焦迈奇	苍云
+# 2022-08-06 18:01:34
+#
+# 万家灯火	老猹子@梦江南	小焦迈奇	苍云
+# 2022-08-06 18:01:32
+#
+# 海誓山盟	老猹子@梦江南	小疏竹	成都
+# 2022-08-04 22:45:01
+#
+# 山河回响	老猹子@梦江南	甜酒酿汤圆2@梦江南	成都
+# 2022-08-04 22:42:25
+#
+# 任行逍遥	甜酒酿汤圆2@梦江南	老猹子@梦江南	成都
+# 2022-08-04 22:41:59
+#
+# 福倒了	甜酒酿汤圆2@梦江南	老猹子@梦江南	成都
+# 2022-08-04 22:41:57
+#
+# 海誓山盟	老猹子@梦江南	甜酒酿汤圆2@梦江南	成都
+# 2022-08-04 22:37:47
+# """
 
 
-async def check_serendipity():
-    role_info_list = [i for i in re.split("[\t\n]", text) if i != ""]
-    with closing(
-            open("Data/serendipity.json")
-    ) as resp:
-        serendipity_json = json.load(resp)
-
-    serendipity_Independent = []
-    for line in serendipity_json:
-        if line["type"] == "绝世奇遇" or line["type"] == "世界奇遇":
-            serendipity_Independent.append(line["name"])
-
-    role_list = []
-    role_set = {}
-
-    while True:
-        if len(role_info_list) == 0:
-            break
-        role_set["用户名"] = role_info_list.pop(0)
-        role_set["奇遇"] = role_info_list.pop(0)
-        role_set["时间"] = role_info_list.pop(0)
-        role_list.append(role_set)
-        role_set = {}
-
-    role_Independent = []
-    for task in role_list:
-        if task["奇遇"] in serendipity_Independent:
-            role_Independent.append(task)
-
-    print(role_Independent)
+# async def check_serendipity():
+#     role_info_list = [i for i in re.split("[\t\n]", text) if i != ""]
+#     actions = ["烟花", "赠方", "收方", "地图", "时间"]
+#     role_list = []
+#     role_set = {}
+#
+#     while True:
+#         if len(role_info_list) == 0:
+#             break
+#         for action in actions:
+#             role_set[action] = role_info_list.pop(0)
+#         role_list.append(role_set)
+#         role_set = {}
+#     print(role_list)
+#
+#
+# asyncio.run(check_serendipity())
+import asyncio
+import httpx
 
 
-asyncio.run(check_serendipity())
+async def main():
+    async with httpx.AsyncClient() as client:
+        param = {'server': "斗转星移", 'next': 1}
+        response = await client.get('https://www.jx3api.com/app/daily',params=param)
+        print(response.json())
+
+
+asyncio.run(main())
