@@ -5,6 +5,9 @@ from functools import wraps
 from itertools import count
 from typing import Callable, List
 from urllib.request import urlopen
+from src.Data.jxDatas import group_list
+
+import nonebot
 from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot import require, get_bots
 
@@ -84,11 +87,14 @@ async def main(servers: List[str]) -> None:
         if server in servers and server not in server_set:
             server_set.add(server)
             tasks.append((server, host, port))
-
+    nonebot.logger.info("开服监控已开启")
     await asyncio.gather(*[check(*server) for server in tasks])
     msg = [msg_box(server) for server, _, _ in tasks]
+
+    nonebot.logger.info(msg)
     bot, = get_bots().values()
-    await bot.send_group_msg(group_id=642668185, message=msg)
+    for group_id in group_list:
+        await bot.send_group_msg(group_id=group_id, message=msg)
 
 
 @monitoring.scheduled_job("cron", hour='7', id="send_monitoring")

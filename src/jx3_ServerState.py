@@ -67,7 +67,6 @@ class ServerState:
             ServerState["ipAddress"] = info.get("ipAddress")
             ServerState["ipPort"] = info.get("ipPort")
             ServerStates.append(ServerState)
-        print(ServerStates)
         return ServerStates
 
     async def get_figure(self):
