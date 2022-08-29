@@ -6,6 +6,7 @@
 @Time : 2021/09/29 22:39:29
 @Docs : 请求推栏战绩例子
 """
+import asyncio
 import time
 import traceback
 from time import gmtime

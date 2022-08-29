@@ -182,9 +182,9 @@ async def onMessage_Daily(matcher: Matcher, args: Message = CommandArg()):
             plain_text = re.sub(r'[ ]+', ' ', plain_text)
             server = jx3Data.mainServer(plain_text.split(" ")[0])
             if server is not None:
-                dailyDate = plain_text.split(" ")[1]
+                daily_date = plain_text.split(" ")[1]
                 day = 0
-                match dailyDate:
+                match daily_date:
                     case "明天":
                         day = 1
                     case "后天" | "第二天":
@@ -192,17 +192,17 @@ async def onMessage_Daily(matcher: Matcher, args: Message = CommandArg()):
                     case "大后天" | "第三天":
                         day = 3
                 daily = DailyInfo.GetDaily(server, day)
-                state = await daily.QueryDailyFigure()
+                state = await daily.query_daily_figure()
                 if state is True:
-                    msg = MessageSegment.image(f"file:///tmp/daily{server}{day}.png")
+                    msg = MessageSegment.image(f"file:///tmp/daily{server}.png")
                     await Daily.finish(msg)
         else:
             nonebot.logger.error("请求错误,请参考:日常 大区 明天")
             await Daily.reject("请求错误,请参考:日常 大区 明天  ")
     else:
         daily = DailyInfo.GetDaily()
-        await daily.QueryDailyFigure()
-        msg = MessageSegment.image(f"file:///tmp/daily斗转星移0.png")
+        await daily.query_daily_figure()
+        msg = MessageSegment.image(f"file:///tmp/daily斗转星移.png")
         await Daily.finish(msg)
 
 

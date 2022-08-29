@@ -39,7 +39,7 @@ headers = {
     "Host": "m.pvp.xoyo.com",
     "Connection": "Keep-Alive",
     "Accept-Encoding": "gzip",
-    "token": "7e9c51f0bcf5449ab913863eb2a7746e:yandereneko:kingsoft::qo3e/LCoXnb1XovF7VxHGg==",
+    "token": "8fd71f296c154aa5bec19a983ea02203:yandereneko:kingsoft::qo3e/LCoXnb1XovF7VxHGg==",
     "User-Agent": "SeasunGame/193 CFNetwork/1333.0.4 Darwin/21.5.0",
     "X-Sk": None
 }
@@ -69,7 +69,8 @@ school_pinyin = {
     "zixia": "紫霞",
     "taixu": "胎虚",
 }
-group_list = ["642668185", "1077830347"]
+#1077830347
+group_list = ["642668185","1077830347"]
 
 all_school = {'霸刀': 10, '少林': 12, '补天': 12, '蓬莱': 14, '紫霞': 14, '藏剑': 13, '明教': 7, '云裳': 17, '花间': 12, '丐帮': 5,
               '凌雪阁': 8, '田螺': 6, '惊羽': 5, '相知': 14, '胎虚': 5, '苍云': 5, '天策': 8, '无方': 11, '灵素': 6, '冰心': 3, '毒经': 6,
