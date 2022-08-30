@@ -93,7 +93,7 @@ def get_ServerState(server=None):
 
 def get_Daily(server=None, daily_next=None):
     daily = jx3_Daily.GetDaily(server, daily_next)
-    daily_info = daily.QueryTodayDaily()
+    daily_info = daily.get_daily()
     return daily_info
 
 

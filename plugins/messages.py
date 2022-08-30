@@ -22,12 +22,8 @@ import src.jx3_ServerState as ServerState
 import src.jx3_PersonHistory as PersonHistory
 import src.jx3_Daily as DailyInfo
 import src.jx3_Adventure as jx3_Adventure
+import src.jx3_Fireworks as jx3_Fireworks
 
-logger.add("logs/error.log",
-           rotation="00:00",
-           diagnose=False,
-           level="ERROR",
-           format=default_format)
 
 RoleJJCRecord = on_command("RoleJJCRecord", rule=keyword("战绩", "JJC信息"), aliases={"战绩", "JJC信息"}, priority=5)
 JJCTop = on_command("JJCTop", rule=keyword("JJC趋势图"), aliases={"JJC趋势图"}, priority=5)
@@ -37,6 +33,7 @@ AllServerState = on_command("AllServerState", rule=keyword("区服"), aliases={"
 PersonInfo = on_command("PersonInfo", rule=keyword("角色"), aliases={"角色"}, priority=5)
 Daily = on_command("Daily", rule=keyword("日常"), aliases={"日常"}, priority=5)
 Adventure = on_command("Adventure", rule=keyword("奇遇"), aliases={"奇遇"}, priority=5)
+Fireworks = on_command("Fireworks", rule=keyword("烟花"), aliases={"烟花"}, priority=5)
 
 
 @RoleJJCRecord.handle()
@@ -46,17 +43,17 @@ async def onMessage_RoleJJCRecord(matcher: Matcher, args: Message = CommandArg()
         if plain_text.find(" ") != -1:
             plain_text = re.sub(r'[ ]+', ' ', plain_text)
             server = plain_text.split(" ")[0]
-            serverRight = jx3Data.mainServer(server)
-            if serverRight is not None:
-                roleName = plain_text.split(" ")[1]
-                jjcRecord = JJCRecord.GetPersonRecord(roleName, server)
-                res = await jjcRecord.get_person_record()
+            server_right = jx3Data.mainServer(server)
+            if server_right is not None:
+                role_name = plain_text.split(" ")[1]
+                jjc_record = JJCRecord.GetPersonRecord(role_name, server)
+                res = await jjc_record.get_person_record()
                 if res is not None:
-                    msg = MessageSegment.image(f"file:///tmp/role{roleName}.png")
+                    msg = MessageSegment.image(f"file:///tmp/role{role_name}.png")
                     await RoleJJCRecord.finish(msg)
                 else:
-                    nonebot.logger.error(f"{roleName} JJC战绩查询不存在,请重试")
-                    await RoleJJCRecord.reject(f"{server} {roleName} JJC战绩查询不存在,请重试")
+                    nonebot.logger.error(f"{role_name} JJC战绩查询不存在,请重试")
+                    await RoleJJCRecord.reject(f"{server} {role_name} JJC战绩查询不存在,请重试")
             else:
                 nonebot.logger.error(f"{server} 大区不存在,请重试")
     else:
@@ -227,6 +224,28 @@ async def onMessage_Adventure(matcher: Matcher, args: Message = CommandArg()):
     else:
         nonebot.logger.error("请求错误,请参考: 奇遇 区服 角色名")
         await Adventure.reject("请求错误,请参考: 奇遇 区服 角色名")
+
+@Fireworks.handle()
+async def onMessage_Fireworks(matcher: Matcher, args: Message = CommandArg()):
+    if args.extract_plain_text() != "":
+        plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
+        if plain_text.find(" ") != -1:
+            server = jx3Data.mainServer(re.split('[ ]+', plain_text)[0])
+            if server is not None:
+                user = re.split('[ ]+', plain_text)[1]
+                fireworks = jx3_Fireworks.Fireworks(server,user)
+                await fireworks.get_Fig()
+                msg = MessageSegment.image(f"file:///tmp/fireworks{user}.png")
+                await Fireworks.finish(msg)
+            else:
+                nonebot.logger.error("烟花获取大区信息填写失败，请重试")
+                await Fireworks.reject("烟花获取大区信息填写失败，请重试")
+        else:
+            nonebot.logger.error("烟花获取输入错误，请重试，参考：奇遇 区服 角色名")
+            await Fireworks.reject("烟花获取输入错误，请重试，参考：奇遇 区服 角色名")
+    else:
+        nonebot.logger.error("请求错误,请参考: 烟花 区服 角色名")
+        await Fireworks.reject("请求错误,请参考: 烟花 区服 角色名")
 #
 # @roleJJCRecord.got("role", prompt="你想查询哪个角色信息呢？")
 # async def handle_city(role: Message = Arg(), roleName: str = ArgPlainText("role")):

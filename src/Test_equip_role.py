@@ -24,7 +24,7 @@ api = API()
 matplotlib.rc("font", family='PingFang HK')
 
 
-class GetPersonInfo:
+class GetRoleEquip:
     def __init__(self, role: str, server: str):
         config = jxData.config
         self.role = role
@@ -33,8 +33,6 @@ class GetPersonInfo:
         self.database = database(config)
         self.role_id = None
         self.person_id = None
-        self.ts = None
-        self.xsk = None
         self.role_name = None
 
     async def main(self):
@@ -58,7 +56,16 @@ class GetPersonInfo:
             if response.code != 0:
                 nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
                 return None
-            return response.data
+            self.role_id = response.data[0]["role_id"]
+            self.server = response.data[0]["server"]
+            self.zone = response.data[0]["zone"]
+            print(response.data[0]["role_name"])
+
+            response = await api.mine_equip_get9role9equip(game_role_id=self.role_id,server=self.server,zone=self.zone)
+            if response.code != 0:
+                nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
+                return None
+            print(response.data)
 
         except Exception as e:
             nonebot.logger.error(e)
@@ -75,37 +82,12 @@ class GetPersonInfo:
             if not data:
                 nonebot.logger.error("获取用户信息失败，请查看问题.")
                 return None
-            server = None
-            fig, ax = plt.subplots(figsize=(8, 9), facecolor='white', edgecolor='white')
-            plt.style.use(dufte.style)
-            ax.axis([0, 10, 0, 10])
-            ax.axis('off')
-            for x, y in reversed(list(enumerate(data))):
-                self.role_name = y.get("role_name")
-                server = y.get("server")
-                pvp_type = y.get("pvp_type")
-                avg_grade = y.get("avg_grade")
-                total_mmr = y.get("total_mmr")
-                won = y.get("won") is True and "胜利" or "失败"
-                consume_time = time.strftime("%M分%S秒", gmtime(y.get("end_time") - y.get("start_time")))
-                start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(y.get("start_time")))
-                ax.text(0, x, f'{pvp_type}V{pvp_type}', verticalalignment='bottom', horizontalalignment='left',
-                        color='#404040')
-                ax.text(1, x, f'{avg_grade}段局 ', verticalalignment='bottom', horizontalalignment='left',
-                        color='#404040')
-                ax.text(2, x, f'{total_mmr}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
-                fontColor = won == "胜利" and 'blue' or 'red'
-                ax.text(3, x, f'{won}', verticalalignment='bottom', horizontalalignment='left', color=fontColor)
-                ax.text(4, x, f'{consume_time}', verticalalignment='bottom', horizontalalignment='left',
-                        color='#404040')
-                ax.text(6, x, f'{start_time}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
-            ax.set_title(server + " " + self.role_name + '  近10场JJC战绩', fontsize=19, color='#303030',
-                         fontweight="heavy",
-                         verticalalignment='top')
-            plt.savefig(f"/tmp/role{self.role_name}.png")
-            return self.role_name
         except Exception as e:
             nonebot.logger.error(e)
             nonebot.logger.error("获取用户信息失败，请查看报错.")
             traceback.print_exc()
             return None
+
+
+role_equip = GetRoleEquip("时南星", "姨妈")
+asyncio.run(role_equip.main())

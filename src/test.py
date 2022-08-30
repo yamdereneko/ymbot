@@ -1,244 +1,123 @@
-# import asyncio
-# import json
-# import traceback
-# import nonebot
-# import requests
-# import src.Data.jxDatas as jxData
-#
-# headers = jxData.headers
-#
-# async def get_xsk(data=None):
-#     try:
-#         data = json.dumps(data)
-#         res = requests.post(url="https://www.jx3api.com/token/calculate", data=data).json()
-#         return res['data']['ts'], res['data']['sk']
-#     except Exception as e:
-#         nonebot.logger.error(e)
-#         nonebot.logger.error("get_xsk失败，请查看问题.")
-#         traceback.print_exc()
-#
-#
-# async def get_person_history(person_id):
-#     # 准备请求参数
-#     try:
-#         if person_id is None:
-#             nonebot.logger.error("person_id 未获取到，返回空")
-#             return None
-#         param = {'person_id': str(person_id), "size": 20, "cursor": 0}
-#         ts, xsk = await get_xsk(param)  # 获取ts和xsk， data 字典可以传ts,不传自动生成
-#         param['ts'] = ts  # 给参数字典赋值ts参数
-#         param = json.dumps(param).replace(" ", "")  # 记得格式化，参数需要提交原始json，非已格式化的json
-#         headers['X-Sk'] = xsk  # 修改请求中的xsk
-#         data = requests.post(url="https://m.pvp.xoyo.com/mine/match/person-history", data=param,
-#                              headers=headers).json()
-#         print(data)
-#         return data
-#     except Exception as e:
-#         nonebot.logger.error(e)
-#         nonebot.logger.error("获取用户信息失败，请查看问题.")
-#         traceback.print_exc()
-#         return None
-#
-# asyncio.run(get_person_history("fccddb1df1b8401f81fded4640899fe6"))
+# -*- coding: utf-8 -*
 
-#
-#
-# import asyncio
-# import time
-# from playwright.async_api import async_playwright
-#
-# time_start = time.time()
-#
-# async def role_server(playwright, school):
-#     try:
-#         # 开启浏览器，默认设置浏览器引擎为chromium。
-#         browser = await playwright.chromium.launch(headless=True)
-#         context = await browser.new_context()
-#         page = await context.new_page()
-#         page.set_default_timeout(3000)
-#         # 进入网站去获取各个门派总号数
-#         await page.goto("https://jx3.seasunwbl.com/buyer?t=role")
-#         await page.click("text=更多筛选条件")
-#         await page.click("text=" + school)
-#         await page.click("[aria-label=\"icon\\: search\"] svg")
-#         await page.wait_for_timeout(2000)
-#
-#         dict_role = {}
-#
-#         # 查询成男号的数量
-#         if await page.locator("text=" + school).first.text_content() != "七秀坊":
-#             size = '成男'
-#             Total = await searchBodySize(page, size)
-#             dict_role[school+size] = Total
-#
-#         # 查询成女号的数量
-#         if await page.locator("text=" + school).first.text_content() != "少林寺":
-#             size = '成女'
-#             Total = await searchBodySize(page, size)
-#             dict_role[school+size] = Total
-#
-#         # 查询萝莉号数量
-#         if await page.locator("text=" + school).first.text_content() != "少林寺":
-#             size = '萝莉'
-#             Total = await searchBodySize(page, size)
-#             dict_role[school+size] = Total
-#
-#         # 查询正太号数量
-#         size = '正太'
-#         Total = await searchBodySize(page, size)
-#         dict_role[school+size] = Total
-#
-#         await context.close()
-#         await browser.close()
-#         print(dict_role)
-#         return dict_role
-#     except Exception as e:
-#         print("门派获取失败")
-#         print(e)
-#
-#
-# async def searchBodySize(page, size):
-#     await page.wait_for_load_state('domcontentloaded')
-#     await page.click("text=" + size)
-#     await page.click("text=查询")
-#     await page.wait_for_timeout(1000)
-#     await page.wait_for_load_state('domcontentloaded')
-#     if not await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li[9]").is_visible(timeout=2000):
-#         for i in range(7, 2, -1):
-#             if await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li["+str(i)+"]").is_visible(timeout=2000):
-#                 await page.wait_for_timeout(500)
-#                 size_count = await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li["+str(i)+"]").text_content()
-#                 await page.wait_for_timeout(500)
-#                 await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li["+str(i)+"]").click()
-#                 await page.wait_for_timeout(500)
-#                 rows = await page.locator("div.app-web-components-role-item-styles-index-m__roleItem--1R4F8").all_text_contents()
-#                 sizeCount = (int(size_count) - 1) * 10 + len(rows)
-#                 await page.wait_for_timeout(200)
-#                 await page.locator("text=" + size).click()
-#                 return sizeCount
-#         rows = await page.locator("div.app-web-components-role-item-styles-index-m__roleItem--1R4F8").all_text_contents()
-#         sizeCount = len(rows)
-#         return sizeCount
-#     elif int(await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li[9]").text_content()) < 10:
-#         for i in range(11, 2, -1):
-#             await page.wait_for_timeout(500)
-#             if not await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li["+str(i)+"]").is_visible(timeout=2000):
-#                 continue
-#             elif await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li["+str(i)+"]").text_content() == "下一页":
-#                 continue
-#             else:
-#                 await page.wait_for_timeout(500)
-#                 size_count = await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li["+str(i)+"]").text_content()
-#                 await page.wait_for_timeout(500)
-#                 await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li["+str(i)+"]").click()
-#                 await page.wait_for_timeout(500)
-#                 rows = await page.locator("div.app-web-components-role-item-styles-index-m__roleItem--1R4F8").all_text_contents()
-#                 sizeCount = (int(size_count) - 1) * 10 + len(rows)
-#                 await page.wait_for_timeout(200)
-#                 await page.locator("text=" + size).click()
-#                 return sizeCount
-#     else:
-#         await page.wait_for_timeout(500)
-#         size_count = await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li[9]").text_content()
-#         await page.wait_for_timeout(500)
-#         await page.locator("//*[@id='app']/div/div[3]/div/div[3]/div[4]/ul/li[9]").click()
-#         await page.wait_for_timeout(500)
-#         rows = await page.locator("div.app-web-components-role-item-styles-index-m__roleItem--1R4F8").all_text_contents()
-#         sizeCount = (int(size_count) - 1) * 10 + len(rows)
-#         await page.wait_for_timeout(200)
-#         await page.locator("text=" + size).click()
-#         return sizeCount
-#
-# async def role(school):
-#     async with async_playwright() as playwright:
-#         role_choose = await role_server(playwright, school)
-#     return role_choose
-#
-# print(asyncio.run(role("大侠")))
-# time_end = time.time()
-# time_sum = time_start - time_end
-# print(time_sum)
+"""
+@Software : PyCharm
+@File : 0.py
+@Author : 喵
+@Time : 2021/09/29 22:39:29
+@Docs : 请求推栏战绩例子
+"""
 import asyncio
-import json
-import re
-from contextlib import closing, suppress
-#
-# text = """金鸾喻情	老猹子@梦江南	小卫兰@梦江南	侠客岛
-# 2022-08-18 22:43:06
-#
-# 真橙之心	小卫兰@梦江南	老猹子@梦江南	成都
-# 2022-08-11 21:13:03
-#
-# 慕佳期	小焦迈奇	老猹子@梦江南	苍云
-# 2022-08-06 18:06:34
-#
-# 吹落心雨	小焦迈奇	老猹子@梦江南	苍云
-# 2022-08-06 18:06:14
-#
-# 此间心同	小焦迈奇	老猹子@梦江南	苍云
-# 2022-08-06 18:06:11
-#
-# 岁星流金	小焦迈奇	老猹子@梦江南	苍云
-# 2022-08-06 18:06:07
-#
-# 山河回响	老猹子@梦江南	小焦迈奇	苍云
-# 2022-08-06 18:01:39
-#
-# 任行逍遥	老猹子@梦江南	小焦迈奇	苍云
-# 2022-08-06 18:01:37
-#
-# 任行逍遥	老猹子@梦江南	小焦迈奇	苍云
-# 2022-08-06 18:01:35
-#
-# 鹊桥引仙	老猹子@梦江南	小焦迈奇	苍云
-# 2022-08-06 18:01:34
-#
-# 万家灯火	老猹子@梦江南	小焦迈奇	苍云
-# 2022-08-06 18:01:32
-#
-# 海誓山盟	老猹子@梦江南	小疏竹	成都
-# 2022-08-04 22:45:01
-#
-# 山河回响	老猹子@梦江南	甜酒酿汤圆2@梦江南	成都
-# 2022-08-04 22:42:25
-#
-# 任行逍遥	甜酒酿汤圆2@梦江南	老猹子@梦江南	成都
-# 2022-08-04 22:41:59
-#
-# 福倒了	甜酒酿汤圆2@梦江南	老猹子@梦江南	成都
-# 2022-08-04 22:41:57
-#
-# 海誓山盟	老猹子@梦江南	甜酒酿汤圆2@梦江南	成都
-# 2022-08-04 22:37:47
-# """
+
+import nonebot
+from src.internal.tuilanapi import API
+import src.Data.jxDatas as jxData
+from src.Data.database import DataBase as database
+
+# 请求头
+headers = jxData.headers
+api = API()
 
 
-# async def check_serendipity():
-#     role_info_list = [i for i in re.split("[\t\n]", text) if i != ""]
-#     actions = ["烟花", "赠方", "收方", "地图", "时间"]
-#     role_list = []
-#     role_set = {}
-#
-#     while True:
-#         if len(role_info_list) == 0:
-#             break
-#         for action in actions:
-#             role_set[action] = role_info_list.pop(0)
-#         role_list.append(role_set)
-#         role_set = {}
-#     print(role_list)
-#
-#
-# asyncio.run(check_serendipity())
-import asyncio
-import httpx
+class GetJJCTop200Record:
+    def __init__(self, weekly: int):
+        config = jxData.config
+        self.weekly = weekly
+        self.server = None
+        self.zone = jxData.mainZone(self.server)
+        self.database = database(config)
+        self.role_id = None
+        self.global_role_id = None
+        self.person_id = None
+
+    async def get_top200_history(self):
+        # 准备请求参数
+        response = await api.cc_mine_arena_top200(typeName='week', tag=self.weekly, heiMaBang=False)
+        if response.code != 0:
+            nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
+            return None
+        data = response.data
+
+        school_top = {}
+
+        for i in jxData.all_school.keys():
+            school_top[i] = 0
+        failure_list = []
+
+        for element in data:
+            school = element.get("personInfo").get("force")
+            name = element.get("personInfo").get("roleName")
+            self.role_id = element.get("personInfo").get("gameRoleId")
+            self.server = element.get("personInfo").get("server")
+            self.zone = element.get("personInfo").get("zone")
+            self.person_id = element.get("personId")
+            if school in jxData.much_school:
+                response = await api.role_indicator(role_id=self.role_id, server=self.server, zone=self.zone)
+                if response.code != 0 or response.data == '':
+                    nonebot.logger.error("role_indicator获取信息失败，请查看错误")
+                    continue
+                self.global_role_id = response.data["role_info"]["global_role_id"]
+                if self.global_role_id is None:
+                    failure_list.append(element)
+                    print(self.role_id + " " + school + " " + self.server + " " + self.zone + " " + name + " 不存在")
+                    response = await api.mine_match_person9history(person_id=str(self.person_id), size=10, cursor=0)
+                    if response.code != 0:
+                        nonebot.logger.error("mine_match_person-history获取信息失败，请查看错误")
+                        continue
+                    person_history = response.data
+                    if person_history is not None:
+                        continue_name = person_history[0].get("role_name")
+                        print("continueName:" + continue_name)
+                        if name == continue_name:
+                            continue_kungfu = person_history[0].get("kungfu")
+                            value = jxData.school_pinyin[continue_kungfu]
+                            school_top[value] = school_top.get(value, 0) + 1
+                            print("重新进行添加：" + continue_name)
+                            continue
+                    continue
+
+                response = await api.cc_mine_match_history(global_role_id=self.global_role_id, size=10, cursor=0)
+                if response.code != 0:
+                    nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
+                    continue
+                jjc_record = response.data
+                if jjc_record is None:
+                    print(self.role_id + " " + school + " " + self.server + " " + self.zone + " 战绩不存在")
+                    failure_list.append(element)
+                    continue
+                kungfu = jjc_record[1].get("kungfu")
+                if kungfu in jxData.school_pinyin:
+                    value = jxData.school_pinyin[kungfu]
+                    school_top[value] = school_top.get(value, 0) + 1
+            else:
+                school_top[school] = school_top.get(school, 0) + 1
+        print(failure_list)
+        print(school_top)
+        return school_top
+
+    async def main(self):
+        # 获取所有的数据进行处理
+        data = await self.get_top200_history()
+        print(data)
+        # 判断连接池数据是否冲突
+        sql = "select week from JJC_rank_weekly"
+        await self.database.connect()
+        weekly = await self.database.fetchall(sql)
+        for week in weekly:
+            if week.get("week") == self.weekly:
+                print("该周数据已存在...")
+                return None
+
+        sql = "insert into JJC_rank_weekly (week, 霸刀, 藏剑, 蓬莱, 无方,云裳,花间,少林,惊羽,丐帮,苍云,紫霞,相知,补天,凌雪,明教,毒经,灵素,天策,田螺,胎虚,离经,莫问,衍天,冰心) values ('%s','%s','%s',%s,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+            self.weekly, data["霸刀"], data["藏剑"], data["蓬莱"], data["无方"], data["云裳"], data["花间"], data["少林"], data["惊羽"],
+            data["丐帮"], data["苍云"], data["紫霞"], data["相知"], data["补天"], data["凌雪阁"], data["明教"], data["毒经"], data["灵素"],
+            data["天策"], data["田螺"], data["胎虚"], data["离经"], data["莫问"], data["衍天宗"], data["冰心"])
+        print(sql)
+        if sum(data.values()) == 200:
+            await self.database.execute(sql)
+        else:
+            print("门派汇总的人数不到正确值，请人工处理错误信息...")
 
 
-async def main():
-    async with httpx.AsyncClient() as client:
-        param = {'server': "斗转星移", 'next': 1}
-        response = await client.get('https://www.jx3api.com/app/daily',params=param)
-        print(response.json())
-
-
-asyncio.run(main())
+jjctop = GetJJCTop200Record(35)
+asyncio.run(jjctop.get_top200_history())
