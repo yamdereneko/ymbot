@@ -100,7 +100,7 @@ async def main(servers: List[str]) -> None:
 async def run_daily():
     bot, = get_bots().values()
     daily = jx3_Daily.GetDaily()
-    await daily.QueryDailyFigure()
+    await daily.query_daily_figure()
     nonebot.logger.info("日常播报已正常播报")
     msg = MessageSegment.image(f"file:///tmp/daily斗转星移0.png")
     for group_id in group_list:
