@@ -65,3 +65,12 @@ class API:
             * `server`：服务器名
             * `next`: 可选，查询天数，默认为0
         """
+    async def cc_mine_match_detail(self, *, match_id: int = ...) -> Response:
+        """
+        说明：
+            今天、明天、后天等的日常任务，七点自动更新。
+
+        参数：
+            * `server`：服务器名
+            * `next`: 可选，查询天数，默认为0
+        """
