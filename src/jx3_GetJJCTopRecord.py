@@ -57,7 +57,7 @@ class GetJJCTopInfo:
             y = []
             ax.set_xlabel('周', fontsize=16)
             ax.set_ylabel('数量', fontsize=16)
-            ax.set_title("推栏" + str(self.school) + "JJC前200趋势图", fontsize=18)
+            ax.set_title(f"推栏" + str(self.school) + f"JJC{self.table}趋势图", fontsize=18)
             for data in res:
                 x.append(data["week"])
                 y.append(data[self.school])

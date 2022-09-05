@@ -24,7 +24,6 @@ import src.jx3_Daily as DailyInfo
 import src.jx3_Adventure as jx3_Adventure
 import src.jx3_Fireworks as jx3_Fireworks
 
-
 RoleJJCRecord = on_command("RoleJJCRecord", rule=keyword("战绩", "JJC信息"), aliases={"战绩", "JJC信息"}, priority=5)
 JJCTop = on_command("JJCTop", rule=keyword("JJC趋势图"), aliases={"JJC趋势图"}, priority=5)
 JJCTop50 = on_command("JJCTop50", rule=keyword("JJC50趋势图"), aliases={"JJC50趋势图"}, priority=5)
@@ -211,7 +210,7 @@ async def onMessage_Adventure(matcher: Matcher, args: Message = CommandArg()):
             server = jx3Data.mainServer(re.split('[ ]+', plain_text)[0])
             if server is not None:
                 user = re.split('[ ]+', plain_text)[1]
-                adventure = jx3_Adventure.Adventure(server,user)
+                adventure = jx3_Adventure.Adventure(server, user)
                 await adventure.get_Fig()
                 msg = MessageSegment.image(f"file:///tmp/adventure{user}.png")
                 await Adventure.finish(msg)
@@ -225,6 +224,7 @@ async def onMessage_Adventure(matcher: Matcher, args: Message = CommandArg()):
         nonebot.logger.error("请求错误,请参考: 奇遇 区服 角色名")
         await Adventure.reject("请求错误,请参考: 奇遇 区服 角色名")
 
+
 @Fireworks.handle()
 async def onMessage_Fireworks(matcher: Matcher, args: Message = CommandArg()):
     if args.extract_plain_text() != "":
@@ -233,7 +233,7 @@ async def onMessage_Fireworks(matcher: Matcher, args: Message = CommandArg()):
             server = jx3Data.mainServer(re.split('[ ]+', plain_text)[0])
             if server is not None:
                 user = re.split('[ ]+', plain_text)[1]
-                fireworks = jx3_Fireworks.Fireworks(server,user)
+                fireworks = jx3_Fireworks.Fireworks(server, user)
                 await fireworks.get_Fig()
                 msg = MessageSegment.image(f"file:///tmp/fireworks{user}.png")
                 await Fireworks.finish(msg)

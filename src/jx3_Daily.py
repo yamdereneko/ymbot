@@ -68,7 +68,6 @@ class GetDaily:
             ax.text(0.1, 0, f'「美人图」:{beautifulWoman}', verticalalignment='bottom', horizontalalignment='left',
                     color='#404040')
             plt.savefig(f"/tmp/daily{self.server}.png")
-            plt.show()
             return True
 
     async def query_weekly_daily(self):
