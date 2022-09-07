@@ -18,6 +18,8 @@ WORKDIR /app
 
 COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 
+RUN pip install --upgrade pip
+
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 RUN rm requirements.txt

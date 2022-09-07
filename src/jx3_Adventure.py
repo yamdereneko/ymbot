@@ -9,6 +9,7 @@ from contextlib import closing, suppress
 from matplotlib import pyplot as plt
 from playwright.async_api import async_playwright
 
+
 class Adventure:
     def __init__(self, server, user):
         self.server = jxData.mainServer(server)
@@ -52,7 +53,7 @@ class Adventure:
 
         role_list = []
         role_set = {}
-        actions = ["用户名","奇遇","时间"]
+        actions = ["用户名", "奇遇", "时间"]
         while True:
             if len(role_info_list) == 0:
                 break
@@ -100,4 +101,3 @@ class Adventure:
             nonebot.logger.error("获取用户信息失败，请查看报错.")
             traceback.print_exc()
             return None
-

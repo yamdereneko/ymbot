@@ -23,6 +23,7 @@ import src.jx3_PersonHistory as PersonHistory
 import src.jx3_Daily as DailyInfo
 import src.jx3_Adventure as jx3_Adventure
 import src.jx3_Fireworks as jx3_Fireworks
+import src.jx3_Multifunction as jx3_Multifunction
 
 RoleJJCRecord = on_command("RoleJJCRecord", rule=keyword("战绩", "JJC信息"), aliases={"战绩", "JJC信息"}, priority=5)
 JJCTop = on_command("JJCTop", rule=keyword("JJC趋势图"), aliases={"JJC趋势图"}, priority=5)
@@ -33,6 +34,9 @@ PersonInfo = on_command("PersonInfo", rule=keyword("角色"), aliases={"角色"}
 Daily = on_command("Daily", rule=keyword("日常"), aliases={"日常"}, priority=5)
 Adventure = on_command("Adventure", rule=keyword("奇遇"), aliases={"奇遇"}, priority=5)
 Fireworks = on_command("Fireworks", rule=keyword("烟花"), aliases={"烟花"}, priority=5)
+SaoHua = on_command("SaoHua", rule=keyword("骚话"), aliases={"骚话"}, priority=5)
+Strategy = on_command("Strategy", rule=keyword("奇遇攻略"), aliases={"奇遇攻略"}, priority=5)
+Require = on_command("Require", rule=keyword("奇遇前置"), aliases={"奇遇前置"}, priority=5)
 
 
 @RoleJJCRecord.handle()
@@ -189,7 +193,6 @@ async def onMessage_Daily(matcher: Matcher, args: Message = CommandArg()):
                     case _:
                         day = 0
                 daily = DailyInfo.GetDaily(server, day)
-                daily_info = await daily.get_daily()
                 state = await daily.query_daily_figure()
                 if state is True:
                     msg = MessageSegment.image(f"file:///tmp/daily{server}.png")
@@ -248,7 +251,41 @@ async def onMessage_Fireworks(matcher: Matcher, args: Message = CommandArg()):
     else:
         nonebot.logger.error("请求错误,请参考: 烟花 区服 角色名")
         await Fireworks.reject("请求错误,请参考: 烟花 区服 角色名")
-#
+
+
+# 骚话部分
+@SaoHua.handle()
+async def onMessage_SaoHua():
+    saohua = await jx3_Multifunction.get_random()
+    msg = MessageSegment.text(saohua['text'])
+    await SaoHua.finish(msg)
+
+
+@Strategy.handle()
+async def onMessage_Strategy(matcher: Matcher, args: Message = CommandArg()):
+    if args.extract_plain_text() != "":
+        plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
+        strategy = await jx3_Multifunction.get_strategy(plain_text)
+        image_url = strategy['url']
+        msg = MessageSegment.image(image_url)
+        await Strategy.finish(msg)
+    else:
+        nonebot.logger.error("请求错误,请参考: 奇遇攻略 奇遇名")
+        await Strategy.reject("请求错误,请参考: 奇遇攻略 奇遇名")
+
+
+@Require.handle()
+async def onMessage_Strategy(matcher: Matcher, args: Message = CommandArg()):
+    if args.extract_plain_text() != "":
+        plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
+        require = await jx3_Multifunction.get_require(plain_text)
+        image_url = require['upload']
+        msg = MessageSegment.image(image_url)
+        await Require.finish(msg)
+    else:
+        nonebot.logger.error("请求错误,请参考: 奇遇前置 奇遇名")
+        await Require.reject("请求错误,请参考: 奇遇前置 奇遇名")
+
 # @roleJJCRecord.got("role", prompt="你想查询哪个角色信息呢？")
 # async def handle_city(role: Message = Arg(), roleName: str = ArgPlainText("role")):
 #     await roleJJCRecord.reject(role.template("你想查询的角色 {role} 暂不支持，请重新输入！"))
