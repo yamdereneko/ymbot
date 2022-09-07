@@ -1,7 +1,6 @@
 import asyncio
 import traceback
 import dufte
-import matplotlib
 import nonebot
 import src.Data.jxDatas as jxData
 import json
@@ -9,9 +8,6 @@ import re
 from contextlib import closing, suppress
 from matplotlib import pyplot as plt
 from playwright.async_api import async_playwright
-
-matplotlib.rc("font", family='PingFang HK')
-
 
 class Adventure:
     def __init__(self, server, user):
@@ -31,9 +27,9 @@ class Adventure:
             await page.locator(f"text={self.zone}").click()
             await page.locator("text=服务器").click()
             await page.locator(f"text={self.server}").click()
-            await page.locator("[placeholder=\"在此输入角色名字，按回车键或点击查询\"]").click()
-            await page.locator("[placeholder=\"在此输入角色名字，按回车键或点击查询\"]").fill(self.user)
-            await page.locator("[placeholder=\"在此输入角色名字，按回车键或点击查询\"]").press("Enter")
+            await page.locator("[placeholder=\"在此输入角色名字，按回车键搜索\\.\\.\\.\"]").click()
+            await page.locator("[placeholder=\"在此输入角色名字，按回车键搜索\\.\\.\\.\"]").fill(self.user)
+            await page.locator("[placeholder=\"在此输入角色名字，按回车键搜索\\.\\.\\.\"]").press("Enter")
             await page.wait_for_load_state("domcontentloaded")
             task = await page.locator('tbody.ant-table-tbody').inner_text()
             # ---------------------
@@ -45,7 +41,7 @@ class Adventure:
         task = await self.query_user_info()
         role_info_list = [i for i in re.split("[\t\n]", str(task)) if i != ""]
         with closing(
-                open("sec/Data/serendipity.json")
+                open("src/Data/serendipity.json")
         ) as resp:
             serendipity_json = json.load(resp)
 

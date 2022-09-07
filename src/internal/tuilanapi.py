@@ -56,6 +56,6 @@ class API:
 
     def __getattr__(self, name: str) -> _ApiCall:
         # 拼接url
-        logger.debug(f"<y>推栏API请求功能:</y> | {name.replace('cc', '3c').replace('9', '-')}")
         url = "https://m.pvp.xoyo.com/" + name.replace("_", "/").replace("cc", "3c").replace('9', '-')
+        logger.debug(f"<y>推栏API请求功能:</y> | {url}")
         return partial(self.call_api, url)

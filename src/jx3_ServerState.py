@@ -17,8 +17,6 @@ import json
 import src.Data.jxDatas as jxData
 from matplotlib import pyplot as plt
 
-matplotlib.rc("font", family='PingFang HK')
-
 # 请求头
 headers = jxData.headers
 

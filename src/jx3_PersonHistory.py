@@ -21,7 +21,6 @@ from src.internal.tuilanapi import API
 # 请求头
 
 api = API()
-matplotlib.rc("font", family='PingFang HK')
 
 
 class GetPersonInfo:

@@ -7,8 +7,6 @@ from src.Data.database import DataBase as database
 import dufte
 from matplotlib.ticker import MultipleLocator
 
-matplotlib.rc("font", family='PingFang HK')
-
 
 class GetJJCTopInfo:
     def __init__(self, table: str, weekly: int, school: str):

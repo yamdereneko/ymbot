@@ -7,8 +7,6 @@ import src.Data.jxDatas as jxData
 from matplotlib import pyplot as plt
 from playwright.async_api import async_playwright
 
-matplotlib.rc("font", family='PingFang HK')
-
 
 class Fireworks:
     def __init__(self, server, user):

@@ -176,10 +176,9 @@ async def onMessage_Daily(matcher: Matcher, args: Message = CommandArg()):
         plain_text = args.extract_plain_text()
         if plain_text.find(" ") != -1:
             plain_text = re.sub(r'[ ]+', ' ', plain_text)
-            server = jx3Data.mainServer(plain_text.split(" ")[0])
+            server = jx3Data.mainServer(plain_text.split(" ")[1])
             if server is not None:
-                daily_date = plain_text.split(" ")[1]
-                day = 0
+                daily_date = plain_text.split(" ")[0]
                 match daily_date:
                     case "明天":
                         day = 1
@@ -187,7 +186,10 @@ async def onMessage_Daily(matcher: Matcher, args: Message = CommandArg()):
                         day = 2
                     case "大后天" | "第三天":
                         day = 3
+                    case _:
+                        day = 0
                 daily = DailyInfo.GetDaily(server, day)
+                daily_info = await daily.get_daily()
                 state = await daily.query_daily_figure()
                 if state is True:
                     msg = MessageSegment.image(f"file:///tmp/daily{server}.png")

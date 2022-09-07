@@ -9,7 +9,6 @@
 """
 import asyncio
 import time
-import matplotlib
 import matplotlib.pyplot as plt
 import nonebot
 import src.Data.jxDatas as jxData
@@ -19,7 +18,6 @@ from time import gmtime
 from src.Data.database import DataBase as database
 
 # 请求头
-matplotlib.rc("font", family='PingFang HK')
 api = API()
 
 
@@ -68,20 +66,21 @@ class GetPersonRecord:
         ax.set_title("斗转星移  " + self.role + '  近10场JJC战绩', fontsize=19, color='#303030', fontweight="heavy",
                      verticalalignment='top')
         ax.axis('off')
-        for x, y in reversed(list(enumerate(record))):
+        for x, y in enumerate(record):
+            floor = len(record) - x - 1
             pvp_type = y.get("pvp_type")
             avg_grade = y.get("avg_grade")
             total_mmr = y.get("total_mmr")
             won = y.get("won") is True and "胜利" or "失败"
             consume_time = time.strftime("%M分%S秒", gmtime(y.get("end_time") - y.get("start_time")))
             start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(y.get("start_time")))
-            ax.text(0, x, f'{pvp_type}V{pvp_type}', verticalalignment='bottom', horizontalalignment='left',
+            ax.text(0, floor, f'{pvp_type}V{pvp_type}', verticalalignment='bottom', horizontalalignment='left',
                     color='#404040')
-            ax.text(1, x, f'{avg_grade}段局 ', verticalalignment='bottom', horizontalalignment='left', color='#404040')
-            ax.text(2, x, f'{total_mmr}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
+            ax.text(1, floor, f'{avg_grade}段局 ', verticalalignment='bottom', horizontalalignment='left', color='#404040')
+            ax.text(2, floor, f'{total_mmr}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
             font_color = won == "胜利" and 'blue' or 'red'
-            ax.text(3, x, f'{won}', verticalalignment='bottom', horizontalalignment='left', color=font_color)
-            ax.text(4, x, f'{consume_time}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
-            ax.text(6, x, f'{start_time}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
+            ax.text(3, floor, f'{won}', verticalalignment='bottom', horizontalalignment='left', color=font_color)
+            ax.text(4, floor, f'{consume_time}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
+            ax.text(6, floor, f'{start_time}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
         plt.savefig(f"/tmp/role{self.role}.png")
         return record

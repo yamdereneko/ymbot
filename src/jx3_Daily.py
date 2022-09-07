@@ -7,6 +7,7 @@
 @Time : 2021/09/29 22:39:29
 @Docs : 请求推栏战绩例子
 """
+import asyncio
 import os
 import matplotlib
 import matplotlib.pyplot as plt
@@ -16,9 +17,9 @@ import dufte
 from src.internal.jx3api import API
 
 # 请求头
-matplotlib.rc("font", family='PingFang HK')
-
 api = API()
+
+
 class GetDaily:
     def __init__(self, server: str = "姨妈", daily_next: int = 0):
         self.server = jxData.mainServer(server)
@@ -28,47 +29,43 @@ class GetDaily:
             self.daily_next = 0
 
     async def get_daily(self):
-        response = await api.app_daily(server=self.server)
+        response = await api.app_daily(server=self.server,next=self.daily_next)
         if response.code != 200:
             nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
             return None
         return response.data
 
     async def query_daily_figure(self):
-        if os.path.exists(f"/tmp/daily{self.server}.png"):
-            nonebot.logger.info("日常图已经存在")
-            return True
-        else:
-            data = await self.get_daily()
-            if data is None:
-                nonebot.logger.error(self.server + "日常未得到，将返回None")
-                return None
-            team = ":".join(data.get("team"))
-            fig, ax = plt.subplots(figsize=(8, 9), facecolor='white', edgecolor='white')
-            plt.style.use(dufte.style)
-            ax.axis([0, 2, 0, 4])
-            ax.set_title(f'今天是{data.get("date")},星期{data.get("week")}', fontsize=19, color='#303030', fontweight="heavy",
-                         verticalalignment='top')
-            ax.axis('off')
-            ax.text(0.1, 3.5, f'「大战」:{data.get("war")}', verticalalignment='bottom', horizontalalignment='left',
-                    color='#404040')
-            ax.text(0.1, 3, f'「战场」:{data.get("battle")}', verticalalignment='bottom', horizontalalignment='left',
-                    color='#404040')
-            ax.text(0.1, 2.5, f'「阵营日常」:{data.get("camp")}', verticalalignment='bottom', horizontalalignment='left',
-                    color='#404040')
-            ax.text(0.1, 2, f'「驰援」:{data.get("relief")}', verticalalignment='bottom', horizontalalignment='left',
-                    color='#404040')
-            ax.text(0.1, 1.5, f'「公共日常周常」:{team.split(":")[0]}', verticalalignment='bottom',
-                    horizontalalignment='left', color='#404040')
-            ax.text(0.1, 1, f'「5人周常副本」:{team.split(":")[1]}', verticalalignment='bottom',
-                    horizontalalignment='left', color='#404040')
-            ax.text(0.1, 0.5, f'「10人周常副本」:{team.split(":")[2]}', verticalalignment='bottom',
-                    horizontalalignment='left', color='#404040')
-            beautifulWoman = data.get("draw") is None and '无' or data.get("draw")
-            ax.text(0.1, 0, f'「美人图」:{beautifulWoman}', verticalalignment='bottom', horizontalalignment='left',
-                    color='#404040')
-            plt.savefig(f"/tmp/daily{self.server}.png")
-            return True
+        data = await self.get_daily()
+        if data is None:
+            nonebot.logger.error(self.server + "日常未得到，将返回None")
+            return None
+        team = ":".join(data.get("team"))
+        fig, ax = plt.subplots(figsize=(8, 9), facecolor='white', edgecolor='white')
+        plt.style.use(dufte.style)
+        ax.axis([0, 2, 0, 4])
+        ax.set_title(f'今天是{data.get("date")},星期{data.get("week")}', fontsize=19, color='#303030', fontweight="heavy",
+                     verticalalignment='top')
+        ax.axis('off')
+        ax.text(0.1, 3.5, f'「大战」:{data.get("war")}', verticalalignment='bottom', horizontalalignment='left',
+                color='#404040')
+        ax.text(0.1, 3, f'「战场」:{data.get("battle")}', verticalalignment='bottom', horizontalalignment='left',
+                color='#404040')
+        ax.text(0.1, 2.5, f'「阵营日常」:{data.get("camp")}', verticalalignment='bottom', horizontalalignment='left',
+                color='#404040')
+        ax.text(0.1, 2, f'「驰援」:{data.get("relief")}', verticalalignment='bottom', horizontalalignment='left',
+                color='#404040')
+        ax.text(0.1, 1.5, f'「公共日常周常」:{team.split(":")[0]}', verticalalignment='bottom',
+                horizontalalignment='left', color='#404040')
+        ax.text(0.1, 1, f'「5人周常副本」:{team.split(":")[1]}', verticalalignment='bottom',
+                horizontalalignment='left', color='#404040')
+        ax.text(0.1, 0.5, f'「10人周常副本」:{team.split(":")[2]}', verticalalignment='bottom',
+                horizontalalignment='left', color='#404040')
+        beautifulWoman = data.get("draw") is None and '无' or data.get("draw")
+        ax.text(0.1, 0, f'「美人图」:{beautifulWoman}', verticalalignment='bottom', horizontalalignment='left',
+                color='#404040')
+        plt.savefig(f"/tmp/daily{self.server}.png")
+        return True
 
     async def query_weekly_daily(self):
         response = await api.app_calculate(count=7)

@@ -17,12 +17,11 @@ import matplotlib.pyplot as plt
 import src.Data.jxDatas as jxData
 from src.Data.database import DataBase as database
 from src.internal.tuilanapi import API
+from matplotlib import font_manager
 
 # 请求头
 
 api = API()
-matplotlib.rc("font", family='PingFang HK')
-
 
 class GetPersonInfo:
     def __init__(self, role: str, server: str):
