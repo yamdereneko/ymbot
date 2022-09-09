@@ -70,5 +70,13 @@ class GetPersonInfo:
             nonebot.logger.error("获取用户信息失败，请查看问题.")
             traceback.print_exc()
             return None
-personInfo = GetPersonInfo("时南星","姨妈")
-asyncio.run(personInfo.main())
+# personInfo = GetPersonInfo("时南星","姨妈")
+# asyncio.run(personInfo.main())
+
+
+import matplotlib
+print(matplotlib.matplotlib_fname())
+
+for font in font_manager.fontManager.ttflist:
+    # 查看字体名以及对应的字体文件名
+    print(font.name, '-', font.fname)

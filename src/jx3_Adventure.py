@@ -1,4 +1,5 @@
 import asyncio
+import time
 import traceback
 import dufte
 import nonebot
@@ -94,8 +95,9 @@ class Adventure:
                         color='#404040', verticalalignment='top')
             ax.text(2, len(task) + 2, f'{self.user}', fontsize=16, color='#303030',
                     fontweight="heavy", verticalalignment='top', horizontalalignment='center')
-
-            plt.savefig(f"/tmp/adventure{self.user}.png")
+            datetime = int(time.time())
+            plt.savefig(f"/tmp/adventure{datetime}.png")
+            return datetime
         except Exception as e:
             nonebot.logger.error(e)
             nonebot.logger.error("获取用户信息失败，请查看报错.")

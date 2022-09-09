@@ -7,9 +7,8 @@
 @Time : 2021/09/29 22:39:29
 @Docs : 请求推栏战绩例子
 """
-import asyncio
-import os
-import matplotlib
+import time
+
 import matplotlib.pyplot as plt
 import nonebot
 import src.Data.jxDatas as jxData
@@ -29,7 +28,7 @@ class GetDaily:
             self.daily_next = 0
 
     async def get_daily(self):
-        response = await api.app_daily(server=self.server,next=self.daily_next)
+        response = await api.app_daily(server=self.server, next=self.daily_next)
         if response.code != 200:
             nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
             return None
@@ -64,8 +63,9 @@ class GetDaily:
         beautifulWoman = data.get("draw") is None and '无' or data.get("draw")
         ax.text(0.1, 0, f'「美人图」:{beautifulWoman}', verticalalignment='bottom', horizontalalignment='left',
                 color='#404040')
-        plt.savefig(f"/tmp/daily{self.server}.png")
-        return True
+        datetime = int(time.time())
+        plt.savefig(f"/tmp/daily{datetime}.png")
+        return datetime
 
     async def query_weekly_daily(self):
         response = await api.app_calculate(count=7)

@@ -76,11 +76,14 @@ class GetPersonRecord:
             start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(y.get("start_time")))
             ax.text(0, floor, f'{pvp_type}V{pvp_type}', verticalalignment='bottom', horizontalalignment='left',
                     color='#404040')
-            ax.text(1, floor, f'{avg_grade}段局 ', verticalalignment='bottom', horizontalalignment='left', color='#404040')
+            ax.text(1, floor, f'{avg_grade}段局 ', verticalalignment='bottom', horizontalalignment='left',
+                    color='#404040')
             ax.text(2, floor, f'{total_mmr}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
             font_color = won == "胜利" and 'blue' or 'red'
             ax.text(3, floor, f'{won}', verticalalignment='bottom', horizontalalignment='left', color=font_color)
-            ax.text(4, floor, f'{consume_time}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
+            ax.text(4, floor, f'{consume_time}', verticalalignment='bottom', horizontalalignment='left',
+                    color='#404040')
             ax.text(6, floor, f'{start_time}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
-        plt.savefig(f"/tmp/role{self.role}.png")
-        return record
+        datetime = int(time.time())
+        plt.savefig(f"/tmp/record{datetime}.png")
+        return datetime

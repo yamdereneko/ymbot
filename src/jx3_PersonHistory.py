@@ -101,8 +101,9 @@ class GetPersonInfo:
             ax.set_title(server + " " + self.role_name + '  近10场JJC战绩', fontsize=19, color='#303030',
                          fontweight="heavy",
                          verticalalignment='top')
-            plt.savefig(f"/tmp/role{self.role_name}.png")
-            return self.role_name
+            datetime = int(time.time())
+            plt.savefig(f"/tmp/role{datetime}.png")
+            return datetime
         except Exception as e:
             nonebot.logger.error(e)
             nonebot.logger.error("获取用户信息失败，请查看报错.")

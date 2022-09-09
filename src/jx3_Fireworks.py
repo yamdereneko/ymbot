@@ -1,4 +1,5 @@
 import re
+import time
 import traceback
 import dufte
 import matplotlib
@@ -94,7 +95,9 @@ class Fireworks:
                         color='#404040', verticalalignment='top')
             ax.set_title(f'{self.user}', fontsize=16, color='#303030',
                          fontweight="heavy", verticalalignment='top', horizontalalignment='center')
-            plt.savefig(f"/tmp/fireworks{self.user}.png")
+            datetime = int(time.time())
+            plt.savefig(f"/tmp/fireworks{datetime}.png")
+            return datetime
         except Exception as e:
             nonebot.logger.error(e)
             nonebot.logger.error("获取用户信息失败，请查看报错.")

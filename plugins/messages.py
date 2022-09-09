@@ -52,7 +52,7 @@ async def onMessage_RoleJJCRecord(matcher: Matcher, args: Message = CommandArg()
                 jjc_record = JJCRecord.GetPersonRecord(role_name, server)
                 res = await jjc_record.get_person_record()
                 if res is not None:
-                    msg = MessageSegment.image(f"file:///tmp/role{role_name}.png")
+                    msg = MessageSegment.image(f"file:/tmp/record{res}.png")
                     await RoleJJCRecord.finish(msg)
                 else:
                     nonebot.logger.error(f"{role_name} JJC战绩查询不存在,请重试")
@@ -94,7 +94,7 @@ async def onMessage_JJCTop(matcher: Matcher, args: Message = CommandArg()):
                     jjcInfo = jx3JJCInfo.GetJJCTopInfo(table, 0, plain_text)
                     record_figure = await jjcInfo.get_JJCWeeklySchoolRecord()
                     if record_figure is not None:
-                        msg = MessageSegment.image(f"file:///tmp/schoolTop{jx3Data.school(plain_text)}.png")
+                        msg = MessageSegment.image(f"file:/tmp/schoolTop{jx3Data.school(plain_text)}.png")
                         await JJCTop.finish(msg)
                     else:
                         nonebot.logger.error("创建趋势图失败，请检查报错")
@@ -124,7 +124,7 @@ async def onMessage_PersonInfo(matcher: Matcher, args: Message = CommandArg()):
                 personInfo = PersonHistory.GetPersonInfo(roleName, server)
                 role_name = await personInfo.get_Fig()
                 if role_name is not None:
-                    msg = MessageSegment.image(f"file:///tmp/role{role_name}.png")
+                    msg = MessageSegment.image(f"file:/tmp/role{role_name}.png")
                     await PersonInfo.finish(msg)
                 else:
                     nonebot.logger.error("用户信息未成功获取，请重试")
@@ -165,7 +165,7 @@ async def onMessage_AllServerState(matcher: Matcher, args: Message = CommandArg(
         plain_text = args.extract_plain_text()
         all_serverState = ServerState.ServerState(plain_text)
         if await all_serverState.get_figure() is True:
-            msg = MessageSegment.image(f"file:///tmp/serverState.png")
+            msg = MessageSegment.image(f"file:/tmp/serverState.png")
             await AllServerState.finish(msg)
         else:
             nonebot.logger.error("全区服图未正常创建，请查看")
@@ -194,17 +194,20 @@ async def onMessage_Daily(matcher: Matcher, args: Message = CommandArg()):
                         day = 0
                 daily = DailyInfo.GetDaily(server, day)
                 state = await daily.query_daily_figure()
-                if state is True:
-                    msg = MessageSegment.image(f"file:///tmp/daily{server}.png")
+                if state is not None:
+                    msg = MessageSegment.image(f"file:/tmp/daily{state}.png")
                     await Daily.finish(msg)
         else:
             nonebot.logger.error("请求错误,请参考:日常 大区 明天")
-            await Daily.reject("请求错误,请参考:日常 大区 明天  ")
+            await Daily.reject("请求错误,请参考:日常 大区 明天")
     else:
         daily = DailyInfo.GetDaily()
-        await daily.query_daily_figure()
-        msg = MessageSegment.image(f"file:///tmp/daily斗转星移.png")
-        await Daily.finish(msg)
+        datetime = await daily.query_daily_figure()
+        if datetime is not None:
+            msg = MessageSegment.image(f"file:/tmp/daily{datetime}.png")
+            await Daily.finish(msg)
+        else:
+            await Daily.reject("日常请求失败")
 
 
 @Adventure.handle()
@@ -216,9 +219,10 @@ async def onMessage_Adventure(matcher: Matcher, args: Message = CommandArg()):
             if server is not None:
                 user = re.split('[ ]+', plain_text)[1]
                 adventure = jx3_Adventure.Adventure(server, user)
-                await adventure.get_Fig()
-                msg = MessageSegment.image(f"file:///tmp/adventure{user}.png")
-                await Adventure.finish(msg)
+                datetime = await adventure.get_Fig()
+                if datetime is not None:
+                    msg = MessageSegment.image(f"file:/tmp/adventure{datetime}.png")
+                    await Adventure.finish(msg)
             else:
                 nonebot.logger.error("奇遇获取大区信息填写失败，请重试")
                 await Adventure.reject("奇遇获取大区信息填写失败，请重试")
@@ -239,9 +243,10 @@ async def onMessage_Fireworks(matcher: Matcher, args: Message = CommandArg()):
             if server is not None:
                 user = re.split('[ ]+', plain_text)[1]
                 fireworks = jx3_Fireworks.Fireworks(server, user)
-                await fireworks.get_Fig()
-                msg = MessageSegment.image(f"file:///tmp/fireworks{user}.png")
-                await Fireworks.finish(msg)
+                datetime = await fireworks.get_Fig()
+                if datetime is not None:
+                    msg = MessageSegment.image(f"file:/tmp/fireworks{datetime}.png")
+                    await Fireworks.finish(msg)
             else:
                 nonebot.logger.error("烟花获取大区信息填写失败，请重试")
                 await Fireworks.reject("烟花获取大区信息填写失败，请重试")

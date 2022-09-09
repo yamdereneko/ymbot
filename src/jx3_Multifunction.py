@@ -40,18 +40,6 @@ async def get_require(name: str):
     return response.data
 
 
-async def next_recruit(server: str, keyword: str):
-    response = await api.next_recruit(server=server, keyword=keyword)
-    print(response.json())
-    if response.code != 200:
-        nonebot.logger.error("API接口next_recruit获取信息失败，请查看错误")
-        return None
-
-    return response.data
-
-asyncio.run(next_recruit('斗转星移','河阳'))
-
-
 class Multifunction:
     def __init__(self):
         print('调用多功能场景')
