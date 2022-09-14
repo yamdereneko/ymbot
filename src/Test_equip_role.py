@@ -34,7 +34,7 @@ class GetRoleEquip:
         self.person_id = None
         self.role_name = None
 
-    async def main(self):
+    async def equips(self):
         try:
             sql = "select id from InfoCache where name='%s'" % self.role
             await self.database.connect()
@@ -64,7 +64,7 @@ class GetRoleEquip:
             if response.code != 0:
                 nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
                 return None
-            print(response.data)
+            return response.data
 
         except Exception as e:
             nonebot.logger.error(e)
@@ -74,13 +74,22 @@ class GetRoleEquip:
 
     async def get_Fig(self):
         try:
-            data = await self.main()
-            if data is None:
-                nonebot.logger.error("获取用户信息失败，请查看问题.")
-                return None
-            if not data:
-                nonebot.logger.error("获取用户信息失败，请查看问题.")
-                return None
+            data = await self.equips()
+            print(data)
+            equip = data['Equips']
+            for _ in equip:
+                print(_['Name'])
+                print(_['Quality'])
+
+            kungfu = data['Kungfu']
+            print(kungfu)
+
+            PersonalPanel = data['PersonalPanel']
+            print(PersonalPanel)
+
+            TotalEquipsScore = data['TotalEquipsScore']
+            print(TotalEquipsScore)
+
         except Exception as e:
             nonebot.logger.error(e)
             nonebot.logger.error("获取用户信息失败，请查看报错.")
@@ -88,5 +97,5 @@ class GetRoleEquip:
             return None
 
 
-role_equip = GetRoleEquip("时南星", "姨妈")
-asyncio.run(role_equip.main())
+role_equip = GetRoleEquip("小疏竹", "姨妈")
+asyncio.run(role_equip.get_Fig())

@@ -22,4 +22,4 @@ logger.add("logs/error.log",
 
 if __name__ == "__main__":
     nonebot.logger.warning("Always use `nb run` to start the bot instead of manually running!")
-    nonebot.run(app=app, host="0.0.0.0", port=8080)
+    nonebot.run(app=app, host="0.0.0.0", port=8081)
