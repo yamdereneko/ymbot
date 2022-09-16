@@ -59,15 +59,17 @@ class GetPersonRecord:
             nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
             return None
         record = response.data
+        return record
 
+    async def get_person_record_figure(self, data):
         fig, ax = plt.subplots(figsize=(8, 9), facecolor='white', edgecolor='white')
         plt.style.use(dufte.style)
         ax.axis([0, 10, 0, 10])
         ax.set_title("斗转星移  " + self.role + '  近10场JJC战绩', fontsize=19, color='#303030', fontweight="heavy",
                      verticalalignment='top')
         ax.axis('off')
-        for x, y in enumerate(record):
-            floor = len(record) - x - 1
+        for x, y in enumerate(data):
+            floor = len(data) - x - 1
             pvp_type = y.get("pvp_type")
             avg_grade = y.get("avg_grade")
             total_mmr = y.get("total_mmr")

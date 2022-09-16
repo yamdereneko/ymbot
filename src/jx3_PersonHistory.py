@@ -12,7 +12,6 @@ import traceback
 from time import gmtime
 import dufte
 import nonebot
-import matplotlib
 import matplotlib.pyplot as plt
 import src.Data.jxDatas as jxData
 from src.Data.database import DataBase as database
@@ -36,7 +35,7 @@ class GetPersonInfo:
         self.xsk = None
         self.role_name = None
 
-    async def main(self):
+    async def get_person_info(self):
         try:
             sql = "select id from InfoCache where name='%s'" % self.role
             await self.database.connect()
@@ -65,9 +64,8 @@ class GetPersonInfo:
             traceback.print_exc()
             return None
 
-    async def get_Fig(self):
+    async def get_Fig(self, data):
         try:
-            data = await self.main()
             if data is None:
                 nonebot.logger.error("获取用户信息失败，请查看问题.")
                 return None
