@@ -8,4 +8,6 @@ COPY ./ /app/
 
 WORKDIR /app
 
-CMD [ "python", "./bot.py" ]
+RUN chmod a+x start.sh
+
+CMD [ "./start.sh" ]
