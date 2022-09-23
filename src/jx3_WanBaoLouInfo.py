@@ -1,38 +1,36 @@
-import requests
-import pymysql
+import asyncio
+from httpx import AsyncClient
 import src.Data.jxDatas as jxData
-import datetime
-
-
-async def connect_Mysql(shape, shcool, role_sum):
-    try:
-        db = pymysql.connect(host="localhost", user="root", password="Qinhao123.", database="farbnamen", charset="utf8")
-        cursor = db.cursor()
-        now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        sql = "insert into wanbaolou_number (shape, school, quantity, time) values ('%s', '%s',%s,'%s')" % (shape, shcool, role_sum, now_time)
-        cursor.execute(sql)
-        db.commit()
-        cursor.fetchall()
-        db.close()
-    except Exception as e:
-        print(e)
-        print("连接数据库异常")
 
 
 async def request_api(size, school, page):
+    client = AsyncClient()
     bodyType = jxData.bodyType
+    role_experience_point = '100000' + "," + '1000000'
     school_type = jxData.school_number
-    url = "https://api-wanbaolou.xoyo.com/api/buyer/goods/list?game_id=jx3&filter%5Brole_sect%5D={0}&filter%5Brole_shape%5D={1}&game=jx3&page={2}&size=10&goods_type=2".format(
-        school_type[school], bodyType[size], page)
+    url = "https://api-wanbaolou.xoyo.com/api/buyer/goods/list?req_id=uMgUXwDzog9NvLr8DooaK88r1mT96RXL&game_id=jx3" \
+          "&zone_id=&server_id=&filter[account_type]=1&filter[price]=0&filter[state]=0&filter[tags]=0&filter[" \
+          "role_sect]={0}&filter[role_shape]={1}&filter[role_camp]=0&filter[role_equipment_point]=0&filter[" \
+          "role_experience_point]={3}&filter[role_level]=0&filter[role_appearance]=&filter[" \
+          "role_zixing_point]=0&filter[role_homeland_level]=0&game=jx3&page={2}&size=10&goods_type=2&sort[" \
+          "role_experience_point]=0".format(school_type[school], bodyType[size], page, role_experience_point)
+    # url = "https://api-wanbaolou.xoyo.com/api/buyer/goods/list?game_id=jx3&filter%5Brole_sect%5D={0}&filter%5Brole_shape%5D={1}&game=jx3&page={2}&size=10&goods_type=2&sort[role_experience_point]=0".format(
+    #     school_type[school], bodyType[size], page)
     payload = {}
     headers = {"Content-Type": "application/json"}
-    response = requests.get(url, headers=headers, data=payload)
+    response = await client.get(url=url, headers=headers, params=payload)
+    print(response)
+    if response.status_code != 200:
+        print('网站不能正确响应，请查看具体返回')
+    elif response.json()['code'] != 1:
+        print('网站不能正确响应，请查看具体返回')
+    print(response.json())
     return response.json()
 
 
 async def main(size, school, page: int = 1):
     man = await request_api(size, school, page)
-    if man.get("code") == -11:
+    if man.get('code') == -1:
         roles_dict = "-11"
         return roles_dict, 0
     # print(man.get("data").get("total_record"))
@@ -51,5 +49,5 @@ async def main(size, school, page: int = 1):
         # roles["服务器"] = role.get("info").split("-")[1]
         # roles["链接"] = "https://jx3.seasunwbl.com/role?consignment_id=" + role.get("consignment_id")
         roles_dict.append(role)
-    await connect_Mysql(size, school, role_sum)
+    print(roles_dict)
     return roles_dict, role_sum

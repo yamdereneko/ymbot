@@ -58,7 +58,6 @@ class AdventureModel(BaseModel):
     role: Union[str, None] = None
 
 
-
 # ************************************************
 # 代码实现部分 实际代码为异步
 
@@ -68,26 +67,26 @@ def roles(shape, school):
 
 
 def get_jjc_Record(role_name, server):
-    role_JJC_Record = JJCRecord.GetPersonRecord(role_name, server)
-    person_JJC_Record = role_JJC_Record.get_person_record()
-    return person_JJC_Record
+    role_jjc_record = JJCRecord.GetPersonRecord(role_name, server)
+    person_jjc_record = role_jjc_record.get_person_record()
+    return person_jjc_record
 
 
 def get_person_history(role_name, server):
     person_info = PersonInfo.GetPersonInfo(role_name, server)
-    person_history_res = person_info.main()
+    person_history_res = person_info.get_person_info()
     return person_history_res
 
 
 def get_JJCTop_Record(table, week):
-    jjcRecord = GetJJCTopRecord.GetJJCTopInfo(table, week, "")
-    jjcTopRecord = jjcRecord.get_JJCWeeklyRecord()
-    return jjcTopRecord
+    jjc_record = GetJJCTopRecord.GetJJCTopInfo(table, week, "")
+    jjc_top_record = jjc_record.get_JJCWeeklyRecord()
+    return jjc_top_record
 
 
 def get_ServerState(server=None):
-    State = ServerState.ServerState(server)
-    server_state = State.get_server_list()
+    state = ServerState.ServerState(server)
+    server_state = state.get_server_list()
     return server_state
 
 
@@ -217,6 +216,7 @@ async def daily_api(
         raise UnicornException(name=str(), content="日常查询失败")
     return {"code": 0, "msg": "success", "data": dailyInfo}
 
+
 # 奇遇信息查询
 @app.get("/jx3/adventure")
 async def adventure_api(
@@ -229,4 +229,3 @@ async def adventure_api(
         if adventure_info is None:
             raise UnicornException(name=str(), content="奇遇查询失败")
         return {"code": 0, "msg": "success", "data": adventure_info}
-

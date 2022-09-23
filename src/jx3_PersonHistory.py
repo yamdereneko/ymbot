@@ -85,7 +85,10 @@ class GetPersonInfo:
                 total_mmr = y.get("total_mmr")
                 won = y.get("won") is True and "胜利" or "失败"
                 consume_time = time.strftime("%M分%S秒", gmtime(y.get("end_time") - y.get("start_time")))
-                start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(y.get("start_time")))
+                if time.altzone == 0:
+                    start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(y.get("start_time") + 28800))
+                else:
+                    start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(y.get("start_time")))
                 ax.text(0, x, f'{pvp_type}V{pvp_type}', verticalalignment='bottom', horizontalalignment='left',
                         color='#404040')
                 ax.text(1, x, f'{avg_grade}段局 ', verticalalignment='bottom', horizontalalignment='left',

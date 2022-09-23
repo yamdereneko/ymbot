@@ -38,7 +38,9 @@ async def socket_connector(host: str, port: str, timeout: int = 3) -> bool:
             asyncio.open_connection(host, port), timeout=timeout
         )
         w.close()
+        monitoring.resume()
         return True
+    monitoring.pause()
     return False
 
 
@@ -88,13 +90,14 @@ async def main(servers: List[str]) -> None:
             server_set.add(server)
             tasks.append((server, host, port))
     nonebot.logger.info("开服监控已开启")
-    await asyncio.gather(*[check(*server) for server in tasks])
+    res = await asyncio.gather(*[check(*server) for server in tasks])
     msg = [msg_box(server) for server, _, _ in tasks]
 
     nonebot.logger.info(msg)
     bot, = get_bots().values()
     for group_id in group_list:
         await bot.send_group_msg(group_id=group_id, message=msg)
+    monitoring.shutdown()
 
 
 async def run_daily():
@@ -111,3 +114,4 @@ async def run_daily():
 def monitoringServer():
     asyncio.run(run_daily())
     asyncio.run(main(["斗转星移"]))
+

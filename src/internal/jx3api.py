@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+
 from typing import Any
 from functools import partial
-
+from src.Data.jxDatas import jx3api_ticket
 from loguru import logger
 from typing_extensions import Protocol
 from pydantic import BaseModel
@@ -35,7 +36,10 @@ class API:
     async def call_api(self, url: str, **data: Any) -> Response:
         """请求api网站数据"""
         try:
-            res = await self.client.get(url=url, params=data)
+            headers = {
+                'token': jx3api_ticket
+            }
+            res = await self.client.get(url=url, params=data, headers=headers)
             return Response.parse_obj(res.json())
         except Exception as e:
             logger.error(f"<y>JX3API请求出错：</y> | {str(e)}")

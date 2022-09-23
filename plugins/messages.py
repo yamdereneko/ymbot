@@ -15,6 +15,7 @@ from nonebot.rule import keyword
 from nonebot.matcher import Matcher
 from nonebot.adapters import Message
 from nonebot.params import CommandArg
+from src.Data.jxDatas import server_binding
 import src.Data.jx3_Redis as redis
 import src.Data.jxDatas as jx3Data
 import src.jx3_GetJJCTopRecord as jx3JJCInfo
@@ -25,6 +26,9 @@ import src.jx3_Daily as DailyInfo
 import src.jx3_Adventure as jx3_Adventure
 import src.jx3_Fireworks as jx3_Fireworks
 import src.jx3_Multifunction as jx3_Multifunction
+import src.jx3_Recruit as jx3_Recruit
+
+
 
 RoleJJCRecord = on_command("RoleJJCRecord", rule=keyword("战绩", "JJC信息"), aliases={"战绩", "JJC信息"}, priority=5)
 JJCTop = on_command("JJCTop", rule=keyword("JJC趋势图"), aliases={"JJC趋势图"}, priority=5)
@@ -38,6 +42,7 @@ Fireworks = on_command("Fireworks", rule=keyword("烟花"), aliases={"烟花"}, 
 SaoHua = on_command("SaoHua", rule=keyword("骚话"), aliases={"骚话"}, priority=5)
 Strategy = on_command("Strategy", rule=keyword("奇遇攻略"), aliases={"奇遇攻略"}, priority=5)
 Require = on_command("Require", rule=keyword("奇遇前置"), aliases={"奇遇前置"}, priority=5)
+Recruit = on_command("Recruit", rule=keyword("招募"), aliases={"招募"}, priority=5)
 
 
 @RoleJJCRecord.handle()
@@ -173,22 +178,22 @@ async def onMessage_PersonInfo(matcher: Matcher, args: Message = CommandArg()):
                 role_info = await person_info.get_person_info()
                 red = redis.Redis()
                 frame = f"/tmp/role{role}.png"
-                redis_person_data = await red.query('person_'+role)
+                redis_person_data = await red.query('person_' + role)
 
                 if redis_person_data:
                     res = json.loads(redis_person_data)
                     if res == role_info:
-                        await red.get_image('person_'+role+'_image', frame)
+                        await red.get_image('person_' + role + '_image', frame)
                         msg = MessageSegment.image('file:' + frame)
                         await PersonInfo.finish(msg)
                     else:
-                        await red.delete('person_'+role)
-                        await red.delete('person_'+role+'_image')
+                        await red.delete('person_' + role)
+                        await red.delete('person_' + role + '_image')
 
-                await red.add('person_'+role, role_info)
+                await red.add('person_' + role, role_info)
                 person_image = await person_info.get_Fig(role_info)
                 frame = f"/tmp/role{person_image}.png"
-                await red.insert_image('person_'+role+'_image', frame)
+                await red.insert_image('person_' + role + '_image', frame)
                 msg = MessageSegment.image('file:' + frame)
                 await PersonInfo.finish(msg)
             else:
@@ -267,35 +272,31 @@ async def onMessage_Adventure(matcher: Matcher, args: Message = CommandArg()):
         plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
         if plain_text.find(" ") != -1:
             server = jx3Data.mainServer(re.split('[ ]+', plain_text)[0])
-            if server:
-                user = re.split('[ ]+', plain_text)[1]
-                adventure = jx3_Adventure.Adventure(server, user)
-                user_adventure_data = await adventure.check_serendipity()
-                red = redis.Redis()
-                frame = f"/tmp/adventure{user}.png"
-                redis_adventure_data = await red.query('adventure_'+user)
-                if redis_adventure_data:
-                    res = json.loads(redis_adventure_data)
-                    if res == user_adventure_data:
-                        await red.get_image('adventure_'+user+'_image', frame)
-                        msg = MessageSegment.image('file:' + frame)
-                        await Adventure.finish(msg)
-                    else:
-                        await red.delete('adventure_'+user)
-                        await red.delete('adventure_'+user+'_image')
-
-                await red.add('adventure_'+user, user_adventure_data)
-                user_adventure_image = await adventure.get_Fig()
-                frame = f"/tmp/adventure{user_adventure_image}.png"
-                await red.insert_image('adventure_'+user+'_image', frame)
+            user = re.split('[ ]+', plain_text)[1]
+        else:
+            server = server_binding
+            user = plain_text
+        adventure = jx3_Adventure.Adventure(server, user)
+        user_adventure_data = await adventure.query_user_info()
+        red = redis.Redis()
+        frame = f"/tmp/adventure{user}.png"
+        redis_adventure_data = await red.query('adventure_' + user)
+        if redis_adventure_data:
+            res = json.loads(redis_adventure_data)
+            if res == user_adventure_data:
+                await red.get_image('adventure_' + user + '_image', frame)
                 msg = MessageSegment.image('file:' + frame)
                 await Adventure.finish(msg)
             else:
-                nonebot.logger.error("奇遇获取大区信息填写失败，请重试")
-                await Adventure.reject("奇遇获取大区信息填写失败，请重试")
-        else:
-            nonebot.logger.error("奇遇获取输入错误，请重试，参考：奇遇 区服 角色名")
-            await Adventure.reject("奇遇获取输入错误，请重试，参考：奇遇 区服 角色名")
+                await red.delete('adventure_' + user)
+                await red.delete('adventure_' + user + '_image')
+
+        await red.add('adventure_' + user, user_adventure_data)
+        user_adventure_image = await adventure.get_Fig()
+        frame = f"/tmp/adventure{user_adventure_image}.png"
+        await red.insert_image('adventure_' + user + '_image', frame)
+        msg = MessageSegment.image('file:' + frame)
+        await Adventure.finish(msg)
     else:
         nonebot.logger.error("请求错误,请参考: 奇遇 区服 角色名")
         await Adventure.reject("请求错误,请参考: 奇遇 区服 角色名")
@@ -307,35 +308,32 @@ async def onMessage_Fireworks(matcher: Matcher, args: Message = CommandArg()):
         plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
         if plain_text.find(" ") != -1:
             server = jx3Data.mainServer(re.split('[ ]+', plain_text)[0])
-            if server:
-                user = re.split('[ ]+', plain_text)[1]
-                fireworks = jx3_Fireworks.Fireworks(server, user)
-                user_fireworks_data = await fireworks.check_fireworks()
-                red = redis.Redis()
-                frame = f"/tmp/fireworks{user}.png"
-                redis_fireworks_data = await red.query('fireworks_'+user)
-                if redis_fireworks_data:
-                    res = json.loads(redis_fireworks_data)
-                    if res == user_fireworks_data:
-                        await red.get_image('fireworks_'+user+'_image', frame)
-                        msg = MessageSegment.image('file:' + frame)
-                        await Fireworks.finish(msg)
-                    else:
-                        await red.delete('fireworks_'+user)
-                        await red.delete('fireworks_'+user+'_image')
-
-                await red.add('fireworks_'+user, user_fireworks_data)
-                user_fireworks_image = await fireworks.get_Fig()
-                frame = f"/tmp/fireworks{user_fireworks_image}.png"
-                await red.insert_image('fireworks_'+user+'_image', frame)
+            user = re.split('[ ]+', plain_text)[1]
+        else:
+            server = server_binding
+            user = plain_text
+        fireworks = jx3_Fireworks.Fireworks(server, user)
+        user_fireworks_data = await fireworks.query_user_firework_info()
+        red = redis.Redis()
+        frame = f"/tmp/fireworks{user}.png"
+        redis_fireworks_data = await red.query('fireworks_' + user)
+        if redis_fireworks_data:
+            res = json.loads(redis_fireworks_data)
+            if res == user_fireworks_data:
+                await red.get_image('fireworks_' + user + '_image', frame)
                 msg = MessageSegment.image('file:' + frame)
                 await Fireworks.finish(msg)
             else:
-                nonebot.logger.error("烟花获取大区信息填写失败，请重试")
-                await Fireworks.reject("烟花获取大区信息填写失败，请重试")
-        else:
-            nonebot.logger.error("烟花获取输入错误，请重试，参考：奇遇 区服 角色名")
-            await Fireworks.reject("烟花获取输入错误，请重试，参考：奇遇 区服 角色名")
+                await red.delete('fireworks_' + user)
+                await red.delete('fireworks_' + user + '_image')
+
+        await red.add('fireworks_' + user, user_fireworks_data)
+        user_fireworks_image = await fireworks.get_Fig()
+        frame = f"/tmp/fireworks{user_fireworks_image}.png"
+        await red.insert_image('fireworks_' + user + '_image', frame)
+        msg = MessageSegment.image('file:' + frame)
+        await Fireworks.finish(msg)
+
     else:
         nonebot.logger.error("请求错误,请参考: 烟花 区服 角色名")
         await Fireworks.reject("请求错误,请参考: 烟花 区服 角色名")
@@ -373,6 +371,29 @@ async def onMessage_Strategy(matcher: Matcher, args: Message = CommandArg()):
     else:
         nonebot.logger.error("请求错误,请参考: 奇遇前置 奇遇名")
         await Require.reject("请求错误,请参考: 奇遇前置 奇遇名")
+
+
+@Recruit.handle()
+async def onMessage_Recruit(matcher: Matcher, args: Message = CommandArg()):
+    if args.extract_plain_text() != "":
+        plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
+
+        if plain_text.find(" ") != -1:
+            server = jx3Data.mainServer(re.split('[ ]+', plain_text)[0])
+            recruit_text = re.split('[ ]+', plain_text)[1]
+        else:
+            server = server_binding
+            recruit_text = plain_text
+
+        recruit = jx3_Recruit.Recruit(server, recruit_text)
+        recruit_total = await recruit.get_Fig()
+        recruit_image = f"/tmp/recruit{recruit_total}.png"
+        msg = MessageSegment.image('file:' + recruit_image)
+        await Recruit.finish(msg)
+    else:
+        nonebot.logger.error("招募获取大区信息填写失败，请重试")
+        await Recruit.reject("招募获取大区信息填写失败，请重试")
+
 
 # @roleJJCRecord.got("role", prompt="你想查询哪个角色信息呢？")
 # async def handle_city(role: Message = Arg(), roleName: str = ArgPlainText("role")):

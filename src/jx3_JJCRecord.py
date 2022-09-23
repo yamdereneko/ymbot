@@ -50,15 +50,16 @@ class GetPersonRecord:
 
         response = await api.role_indicator(role_id=self.role_id, server=self.server, zone=self.zone)
         if response.code != 0:
-            nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
+            nonebot.logger.error("API接口role_indicator获取信息失败，请查看错误")
             return None
         self.global_role_id = response.data["role_info"]["global_role_id"]
 
         response = await api.cc_mine_match_history(global_role_id=self.global_role_id, size=10, cursor=0)
         if response.code != 0:
-            nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
+            nonebot.logger.error("API接口cc_mine_match_history获取信息失败，请查看错误")
             return None
         record = response.data
+        print(record)
         return record
 
     async def get_person_record_figure(self, data):
@@ -75,7 +76,11 @@ class GetPersonRecord:
             total_mmr = y.get("total_mmr")
             won = y.get("won") is True and "胜利" or "失败"
             consume_time = time.strftime("%M分%S秒", gmtime(y.get("end_time") - y.get("start_time")))
-            start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(y.get("start_time")))
+            if time.altzone == 0:
+                start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(y.get("start_time") + 28800))
+            else:
+                start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(y.get("start_time")))
+
             ax.text(0, floor, f'{pvp_type}V{pvp_type}', verticalalignment='bottom', horizontalalignment='left',
                     color='#404040')
             ax.text(1, floor, f'{avg_grade}段局 ', verticalalignment='bottom', horizontalalignment='left',

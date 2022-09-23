@@ -2,24 +2,13 @@
 import asyncio
 import base64
 import json
-
 import nonebot
-import redis
-import pickle
-
-from matplotlib import pyplot as plt
+from src.Data.jxDatas import redis_config
 
 
 class Redis:
     def __init__(self):
-        self.conn = redis.Redis(
-            host='114.115.181.82',  # ip地址
-            port=6379,  # 端口号
-            db=0,
-            decode_responses=True,
-            password="qinhao123"
-            # 设置为True存的数据格式就是str类型
-        )
+        self.conn = redis_config
 
     async def add(self, key, data):
         if await self.query(key):

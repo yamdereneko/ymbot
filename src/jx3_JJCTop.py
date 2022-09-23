@@ -45,7 +45,7 @@ class GetJJCTopRecord:
             school_top[i] = 0
         failure_list = []
 
-        for element in data[:self.pvp_type]:
+        for x, element in enumerate(data[:self.pvp_type]):
             school = element.get("personInfo").get("force")
             name = element.get("personInfo").get("roleName")
             self.role_id = element.get("personInfo").get("gameRoleId")
@@ -54,9 +54,8 @@ class GetJJCTopRecord:
             self.person_id = element.get("personId")
             if school in jxData.much_school:
                 response = await api.role_indicator(role_id=self.role_id, server=self.server, zone=self.zone)
-                if response.code != 0 or response.data['role_info'] is None:
+                if response.code != 0 or response.data == {}:
                     failure_list.append(element)
-                    print(self.role_id + " " + school + " " + self.server + " " + self.zone + " " + name + " 不存在")
                     response = await api.mine_match_person9history(person_id=str(self.person_id), size=10, cursor=0)
                     if response.code != 0:
                         nonebot.logger.error("mine_match_person-history获取信息失败，请查看错误")
@@ -75,8 +74,8 @@ class GetJJCTopRecord:
                 self.global_role_id = response.data["role_info"]["global_role_id"]
                 response = await api.cc_mine_match_history(global_role_id=self.global_role_id, size=10, cursor=0)
                 jjc_record = response.data
-                if jjc_record is None:
-                    print(self.role_id + " " + school + " " + self.server + " " + self.zone + " 战绩不存在")
+                if jjc_record is None or jjc_record == {}:
+                    print(f'{name} 排名{str(x)}: {self.role_id} {school} {self.server} {self.zone} 不存在')
                     failure_list.append(element)
                     continue
                 kungfu = jjc_record[1].get("kungfu")
@@ -91,6 +90,7 @@ class GetJJCTopRecord:
     async def main(self):
         # 获取所有的数据进行处理
         data = await self.get_top_history()
+        print(data)
         # 判断连接池数据是否冲突
         sql = "select week from JJC_rank_weekly"
         await self.database.connect()
@@ -110,5 +110,6 @@ class GetJJCTopRecord:
         else:
             print("门派汇总的人数不到正确值，请人工处理错误信息...")
 
-record = GetJJCTopRecord(35,200)
-print(asyncio.run(record.get_top_history()))
+
+record = GetJJCTopRecord(37, 200)
+print(asyncio.run(record.main()))

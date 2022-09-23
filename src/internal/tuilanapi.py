@@ -45,6 +45,7 @@ class API:
         try:
             ts, xsk = await self.get_xsk(data)
             headers = jxData.headers
+            # headers['token'] = jxData.ticket[]
             headers['X-Sk'] = xsk
             data['ts'] = ts
             data = json.dumps(data).replace(" ", "")
