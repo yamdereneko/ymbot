@@ -17,7 +17,7 @@ api = API()
 
 
 async def get_strategy(name: str):
-    response = await api.app_strategy(name=name)
+    response = await api.data_lucky_strategy(name=name)
     if response.code != 200:
         nonebot.logger.error("API接口get_strategy获取信息失败，请查看错误")
         return None
@@ -25,7 +25,7 @@ async def get_strategy(name: str):
 
 
 async def get_random():
-    response = await api.app_random()
+    response = await api.data_chat_random()
     if response.code != 200:
         nonebot.logger.error("API接口get_random获取信息失败，请查看错误")
         return None
@@ -33,9 +33,17 @@ async def get_random():
 
 
 async def get_require(name: str):
-    response = await api.app_require(name=name)
+    response = await api.data_lucky_require(name=name)
     if response.code != 200:
         nonebot.logger.error("API接口get_require获取信息失败，请查看错误")
+        return None
+    return response.data
+
+
+async def get_flatterer():
+    response = await api.data_useless_flatterer()
+    if response.code != 200:
+        nonebot.logger.error("API接口data_useless_flatterer获取信息失败，请查看错误")
         return None
     return response.data
 

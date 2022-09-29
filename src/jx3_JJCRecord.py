@@ -13,12 +13,14 @@ import matplotlib.pyplot as plt
 import nonebot
 import src.Data.jxDatas as jxData
 import dufte
-from src.internal.tuilanapi import API
+from src.internal.tuilanapi import API as tuilanAPI
+from src.internal.jx3api import API as jx3API
 from time import gmtime
 from src.Data.database import DataBase as database
 
 # 请求头
-api = API()
+api = tuilanAPI()
+jx3api = jx3API()
 
 
 class GetPersonRecord:
@@ -28,7 +30,6 @@ class GetPersonRecord:
         self.server = jxData.mainServer(server)
         self.zone = jxData.mainZone(self.server)
         self.database = database(config)
-        self.role_id = None
         self.global_role_id = None
 
     async def get_person_record(self):
@@ -40,33 +41,26 @@ class GetPersonRecord:
             * `InfoCache`： 表名
             * `role`: 角色名
         """
-        sql = "select id from InfoCache where name='%s'" % self.role
-        await self.database.connect()
-        role_id_dict = await self.database.fetchone(sql)
-        if role_id_dict is None:
-            nonebot.logger.error(self.role + "得role_id未得到，将返回None")
+        response = await jx3api.data_role_roleInfo(server=self.server, name=self.role)
+        if response.code != 200:
+            nonebot.logger.error("API接口role_roleInfo获取信息失败，请查看错误")
             return None
-        self.role_id = str(role_id_dict.get("id"))
-
-        response = await api.role_indicator(role_id=self.role_id, server=self.server, zone=self.zone)
-        if response.code != 0:
-            nonebot.logger.error("API接口role_indicator获取信息失败，请查看错误")
-            return None
-        self.global_role_id = response.data["role_info"]["global_role_id"]
+        self.global_role_id = response.data['globalRoleId']
 
         response = await api.cc_mine_match_history(global_role_id=self.global_role_id, size=10, cursor=0)
-        if response.code != 0:
+        if response.data is []:
             nonebot.logger.error("API接口cc_mine_match_history获取信息失败，请查看错误")
             return None
+        print(response)
         record = response.data
-        print(record)
         return record
 
     async def get_person_record_figure(self, data):
         fig, ax = plt.subplots(figsize=(8, 9), facecolor='white', edgecolor='white')
         plt.style.use(dufte.style)
         ax.axis([0, 10, 0, 10])
-        ax.set_title("斗转星移  " + self.role + '  近10场JJC战绩', fontsize=19, color='#303030', fontweight="heavy",
+
+        ax.set_title(f"{data[0]['server']}  " + self.role + '  近10场JJC战绩', fontsize=19, color='#303030', fontweight="heavy",
                      verticalalignment='top')
         ax.axis('off')
         for x, y in enumerate(data):
@@ -92,5 +86,6 @@ class GetPersonRecord:
                     color='#404040')
             ax.text(6, floor, f'{start_time}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
         datetime = int(time.time())
-        plt.savefig(f"/tmp/record{datetime}.png")
+        # plt.savefig(f"/tmp/record{datetime}.png")
+        plt.show()
         return datetime

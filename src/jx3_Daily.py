@@ -28,7 +28,7 @@ class GetDaily:
             self.daily_next = 0
 
     async def get_daily(self):
-        response = await api.app_daily(server=self.server, next=self.daily_next)
+        response = await api.data_active_current(server=self.server, next=self.daily_next)
         if response.code != 200:
             nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
             return None

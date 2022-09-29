@@ -27,6 +27,7 @@ import src.jx3_Adventure as jx3_Adventure
 import src.jx3_Fireworks as jx3_Fireworks
 import src.jx3_Multifunction as jx3_Multifunction
 import src.jx3_Recruit as jx3_Recruit
+import src.jx3_Price as jx3_Price
 
 
 
@@ -43,7 +44,8 @@ SaoHua = on_command("SaoHua", rule=keyword("骚话"), aliases={"骚话"}, priori
 Strategy = on_command("Strategy", rule=keyword("奇遇攻略"), aliases={"奇遇攻略"}, priority=5)
 Require = on_command("Require", rule=keyword("奇遇前置"), aliases={"奇遇前置"}, priority=5)
 Recruit = on_command("Recruit", rule=keyword("招募"), aliases={"招募"}, priority=5)
-
+Price = on_command("Price", rule=keyword("物价"), aliases={"物价"}, priority=5)
+Flatterer = on_command("Flatterer", rule=keyword("舔狗日志"), aliases={"舔狗日志"}, priority=5)
 
 @RoleJJCRecord.handle()
 async def onMessage_RoleJJCRecord(matcher: Matcher, args: Message = CommandArg()):
@@ -205,25 +207,18 @@ async def onMessage_PersonInfo(matcher: Matcher, args: Message = CommandArg()):
 
 
 @ServerCheck.handle()
-async def onMessage_ServerCheck(matcher: Matcher, args: Message = CommandArg()):
-    if args.extract_plain_text() != "":
-        plain_text = args.extract_plain_text().replace(" ", "")
-        all_serverState = ServerState.ServerState(plain_text)
-        serverState = await all_serverState.get_server_list()
-        serverName = jx3Data.mainServer(plain_text)
-        if serverName is not None:
-            for info in serverState:
-                if info.get("mainServer") == serverName:
-                    server_state = info.get("connectState")
-                    state = server_state is True and serverName + "已开服" or serverName + "未开服"
-                    await ServerCheck.finish(state)
-            nonebot.logger.info("开服数据未得到，请检查")
-            await ServerCheck.reject("未找到区服,请重新输入")
-        else:
-            nonebot.logger.error("开服数据未得到，请检查")
+async def onMessage_ServerCheck(args: Message = CommandArg()):
+    plain_text = args.extract_plain_text()
+    if plain_text == "":
+        plain_text = jx3Data.server_binding
+    server_state = ServerState.ServerState(plain_text)
+    server_data = await server_state.check_server_state()
+    nonebot.logger.info(server_data)
+    if server_data.code == 200:
+        state = server_data.data['status'] == 1 and plain_text + "已开服" or plain_text + "未开服"
+        await ServerCheck.finish(state)
     else:
-        nonebot.logger.error("请求错误,请参考:开服 姨妈 ")
-        await ServerCheck.reject("请求错误,请参考:开服 姨妈 ")
+        nonebot.logger.error("开服数据未得到，请检查")
 
 
 @AllServerState.handle()
@@ -346,6 +341,11 @@ async def onMessage_SaoHua():
     msg = MessageSegment.text(saohua['text'])
     await SaoHua.finish(msg)
 
+@Flatterer.handle()
+async def onMessage_Flatterer():
+    flatterer = await jx3_Multifunction.get_flatterer()
+    msg = MessageSegment.text(flatterer['text'])
+    await Flatterer.finish(msg)
 
 @Strategy.handle()
 async def onMessage_Strategy(matcher: Matcher, args: Message = CommandArg()):
@@ -387,13 +387,46 @@ async def onMessage_Recruit(matcher: Matcher, args: Message = CommandArg()):
 
         recruit = jx3_Recruit.Recruit(server, recruit_text)
         recruit_total = await recruit.get_Fig()
-        recruit_image = f"/tmp/recruit{recruit_total}.png"
-        msg = MessageSegment.image('file:' + recruit_image)
-        await Recruit.finish(msg)
+        if recruit_total:
+            recruit_image = f"/tmp/recruit{recruit_total}.png"
+            msg = MessageSegment.image('file:' + recruit_image)
+            await Recruit.finish(msg)
+        else:
+            msg = MessageSegment.text("获取不到招募信息，请稍后再试")
+            await Recruit.reject(msg)
     else:
         nonebot.logger.error("招募获取大区信息填写失败，请重试")
         await Recruit.reject("招募获取大区信息填写失败，请重试")
 
+
+@Price.handle()
+async def onMessage_Price(args: Message = CommandArg()):
+    if args.extract_plain_text() != "":
+        plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
+        price = jx3_Price.Price(plain_text)
+        price_data = await price.query_mono_price()
+        red = redis.Redis()
+        frame = f"/tmp/price.png"
+        redis_price_data = await red.query('price_' + plain_text)
+        if redis_price_data:
+            res = json.loads(redis_price_data)
+            if res == price_data.data:
+                await red.get_image('price_image_' + plain_text, frame)
+                msg = MessageSegment.image('file:' + frame)
+                await Price.finish(msg)
+            else:
+                await red.delete('price')
+                await red.delete('price_image_' + plain_text)
+
+        await red.add('price_' + plain_text, price_data.data)
+        price_image = await price.create_price_figure()
+        frame = f"/tmp/price{price_image}.png"
+        await red.insert_image('price_image_' + plain_text, frame)
+        msg = MessageSegment.image('file:' + frame)
+        await Price.finish(msg)
+    else:
+        nonebot.logger.error("物价信息填写失败，请重试")
+        await Price.reject("物价信息填写失败，请重试")
 
 # @roleJJCRecord.got("role", prompt="你想查询哪个角色信息呢？")
 # async def handle_city(role: Message = Arg(), roleName: str = ArgPlainText("role")):

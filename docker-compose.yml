@@ -11,4 +11,5 @@ services:
       - ENVIRONMENT=dev
       - APP_MODULE=bot:app
       - MAX_WORKERS=1
+      - TZ=Asia/Shanghai
     network_mode: bridge

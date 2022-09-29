@@ -31,7 +31,18 @@ import websockets
 import websockets.exceptions
 from src.Data.jxDatas import jx3api_ticket
 
+import re
 
+import tkinter as Tkinter
+from tkinter import font as tkFont
+
+Tkinter.Frame().destroy()
+txt = tkFont.Font(family="Times New Roman", size=14)
+width = txt.measure("What the heck?")
+print(width)
+
+# print(re.match(r'^2',data).group())
+# print(re.match('\d*4',data).group())
 # 请求头
 #
 # api = API()

@@ -15,11 +15,11 @@ import nonebot
 import matplotlib.pyplot as plt
 import src.Data.jxDatas as jxData
 from src.Data.database import DataBase as database
-from src.internal.tuilanapi import API
-
+from src.internal.tuilanapi import API as tuilanAPI
+from src.internal.jx3api import API as jx3API
 # 请求头
-
-api = API()
+jx3api = jx3API()
+api = tuilanAPI()
 
 
 class GetPersonInfo:
@@ -37,14 +37,11 @@ class GetPersonInfo:
 
     async def get_person_info(self):
         try:
-            sql = "select id from InfoCache where name='%s'" % self.role
-            await self.database.connect()
-            role_id_info = await self.database.fetchone(sql)
-
-            if role_id_info is None:
-                nonebot.logger.error("获取用户id失败")
+            response = await jx3api.data_role_roleInfo(server=self.server, name=self.role)
+            if response.code != 200:
+                nonebot.logger.error("API接口role_roleInfo获取信息失败，请查看错误")
                 return None
-            self.role_id = str(role_id_info.get("id"))
+            self.role_id = response.data['roleId']
 
             response = await api.role_indicator(role_id=self.role_id, server=self.server, zone=self.zone)
             if response.code != 0:

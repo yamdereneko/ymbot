@@ -19,7 +19,7 @@ class Fireworks:
         self.user = user
 
     async def query_user_firework_info(self):
-        response = await api.role_firework(server=self.server, name=self.user)
+        response = await api.data_role_firework(server=self.server, name=self.user)
         if response.code != 200:
             nonebot.logger.error("API接口role_fireworky获取信息失败，请查看错误")
             return None

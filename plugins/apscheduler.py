@@ -1,4 +1,8 @@
 import asyncio
+import json
+
+import nonebot
+import src.Data.jx3_Redis as redis
 from contextlib import closing, suppress
 from datetime import datetime
 from functools import wraps
@@ -7,7 +11,6 @@ from typing import Callable, List
 from urllib.request import urlopen
 from src.Data.jxDatas import group_list
 from src import jx3_Daily as jx3_Daily
-import nonebot
 from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot import require, get_bots
 
@@ -103,11 +106,30 @@ async def main(servers: List[str]) -> None:
 async def run_daily():
     bot, = get_bots().values()
     daily = jx3_Daily.GetDaily()
-    datatime = await daily.query_daily_figure()
-    nonebot.logger.info("日常播报已正常播报")
-    msg = MessageSegment.image(f"file:///tmp/daily{datatime}.png")
+    daily_data = await daily.get_daily()
+    red = redis.Redis()
+    frame = f"/tmp/daily.png"
+    redis_daily_data = await red.query('daily')
+    if redis_daily_data:
+        res = json.loads(redis_daily_data)
+        if res == daily_data:
+            await red.get_image('daily_image', frame)
+            msg = MessageSegment.image('file:' + frame)
+            for group_id in group_list:
+                await bot.send_group_msg(group_id=group_id, message=msg)
+            return
+        else:
+            await red.delete('daily')
+            await red.delete('daily_image')
+
+    await red.add('daily', daily_data)
+    daily_image = await daily.query_daily_figure()
+    frame = f"/tmp/daily{daily_image}.png"
+    await red.insert_image('daily_image', frame)
+    msg = MessageSegment.image('file:' + frame)
     for group_id in group_list:
         await bot.send_group_msg(group_id=group_id, message=msg)
+    return
 
 
 @monitoring.scheduled_job("cron", hour='7', id="send_monitoring")

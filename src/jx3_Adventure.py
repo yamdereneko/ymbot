@@ -21,7 +21,7 @@ class Adventure:
         self.user = user
 
     async def query_user_info(self):
-        response = await api.next_serendipity(server=self.server, name=self.user, ticket=random.choice(jxData.ticket))
+        response = await api.data_lucky_serendipity(server=self.server, name=self.user, ticket=random.choice(jxData.ticket))
         if response.code != 200:
             nonebot.logger.error("API接口next_serendipity获取信息失败，请查看错误")
             return None

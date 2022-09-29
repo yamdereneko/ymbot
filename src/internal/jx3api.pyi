@@ -20,7 +20,7 @@ class API:
     """浏览器客户端"""
 
 
-    async def app_daily(self, *, server: str, next: int = ...) -> Response:
+    async def data_active_current(self, *, server: str, next: int = ...) -> Response:
         """
         说明：
             今天、明天、后天等的日常任务，七点自动更新。
@@ -39,7 +39,7 @@ class API:
             * `count`：可选，计算天数，搜索当天前后指定日期的日常信息
         """
         ...
-    async def app_check(self, *, server: str) -> Response:
+    async def data_server_check(self, *, server: str) -> Response:
         """
         说明：
             检查目标服务器的开服状态，可用于开服监控。
@@ -187,13 +187,13 @@ class API:
             * `name`：大区名称
         """
         ...
-    async def app_random(self) -> Response:
+    async def data_chat_random(self) -> Response:
         """
         说明:
             召唤一条骚话。
         """
         ...
-    async def app_require(self, *, name: str) -> Response:
+    async def data_lucky_require(self, *, name: str) -> Response:
         """
         说明:
             搜索目标奇遇的前置要求。
@@ -202,7 +202,7 @@ class API:
             * `name`：奇遇名称
         """
         ...
-    async def app_strategy(self, *, name: str) -> Response:
+    async def data_lucky_strategy(self, *, name: str) -> Response:
         """
         说明:
             搜索某个奇遇的任务攻略，不需要token
@@ -211,7 +211,7 @@ class API:
             * `name`：奇遇名称
         """
         ...
-    async def next_price(self, *, name: str) -> Response:
+    async def data_trade_search(self, *, name: str) -> Response:
         """
         说明:
             搜索外观物品最新价格，统计了各个来源的数据，补充了更多的关键字。
@@ -229,7 +229,7 @@ class API:
             * `name`：奇遇名称
         """
         ...
-    async def next_serendipity(
+    async def data_lucky_serendipity(
         self, *, server: str, name: str, ticket: str
     ) -> Response:
         """
@@ -352,7 +352,7 @@ class API:
             * `match`：比赛模式，可选值22/33/55，默认值33。
         """
         ...
-    async def role_roleInfo(self, *, server: str, name: str) -> Response:
+    async def data_role_roleInfo(self, *, server: str, name: str) -> Response:
         """
         说明:
             搜索某个角色的信息。
@@ -373,7 +373,7 @@ class API:
             * `ticket`：推栏app的ticket
         """
         ...
-    async def role_firework(self, *, server: str, name: str) -> Response:
+    async def data_role_firework(self, *, server: str, name: str) -> Response:
         """
         说明:
             搜索某个角色的烟花赠送或接收记录。
@@ -383,7 +383,7 @@ class API:
             * `name`：角色名
         """
         ...
-    async def next_recruit(self, *, server: str, keyword: str = ...) -> Response:
+    async def data_team_member_recruit(self, *, server: str, keyword: str = ...) -> Response:
         """
         说明:
             查询指定区服的团队招募信息。
@@ -476,7 +476,7 @@ class API:
             * `word`：输入四字成语，已去除收尾同音成语。
         """
         ...
-    async def transmit_random(self) -> Response:
+    async def data_useless_flatterer(self) -> Response:
         """
         说明:
             召唤一条舔狗日志。

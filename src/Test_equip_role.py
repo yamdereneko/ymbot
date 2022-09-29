@@ -17,11 +17,12 @@ import matplotlib.pyplot as plt
 import src.Data.jxDatas as jxData
 from src.Data.database import DataBase as database
 from src.internal.tuilanapi import API
+from src.internal.jx3api import API as jx3API
 
 # 请求头
 
 api = API()
-
+jx3api = jx3API()
 
 class GetRoleEquip:
     def __init__(self, role: str, server: str):
@@ -36,9 +37,12 @@ class GetRoleEquip:
 
     async def equips(self):
         try:
-            sql = "select id from InfoCache where name='%s'" % self.role
-            await self.database.connect()
-            role_id_info = await self.database.fetchone(sql)
+            response = await jx3api.data_role_roleInfo(server=self.server, name=self.role)
+            print(response)
+            if response.code != 200:
+                nonebot.logger.error("API接口role_roleInfo获取信息失败，请查看错误")
+                return None
+
 
             if role_id_info is None:
                 nonebot.logger.error("获取用户id失败")

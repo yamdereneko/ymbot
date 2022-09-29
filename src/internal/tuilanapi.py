@@ -4,6 +4,9 @@ from typing import Any
 
 from functools import partial
 import aiohttp
+import hashlib
+import hmac
+import datetime
 from loguru import logger
 from typing_extensions import Protocol
 from pydantic import BaseModel
@@ -26,36 +29,43 @@ class Response(BaseModel):
     data: Any
 
 
+async def gen_xsk(data: str) -> str:
+    data += "@#?.#@"
+    secret = "MaYoaMQ3zpWJFWtN9mqJqKpHrkdFwLd9DDlFWk2NnVR1mChVRI6THVe6KsCnhpoR"
+    return hmac.new(secret.encode(), msg=data.encode(), digestmod=hashlib.sha256).hexdigest()
+
+
+async def gen_ts() -> str:
+    return f"{datetime.datetime.now():%Y%m%d%H%M%S%f}"[:-3]
+
+
+async def format_body(data: dict) -> str:
+    return json.dumps(data, separators=(',', ':'))
+
+
 class API:
     client: AsyncClient
 
     def __init__(self):
         self.client = AsyncClient()
 
-    async def get_xsk(self, data=None):
-        async with aiohttp.ClientSession() as session:
-            url = "https://www.jx3api.com/token/calculate"
-            async with session.post(url, data=json.dumps(data)) as resp:
-                res = await resp.json()
-                return res['data']['ts'], res['data']['sk']
-
     async def call_api(self, url: str, **data: Any) -> Response:
         """请求api网站数据"""
 
         try:
-            ts, xsk = await self.get_xsk(data)
             headers = jxData.headers
-            # headers['token'] = jxData.ticket[]
-            headers['X-Sk'] = xsk
-            data['ts'] = ts
-            data = json.dumps(data).replace(" ", "")
-            res = await self.client.post(url=url, data=data, headers=headers)
+            data['ts'] = await gen_ts()
+            param = await format_body(data)
+            headers['X-Sk'] = await gen_xsk(param)
+
+            param = json.dumps(data, separators=(',', ':'))
+            res = await self.client.post(url=url, content=param, headers=headers)
             return Response.parse_obj(res.json())
         except Exception as e:
             logger.error(f"<y>推栏API请求出错：</y> | {str(e)}")
             return Response(code=0, msg=f"{str(e)}", data={}, time=0)
 
-    def __getattr__(self, name: str) -> _ApiCall:
+    def __getattr__(self, name: str) -> partial:
         # 拼接url
         url = "https://m.pvp.xoyo.com/" + name.replace("_", "/").replace("cc", "3c").replace('9', '-')
         logger.debug(f"<y>推栏API请求功能:</y> | {url}")
