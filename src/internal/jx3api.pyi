@@ -142,7 +142,7 @@ class API:
             * `limit`：可选，限制返回数量，可选范围1-50，默认10
         """
         ...
-    async def app_announce(self, *, limit: int = ...) -> Response:
+    async def data_web_announce(self, *, limit: int = ...) -> Response:
         """
         说明:
             搜索官方近期发布的维护公告。

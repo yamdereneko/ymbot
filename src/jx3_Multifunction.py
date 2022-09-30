@@ -48,6 +48,14 @@ async def get_flatterer():
     return response.data
 
 
+async def get_announce():
+    response = await api.data_web_announce()
+    if response.code != 200:
+        nonebot.logger.error("API接口data_web_announce获取信息失败，请查看错误")
+        return None
+    return response.data
+
+
 class Multifunction:
     def __init__(self):
         print('调用多功能场景')

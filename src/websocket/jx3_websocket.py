@@ -5,14 +5,12 @@ from typing import Optional
 
 import nonebot
 import websockets
+from src.Data.jxDatas import group_list
 from nonebot import get_bots
 from nonebot.message import handle_event
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 from websockets.legacy.client import WebSocketClientProtocol
-
-from src.config import jx3api_config
-
-from ._jx3_event import EventRister, WsData, WsNotice
+from src.websocket._jx3_event import EventRister, WsData, WsNotice
 
 
 class Jx3WebSocket(object):
@@ -93,16 +91,18 @@ class Jx3WebSocket(object):
         if self.connect or self.is_connecting:
             return None
 
-        ws_path = jx3api_config.ws_path
-        ws_token = jx3api_config.ws_token
+        ws_path = 'wss://socket.nicemoe.cn'
+        ws_token = None
         if ws_token is None:
             ws_token = ""
         headers = {"token": ws_token}
         nonebot.logger.debug(f"<g>ws_server</g> | 正在链接jx3api的ws服务器：{ws_path}")
+        print(f"<g>ws_server</g> | 正在链接jx3api的ws服务器：{ws_path}")
         self.is_connecting = True
         for i in range(1, 101):
             try:
                 nonebot.logger.debug(f"<g>ws_server</g> | 正在开始第 {i} 次尝试")
+                print(f"<g>ws_server</g> | 正在开始第 {i} 次尝试")
                 self.connect = await websockets.connect(
                     uri=ws_path,
                     extra_headers=headers,
@@ -112,6 +112,7 @@ class Jx3WebSocket(object):
                 )
                 asyncio.create_task(self._task())
                 nonebot.logger.debug("<g>ws_server</g> | ws连接成功！")
+                print("<g>ws_server</g> | ws连接成功！")
                 # await self._raise_notice("jx3api > ws已连接！")
                 break
             except Exception as e:
@@ -141,11 +142,10 @@ class Jx3WebSocket(object):
 
 
 ws_client = Jx3WebSocket()
+x = asyncio.run(ws_client.init())  # 初始化
+asyncio.run(ws_client.__new__(x,''))
 
-
-await ws_client.init() # 初始化
-ws_client.closed # ws是否关闭
-await ws_client.close() # 关闭连接
+# 关闭连接
 """
 ws客户端，用于连接jx3api的ws服务器.
 

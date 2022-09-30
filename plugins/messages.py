@@ -29,8 +29,6 @@ import src.jx3_Multifunction as jx3_Multifunction
 import src.jx3_Recruit as jx3_Recruit
 import src.jx3_Price as jx3_Price
 
-
-
 RoleJJCRecord = on_command("RoleJJCRecord", rule=keyword("战绩", "JJC信息"), aliases={"战绩", "JJC信息"}, priority=5)
 JJCTop = on_command("JJCTop", rule=keyword("JJC趋势图"), aliases={"JJC趋势图"}, priority=5)
 JJCTop50 = on_command("JJCTop50", rule=keyword("JJC50趋势图"), aliases={"JJC50趋势图"}, priority=5)
@@ -46,47 +44,48 @@ Require = on_command("Require", rule=keyword("奇遇前置"), aliases={"奇遇�
 Recruit = on_command("Recruit", rule=keyword("招募"), aliases={"招募"}, priority=5)
 Price = on_command("Price", rule=keyword("物价"), aliases={"物价"}, priority=5)
 Flatterer = on_command("Flatterer", rule=keyword("舔狗日志"), aliases={"舔狗日志"}, priority=5)
+Announce = on_command("Announce", rule=keyword("公告"), aliases={"公告"}, priority=5)
+
 
 @RoleJJCRecord.handle()
 async def onMessage_RoleJJCRecord(matcher: Matcher, args: Message = CommandArg()):
-    if args.extract_plain_text() != "":
-        plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
-        if plain_text.find(" ") != -1:
-            plain_text = re.sub(r'[ ]+', ' ', plain_text)
-            server = plain_text.split(" ")[0]
-            server_right = jx3Data.mainServer(server)
-            if server_right is not None:
-                role_name = plain_text.split(" ")[1]
-                jjc_record = JJCRecord.GetPersonRecord(role_name, server)
-                record = await jjc_record.get_person_record()
-                if record:
-                    red = redis.Redis()
-                    frame = f"/tmp/record{role_name}.png"
-                    redis_record_data = await red.query('record_' + role_name)
-                    if redis_record_data:
-                        res = json.loads(redis_record_data)
-                        if res == record:
-                            await red.get_image('record_' + role_name + '_image', frame)
-                            msg = MessageSegment.image('file:' + frame)
-                            await RoleJJCRecord.finish(msg)
-                        else:
-                            await red.delete('record_' + role_name)
-                            await red.delete('record_' + role_name + '_image')
-
-                    await red.add('record_' + role_name, record)
-                    record_image = await jjc_record.get_person_record_figure(record)
-                    frame = f"/tmp/record{record_image}.png"
-                    await red.insert_image('record_' + role_name + '_image', frame)
+    plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
+    plain_text = re.sub(r'[ ]+', ' ', plain_text)
+    if plain_text.find(" ") != -1:
+        server = plain_text.split(" ")[0]
+        role_name = plain_text.split(" ")[1]
+    else:
+        server = jx3Data.server_binding
+        role_name = plain_text
+    server_right = jx3Data.mainServer(server)
+    if server_right:
+        jjc_record = JJCRecord.GetPersonRecord(role_name, server)
+        record = await jjc_record.get_person_record()
+        if record:
+            red = redis.Redis()
+            frame = f"/tmp/record{role_name}.png"
+            redis_record_data = await red.query('record_' + role_name)
+            if redis_record_data:
+                res = json.loads(redis_record_data)
+                if res == record:
+                    await red.get_image('record_' + role_name + '_image', frame)
                     msg = MessageSegment.image('file:' + frame)
                     await RoleJJCRecord.finish(msg)
                 else:
-                    nonebot.logger.error(f"{role_name} JJC战绩查询不存在,请重试")
-                    await RoleJJCRecord.reject(f"{server} {role_name} JJC战绩查询不存在,请重试")
-            else:
-                nonebot.logger.error(f"{server} 大区不存在,请重试")
+                    await red.delete('record_' + role_name)
+                    await red.delete('record_' + role_name + '_image')
+
+            await red.add('record_' + role_name, record)
+            record_image = await jjc_record.get_person_record_figure(record)
+            frame = f"/tmp/record{record_image}.png"
+            await red.insert_image('record_' + role_name + '_image', frame)
+            msg = MessageSegment.image('file:' + frame)
+            await RoleJJCRecord.finish(msg)
+        else:
+            nonebot.logger.error(f"{role_name} JJC战绩查询不存在,请重试")
+            await RoleJJCRecord.reject(f"{server} {role_name} JJC战绩查询不存在,请重试")
     else:
-        nonebot.logger.error("请求错误,请参考: 战绩 区服 用户名")
-        await RoleJJCRecord.reject("请求错误,请参考: 战绩 区服 用户名")
+        nonebot.logger.error(f"{server} 大区不存在,请重试")
 
 
 # 接收 JJC趋势图
@@ -341,11 +340,21 @@ async def onMessage_SaoHua():
     msg = MessageSegment.text(saohua['text'])
     await SaoHua.finish(msg)
 
+
 @Flatterer.handle()
 async def onMessage_Flatterer():
     flatterer = await jx3_Multifunction.get_flatterer()
     msg = MessageSegment.text(flatterer['text'])
     await Flatterer.finish(msg)
+
+
+@Announce.handle()
+async def onMessage_Announce():
+    announce = await jx3_Multifunction.get_announce()
+    text = announce[0]['type'] + '\n' + announce[0]['title'] + '\n' + announce[0]['date']+ '\n' + announce[0]['url']
+    msg = MessageSegment.text(text)
+    await Flatterer.finish(msg)
+
 
 @Strategy.handle()
 async def onMessage_Strategy(matcher: Matcher, args: Message = CommandArg()):

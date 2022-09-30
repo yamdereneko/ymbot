@@ -101,6 +101,7 @@ async def main(servers: List[str]) -> None:
     for group_id in group_list:
         await bot.send_group_msg(group_id=group_id, message=msg)
     monitoring.shutdown()
+    return
 
 
 async def run_daily():
@@ -132,8 +133,11 @@ async def run_daily():
     return
 
 
-@monitoring.scheduled_job("cron", hour='7', id="send_monitoring")
-def monitoringServer():
-    asyncio.run(run_daily())
-    asyncio.run(main(["斗转星移"]))
+async def async_run():
+    await asyncio.gather(run_daily(), main(["斗转星移"]))
 
+
+@monitoring.scheduled_job("cron", minute='*/2', id="send_monitoring", max_instances=3, misfire_grace_time=60)
+def monitoringServer():
+    with asyncio.run(async_run()):
+        print('执行成功')

@@ -51,7 +51,6 @@ class GetPersonRecord:
         if response.data is []:
             nonebot.logger.error("API接口cc_mine_match_history获取信息失败，请查看错误")
             return None
-        print(response)
         record = response.data
         return record
 
@@ -86,6 +85,5 @@ class GetPersonRecord:
                     color='#404040')
             ax.text(6, floor, f'{start_time}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
         datetime = int(time.time())
-        # plt.savefig(f"/tmp/record{datetime}.png")
-        plt.show()
+        plt.savefig(f"/tmp/record{datetime}.png")
         return datetime
