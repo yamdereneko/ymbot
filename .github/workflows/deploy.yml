@@ -32,7 +32,7 @@ jobs:
           script: |
             cd $DEPLOY_PATH
             docker-compose down
-            docker-compose pull
+            docker-compose build
             docker-compose up -d
 
       - name: update deployment status
