@@ -29,7 +29,8 @@ jobs:
           images: |
             yamdereneko/nb2
           tags: |
-            latest
+            type=semver,pattern={{version}}
+            type=sha
 
       - name: Build and Publish
         uses: docker/build-push-action@v2
