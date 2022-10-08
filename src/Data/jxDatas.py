@@ -1,4 +1,87 @@
 import asyncio
+import random
+import redis
+from pydantic import BaseModel, Extra, Field
+
+"""
+    jx3apiToken
+"""
+jx3api_ticket = "nrje86v129l78x4g9m"
+
+"""
+    推栏token连接池
+"""
+
+ticket = ['143d202ba5034faea12dc232cd8f0429:yandereneko:kingsoft::dzEyNG43ZWxuYXp5ZGN0Mw==',
+          '9d57f8159597435889bd0b7e77ad92db:yamdereneko:kingsoft::dTByZXBhemFkNjY0dGdseA==',
+          '2a1ca92bf2114d3eaacb0be40e04319f:yandereneko1:kingsoft::MGxmbnQ1NGRoZ2Rpa3ZrZA==',
+          'f4f2a4465f4f464a99f50691024792d1:yandereneko2:kingsoft::bmRqcDA2aG9zcXRjeHFjag==']
+
+server_binding = "斗转星移"
+
+redis_config = redis.Redis(
+    host='114.115.181.82',  # ip地址
+    port=6379,  # 端口号
+    db=0,
+    decode_responses=True,
+    password="qinhao123"
+    # 设置为True存的数据格式就是str类型
+)
+
+headers = {
+    "accept": "application/json",
+    "platform": "ios",
+    "gamename": "jx3",
+    "clientkey": "1",
+    "cache-control": "no-cache",
+    "apiversion": "1",
+    "sign": "true",
+    "Content-Type": "application/json",
+    "Host": "m.pvp.xoyo.com",
+    "Connection": "Keep-Alive",
+    "Accept-Encoding": "gzip",
+    "token": random.choice(ticket),
+    "User-Agent": "SeasunGame/193 CFNetwork/1333.0.4 Darwin/21.5.0",
+    "X-Sk": None
+}
+
+
+class Jx3ApiConfig(BaseModel, extra=Extra.ignore):
+    """
+    jx3api的配置
+    """
+
+    ws_path: str = Field("", alias="jx3api_ws_path")
+    """ws连接地址"""
+    ws_token: str = Field("", alias="jx3api_ws_token")
+    """ws的token"""
+    api_url: str = Field("", alias="jx3api_url")
+    """主站的url"""
+    api_token: str = Field("", alias="jx3api_token")
+    """主站的token"""
+
+#
+group_list = ["1077830347", "642668185"]
+
+# group_list = ["549242180"]
+
+config = {
+    'host': '114.115.181.82',  # 连接主机名。
+    'user': 'root',  # 用户账号
+    'password': 'Qinhao123.',  # 用户密码
+    'db': 'farbnamen',  # 数据库名
+    'port': 3306,  # 连接端口
+    'charset': 'utf8',  # 数据编码
+    'minsize': 12,  # 连接池最小值
+    'maxsize': 96,  # 连接池最大值
+    'autocommit': True,  # 自动提交模式
+}
+
+all_school = {'霸刀': 10, '少林': 12, '补天': 12, '蓬莱': 14, '紫霞': 14, '藏剑': 13, '明教': 7, '云裳': 17, '花间': 12, '丐帮': 5,
+              '凌雪': 8, '田螺': 6, '惊羽': 5, '相知': 14, '胎虚': 5, '苍云': 5, '天策': 8, '无方': 11, '灵素': 6, '冰心': 3, '毒经': 6,
+              '衍天': 2, '莫问': 1, '离经': 3}
+
+
 
 bodyType = {
     "成男": 1,
@@ -26,23 +109,6 @@ school_number = {
     "衍天宗": 16,
     "北天药宗": 17
 }
-
-headers = {
-    "accept": "application/json",
-    "platform": "ios",
-    "gamename": "jx3",
-    "clientkey": "1",
-    "cache-control": "no-cache",
-    "apiversion": "1",
-    "sign": "true",
-    "Content-Type": "application/json",
-    "Host": "m.pvp.xoyo.com",
-    "Connection": "Keep-Alive",
-    "Accept-Encoding": "gzip",
-    "token": "8fd71f296c154aa5bec19a983ea02203:yandereneko:kingsoft::qo3e/LCoXnb1XovF7VxHGg==",
-    "User-Agent": "SeasunGame/193 CFNetwork/1333.0.4 Darwin/21.5.0",
-    "X-Sk": None
-}
 much_school = {
     "长歌": 4,
     "唐门": 8,
@@ -69,25 +135,6 @@ school_pinyin = {
     "zixia": "紫霞",
     "taixu": "胎虚",
 }
-# 1077830347
-group_list = ["642668185", "1077830347"]
-
-all_school = {'霸刀': 10, '少林': 12, '补天': 12, '蓬莱': 14, '紫霞': 14, '藏剑': 13, '明教': 7, '云裳': 17, '花间': 12, '丐帮': 5,
-              '凌雪': 8, '田螺': 6, '惊羽': 5, '相知': 14, '胎虚': 5, '苍云': 5, '天策': 8, '无方': 11, '灵素': 6, '冰心': 3, '毒经': 6,
-              '衍天': 2, '莫问': 1, '离经': 3}
-
-config = {
-    'host': '114.115.181.82',  # 连接主机名。
-    'user': 'root',  # 用户账号
-    'password': 'Qinhao123.',  # 用户密码
-    'db': 'farbnamen',  # 数据库名
-    'port': 3306,  # 连接端口
-    'charset': 'utf8',  # 数据编码
-    'minsize': 12,  # 连接池最小值
-    'maxsize': 96,  # 连接池最大值
-    'autocommit': True,  # 自动提交模式
-}
-
 
 def school(method):
     match method:

@@ -52,6 +52,6 @@ if __name__ == '__main__':
         zone_name="电信五区",
         server_name="斗转星移",
         role_id="16624814",
-        token="b30ce6955e7b4e569e56d2cc0b0f2ac5:yamdereneko:kingsoft::ZGc2OHR4dzZ2NzJmMmh2aQ=="
+        token="9d57f8159597435889bd0b7e77ad92db:yamdereneko:kingsoft::dTByZXBhemFkNjY0dGdseA=="
     )
     print(result)

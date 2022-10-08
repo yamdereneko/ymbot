@@ -57,11 +57,10 @@ class API:
             data['ts'] = await gen_ts()
             param = await format_body(data)
             headers['X-Sk'] = await gen_xsk(param)
-
-            param = json.dumps(data, separators=(',', ':'))
             res = await self.client.post(url=url, content=param, headers=headers)
             return Response.parse_obj(res.json())
         except Exception as e:
+            logger.error(f"<y>推栏API请求出错：</y> | {str(url)}")
             logger.error(f"<y>推栏API请求出错：</y> | {str(e)}")
             return Response(code=0, msg=f"{str(e)}", data={}, time=0)
 

@@ -43,6 +43,7 @@ class API:
             return Response.parse_obj(res.json())
         except Exception as e:
             logger.error(f"<y>JX3API请求出错：</y> | {str(e)}")
+            logger.error(res)
             return Response(code=0, msg=f"{str(e)}", data={}, time=0)
 
     def __getattr__(self, name: str) -> _ApiCall:

@@ -137,7 +137,7 @@ async def async_run():
     await asyncio.gather(run_daily(), main(["斗转星移"]))
 
 
-@monitoring.scheduled_job("cron", minute='*/2', id="send_monitoring", max_instances=3, misfire_grace_time=60)
+@monitoring.scheduled_job("cron", hour='7', id="send_monitoring", max_instances=3, misfire_grace_time=60)
 def monitoringServer():
     with asyncio.run(async_run()):
         print('执行成功')

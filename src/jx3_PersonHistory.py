@@ -38,6 +38,7 @@ class GetPersonInfo:
     async def get_person_info(self):
         try:
             response = await jx3api.data_role_roleInfo(server=self.server, name=self.role)
+            print(response)
             if response.code != 200:
                 nonebot.logger.error("API接口role_roleInfo获取信息失败，请查看错误")
                 return None
