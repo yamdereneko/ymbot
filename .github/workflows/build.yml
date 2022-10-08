@@ -2,8 +2,8 @@ name: Docker Hub Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+        - master #只在master推送时执行
 
 jobs:
   docker:
