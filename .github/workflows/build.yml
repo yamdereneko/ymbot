@@ -29,7 +29,7 @@ jobs:
           images: |
             yamdereneko/nb2
           tags: |
-            type=semver,pattern={{version}}
+            type=semver,pattern=latest
             type=sha
 
       - name: Build and Publish
