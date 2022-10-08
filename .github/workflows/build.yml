@@ -27,9 +27,9 @@ jobs:
         id: metadata
         with:
           images: |
-            yamdereneko/nb2
+            yamdereneko/nb2:latest
           tags: |
-            type=semver,pattern=latest
+            type=semver,pattern={{version}}
             type=sha
 
       - name: Build and Publish
