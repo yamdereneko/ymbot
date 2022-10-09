@@ -34,8 +34,7 @@ class GetDaily:
             return None
         return response.data
 
-    async def query_daily_figure(self):
-        data = await self.get_daily()
+    async def query_daily_figure(self, data):
         if data is None:
             nonebot.logger.error(self.server + "日常未得到，将返回None")
             return None

@@ -75,7 +75,7 @@ def msg_box(server: str):
     return msg
 
 
-async def main(servers: List[str]) -> None:
+async def main(servers: List[str]):
     server_set = set()
 
     with closing(
@@ -95,49 +95,35 @@ async def main(servers: List[str]) -> None:
     nonebot.logger.info("开服监控已开启")
     res = await asyncio.gather(*[check(*server) for server in tasks])
     msg = [msg_box(server) for server, _, _ in tasks]
-
     nonebot.logger.info(msg)
-    bot, = get_bots().values()
-    for group_id in group_list:
-        await bot.send_group_msg(group_id=group_id, message=msg)
-    monitoring.shutdown()
-    return
+    return msg
 
 
 async def run_daily():
     bot, = get_bots().values()
     daily = jx3_Daily.GetDaily()
+
     daily_data = await daily.get_daily()
     red = redis.Redis()
-    frame = f"/tmp/daily.png"
-    redis_daily_data = await red.query('daily')
-    if redis_daily_data:
-        res = json.loads(redis_daily_data)
-        if res == daily_data:
-            await red.get_image('daily_image', frame)
-            msg = MessageSegment.image('file:' + frame)
-            for group_id in group_list:
-                await bot.send_group_msg(group_id=group_id, message=msg)
-            return
-        else:
-            await red.delete('daily')
-            await red.delete('daily_image')
 
     await red.add('daily', daily_data)
-    daily_image = await daily.query_daily_figure()
+    daily_image = await daily.query_daily_figure(daily_data)
     frame = f"/tmp/daily{daily_image}.png"
     await red.insert_image('daily_image', frame)
     msg = MessageSegment.image('file:' + frame)
-    for group_id in group_list:
-        await bot.send_group_msg(group_id=group_id, message=msg)
-    return
+    return msg
 
 
 async def async_run():
-    await asyncio.gather(run_daily(), main(["斗转星移"]))
+    task1 = asyncio.shield(run_daily())
+    task2 = asyncio.shield(main(["斗转星移"]))
+    res = await asyncio.gather(task1, task2, return_exceptions=True)
+    bot, = get_bots().values()
+    for group_id in group_list:
+        for msg in res:
+            await bot.send_group_msg(group_id=group_id, message=msg)
 
 
-@monitoring.scheduled_job("cron", hour='7', id="send_monitoring", max_instances=3, misfire_grace_time=60)
+@monitoring.scheduled_job("cron", hour='7', id="send_monitoring", max_instances=3)
 def monitoringServer():
-    with asyncio.run(async_run()):
-        print('执行成功')
+    asyncio.run(async_run())
