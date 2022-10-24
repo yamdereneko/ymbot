@@ -127,6 +127,6 @@ async def async_run():
             await bot.send_group_msg(group_id=group_id, message=msg)
 
 
-@monitoring.scheduled_job("cron", minute='*/1', id="send_monitoring", max_instances=3)
+@monitoring.scheduled_job("cron", hour='7', id="send_monitoring", max_instances=3)
 def monitoringServer():
     asyncio.run(async_run())

@@ -4,10 +4,10 @@
 import nonebot
 from nonebot.adapters.onebot.v11 import Adapter
 from nonebot.log import logger, default_format
-import FastApi as fastAPI
+# import FastApi as fastAPI
 
 nonebot.init()
-app = fastAPI.app
+app = nonebot.get_asgi()
 
 driver = nonebot.get_driver()
 driver.register_adapter(Adapter)
