@@ -17,6 +17,7 @@ import src.Data.jxDatas as jxData
 from src.Data.database import DataBase as database
 from src.internal.tuilanapi import API as tuilanAPI
 from src.internal.jx3api import API as jx3API
+
 # 请求头
 jx3api = jx3API()
 api = tuilanAPI()
@@ -43,14 +44,15 @@ class GetPersonInfo:
                 nonebot.logger.error("API接口role_roleInfo获取信息失败，请查看错误")
                 return None
             self.role_id = response.data['roleId']
-
+            self.person_id = response.data['personId']
             response = await api.role_indicator(role_id=self.role_id, server=self.server, zone=self.zone)
             if response.code != 0:
                 nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
                 return None
-            self.person_id = response.data['person_info']['person_id']
+            # self.person_id = response.data['person_info']['person_id']
 
             response = await api.mine_match_person9history(person_id=str(self.person_id), size=10, cursor=0)
+            print(response)
             if response.code != 0:
                 nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
                 return None

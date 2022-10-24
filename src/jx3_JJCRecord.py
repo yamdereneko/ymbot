@@ -42,12 +42,14 @@ class GetPersonRecord:
             * `role`: 角色名
         """
         response = await jx3api.data_role_roleInfo(server=self.server, name=self.role)
+        print(response)
         if response.code != 200:
             nonebot.logger.error("API接口role_roleInfo获取信息失败，请查看错误")
             return None
         self.global_role_id = response.data['globalRoleId']
 
         response = await api.cc_mine_match_history(global_role_id=self.global_role_id, size=10, cursor=0)
+        print(response)
         if response.data is []:
             nonebot.logger.error("API接口cc_mine_match_history获取信息失败，请查看错误")
             return None

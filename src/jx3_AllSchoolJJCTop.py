@@ -37,7 +37,3 @@ class GetAllSchool:
         plt.legend(fontsize=12)
         plt.show()
         # plt.savefig(f"/tmp/schoolTop{self.school}.png")
-
-
-allSchool = GetAllSchool('JJC_rank_weekly')
-asyncio.run(allSchool.get_JJCWeeklyAllSchoolRecord())

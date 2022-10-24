@@ -43,11 +43,7 @@ class GetRoleEquip:
                 nonebot.logger.error("API接口role_roleInfo获取信息失败，请查看错误")
                 return None
 
-
-            if role_id_info is None:
-                nonebot.logger.error("获取用户id失败")
-                return None
-            self.role_id = str(role_id_info.get("id"))
+            self.role_id = response.data["roleId"]
 
             response = await api.role_indicator(role_id=self.role_id, server=self.server, zone=self.zone)
             if response.code != 0:
@@ -59,6 +55,7 @@ class GetRoleEquip:
             if response.code != 0:
                 nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
                 return None
+            print(response.data)
             self.role_id = response.data[0]["role_id"]
             self.server = response.data[0]["server"]
             self.zone = response.data[0]["zone"]

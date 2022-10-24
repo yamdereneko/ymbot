@@ -115,17 +115,6 @@ import re
 #
 
 
-
-#
-#
-aa = {'霸刀': 7, '少林': 7, '补天': 4, '蓬莱': 8, '紫霞': 15, '藏剑': 9, '明教': 6, '云裳': 18, '花间': 11, '丐帮': 5, '凌雪': 0, '田螺': 3, '惊羽': 6, '相知': 13, '胎虚': 7, '苍云': 7, '天策': 8, '无方': 17, '灵素': 16, '冰心': 2, '毒经': 3, '衍天': 0, '莫问': 4, '离经': 9, '凌雪阁': 7, '衍天宗': 8}
-bb = {'霸刀': 3, '少林': 2, '补天': 0, '蓬莱': 3, '紫霞': 3, '藏剑': 3, '明教': 3, '云裳': 3, '花间': 3, '丐帮': 1, '凌雪': 0, '田螺': 0,
-       '惊羽': 1, '相知': 3, '胎虚': 2, '苍云': 2, '天策': 1, '无方': 5, '灵素': 6, '冰心': 0, '毒经': 2, '衍天': 0, '莫问': 0, '离经': 1,
-       '凌雪阁': 2, '衍天宗': 1}
-cc = {'霸刀': 3, '少林': 5, '补天': 3, '蓬莱': 4, '紫霞': 8, '藏剑': 3, '明教': 3, '云裳': 7, '花间': 6, '丐帮': 3, '凌雪': 0, '田螺': 0,
-       '惊羽': 3, '相知': 4, '胎虚': 6, '苍云': 3, '天策': 5, '无方': 10, '灵素': 11, '冰心': 1, '毒经': 2, '衍天': 0, '莫问': 1, '离经': 2,
-       '凌雪阁': 4, '衍天宗': 3}
-print(sum(cc.values()))
 # """
 # @Software : PyCharm
 # @File : 0.py
@@ -254,3 +243,90 @@ print(sum(cc.values()))
 # person = GetPersonInfo('冻冻','唯满侠')
 # f = asyncio.run(person.get_person_info())
 # print(f)
+
+# def apply_ascyn(func, args, callback):
+#     """
+#     func 函数的是处理的函数
+#     args 表示的参数
+#     callback 表示的函数处理完成后的 该执行的动作
+#     """
+#     result = func(*args)
+#     callback(result)
+#
+#
+# def add(x, y):
+#     return x + y
+#
+#
+# def print_result(result):
+#     print(result)
+#
+#
+# apply_ascyn(add, (2, 3), callback=print_result)
+# -*- coding: utf-8 -*
+
+data = [{
+    'name': 'mowen',
+    'skills': [
+        {
+            'name': '扶摇直上',
+            'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_jianghu04.png?v=2',
+            'success_times': 0,
+            'times': 1,
+            'accuracy': False
+        },
+        {
+            'name': '蹑云逐月',
+            'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_jianghu09.png?v=2',
+            'success_times': 0,
+            'times': 6,
+            'accuracy': False
+        }
+    ]
+}, {'name': 'xiangzhi', 'skills': [
+    {'name': '高山流水', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_0514_36.png?v=2', 'success_times': 0,
+     'times': 121, 'accuracy': False},
+    {'name': '梅花三弄', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_0514_15.png?v=2', 'success_times': 0,
+     'times': 212, 'accuracy': False},
+    {'name': '笑傲光阴', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_0514_24.png?v=2', 'success_times': 0,
+     'times': 1403, 'accuracy': False},
+    {'name': '江逐月天', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_0514_16.png?v=2', 'success_times': 1779,
+     'times': 5335, 'accuracy': True},
+    {'name': '云生结海', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_0514_04.png?v=2', 'success_times': 0,
+     'times': 2611, 'accuracy': False},
+    {'name': '青霄飞羽', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_0514_34.png?v=2', 'success_times': 0,
+     'times': 6196, 'accuracy': False},
+    {'name': '孤影化双', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_0514_08.png?v=2', 'success_times': 0,
+     'times': 2190, 'accuracy': False},
+    {'name': '杯水留影', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_0514_14.png?v=2', 'success_times': 0,
+     'times': 468, 'accuracy': False},
+    {'name': '羽', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_0514_120.png?v=2', 'success_times': 0,
+     'times': 19795, 'accuracy': False},
+    {'name': '迴梦逐光', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_0514_30.png?v=2', 'success_times': 0,
+     'times': 4851, 'accuracy': False},
+    {'name': '高山流水', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_0514_36.png?v=2', 'success_times': 0,
+     'times': 881, 'accuracy': False},
+    {'name': '梅花三弄', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_0514_15.png?v=2', 'success_times': 0,
+     'times': 7644, 'accuracy': False},
+    {'name': '琴音共鸣', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_0514_63.png?v=2', 'success_times': 0,
+     'times': 1315, 'accuracy': False},
+    {'name': '歌尽影生', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_0514_55.png?v=2', 'success_times': 0, 'times': 2,
+     'accuracy': False},
+    {'name': '扶摇直上', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_jianghu04.png?v=2', 'success_times': 0,
+     'times': 1285, 'accuracy': False},
+    {'name': '蹑云逐月', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_jianghu09.png?v=2', 'success_times': 0,
+     'times': 2126, 'accuracy': False},
+    {'name': '迎风回浪', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_jianghu10.png?v=2', 'success_times': 0,
+     'times': 831, 'accuracy': False},
+    {'name': '凌霄揽胜', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_jianghu01.png?v=2', 'success_times': 0,
+     'times': 499, 'accuracy': False},
+    {'name': '瑶台枕鹤', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/skill_jianghu08.png?v=2', 'success_times': 0,
+     'times': 386, 'accuracy': False},
+    {'name': '后撤', 'icon': 'https://dl.pvp.xoyo.com/prod/icons/JNLXG_19_11_28_16.png?v=2', 'success_times': 0,
+     'times': 2356, 'accuracy': False}
+]
+    }
+]
+z = 0
+print(len(data[z]["skills"]))
+

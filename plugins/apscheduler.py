@@ -15,6 +15,7 @@ from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot import require, get_bots
 
 monitoring = require("nonebot_plugin_apscheduler").scheduler
+flag = 0
 
 
 def retry(attempt: int = 3) -> Callable:
@@ -30,12 +31,12 @@ def retry(attempt: int = 3) -> Callable:
                 await asyncio.sleep(c)
 
         return warpper
-
     return decorator
 
 
 @retry()
 async def socket_connector(host: str, port: str, timeout: int = 3) -> bool:
+    global flag
     with suppress(Exception):
         _, w = await asyncio.wait_for(
             asyncio.open_connection(host, port), timeout=timeout
@@ -43,6 +44,7 @@ async def socket_connector(host: str, port: str, timeout: int = 3) -> bool:
         w.close()
         monitoring.resume()
         return True
+    flag += 1
     monitoring.pause()
     return False
 
@@ -76,6 +78,7 @@ def msg_box(server: str):
 
 
 async def main(servers: List[str]):
+    global flag
     server_set = set()
 
     with closing(
@@ -96,11 +99,11 @@ async def main(servers: List[str]):
     res = await asyncio.gather(*[check(*server) for server in tasks])
     msg = [msg_box(server) for server, _, _ in tasks]
     nonebot.logger.info(msg)
+
     return msg
 
 
 async def run_daily():
-    bot, = get_bots().values()
     daily = jx3_Daily.GetDaily()
 
     daily_data = await daily.get_daily()
@@ -124,6 +127,6 @@ async def async_run():
             await bot.send_group_msg(group_id=group_id, message=msg)
 
 
-@monitoring.scheduled_job("cron", hour='7', id="send_monitoring", max_instances=3)
+@monitoring.scheduled_job("cron", minute='*/1', id="send_monitoring", max_instances=3)
 def monitoringServer():
     asyncio.run(async_run())

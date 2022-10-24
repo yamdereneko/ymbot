@@ -1,177 +1,57 @@
-# -*- coding: utf-8 -*-
+from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK, ConnectionClosed
+import websockets
 import asyncio
-import random
+import json
 
-from nonebot import get_driver, on, on_regex
-from nonebot.adapters.onebot.v11 import Bot, PrivateMessageEvent
-from nonebot.permission import SUPERUSER
-from nonebot.plugin import PluginMetadata
-from tortoise import Tortoise
-
-from src.internal.plugin_manager import plugin_manager
-from src.modules.group_info import GroupInfo
-from src.modules.user_info import UserInfo
-from src.params import PluginConfig
-from src.utils.browser import browser
-from src.utils.log import logger
-from src.utils.utils import GroupList_Async
-
-from ._jx3_event import RecvEvent, WsNotice
-from .data_source import get_ws_status, ws_init
-from .jx3_websocket import ws_client
-
-__plugin_meta__ = PluginMetadata(
-    name="服务管理插件",
-    description="管理bot的启动连接服务，以及jx3api的ws管理",
-    usage="本插件不受插件管理器限制",
-    config=PluginConfig(enable_managed=False),
-)
+# pip install websockets
 
 
-driver = get_driver()
-
-# ----------------------------------------------------------------
-#   bot服务的各种hook
-# ----------------------------------------------------------------
+async def f10000(data):
+    print("这里开始处理数据", data)
+    return
 
 
-@driver.on_bot_connect
-async def _(bot: Bot):
-    """机器人连接处理"""
-    # 获取群
-    logger.info(f"<y>Bot {bot.self_id}</y> 已连接，正在注册...")
-    group_list = await bot.get_group_list()
-    for group in group_list:
-        group_id: int = group["group_id"]
-        group_name: str = group["group_name"]
-        # 注册群信息
-        await GroupInfo.group_init(group_id, group_name)
-        # 注册插件
-        await plugin_manager.load_plugins(group_id)
-        # 注册成员信息
-        member_list = await bot.get_group_member_list(group_id=group_id)
-        for one_member in member_list:
-            user_id = one_member["user_id"]
-            user_name = (
-                one_member["nickname"]
-                if one_member["card"] == ""
-                else one_member["card"]
-            )
-            await UserInfo.user_init(user_id, group_id, user_name)
-    logger.info(f"<y>Bot {bot.self_id}</y> 注册完毕。")
+class WebSocket:
+    def __init__(self):
+        self.title = "WebSocket"
+        self.count = 0
+        self.handler = {
+            2002: f10000,  # 连接成功
+        }
 
-
-@driver.on_bot_disconnect
-async def _(bot: Bot):
-    """bot链接关闭"""
-    logger.info("<y>检测到bot离线...</y>")
-
-
-@driver.on_startup
-async def _():
-    """等定时插件和数据加载完毕后"""
-    logger.info("<g>正在初始化浏览器...</g>")
-    await browser.init()
-    logger.info("<y>浏览器初始化完毕。</y>")
-    asyncio.create_task(ws_init())
-    # scheduler.add_job(func=ws_init, next_run_time=datetime.now() + timedelta(seconds=2))
-
-
-@driver.on_shutdown
-async def _():
-    """结束进程"""
-    logger.info("检测到进程关闭，正在清理...")
-    logger.info("<y>正在关闭浏览器...</y>")
-    await browser.shutdown()
-    logger.info("<g>浏览器关闭成功。</g>")
-
-    logger.info("<y>正在关闭数据库...</y>")
-    await Tortoise.close_connections()
-    logger.info("<g>数据库关闭成功。</g>")
-
-    logger.info("<y>关闭ws链接...</y>")
-    await ws_client.close()
-    logger.info("<g>ws链接关闭成功。</g>")
-
-
-# ----------------------------------------------------------------
-#  server操作的几个mathcer
-# ----------------------------------------------------------------
-check_ws = on_regex(pattern=r"^查看连接$", permission=SUPERUSER, priority=2, block=True)
-connect_ws = on_regex(pattern=r"^连接服务$", permission=SUPERUSER, priority=2, block=True)
-close_ws = on_regex(pattern=r"^关闭连接$", permission=SUPERUSER, priority=2, block=True)
-
-
-@check_ws.handle()
-async def _(event: PrivateMessageEvent):
-    """查看连接"""
-    if ws_client.closed:
-        msg = "jx3api > ws连接已关闭！"
-    else:
-        msg = "jx3api > ws连接正常！"
-    await check_ws.finish(msg)
-
-
-@connect_ws.handle()
-async def _(event: PrivateMessageEvent):
-    """连接服务器"""
-    if not ws_client.closed:
-        await connect_ws.finish("连接正常，请不要重复连接。")
-
-    if ws_client.is_connecting:
-        await connect_ws.finish("正在连接中，请不要重复连接。")
-
-    await connect_ws.send("正在连接服务器...")
-    flag = await ws_client.init()
-    msg = None
-    if flag:
-        msg = "jx3api > ws已连接！"
-    await connect_ws.finish(msg)
-
-
-@close_ws.handle()
-async def _(event: PrivateMessageEvent):
-    """关闭连接"""
-    if not ws_client.closed:
-        await ws_client.close()
-    await close_ws.finish()
-
-
-# ----------------------------------------------------------------
-#       ws消息事件处理
-# ----------------------------------------------------------------
-
-ws_recev = on(type="WsRecv", priority=4, block=True)
-ws_notice = on(type="WsNotice", priority=4, block=True)
-
-
-@ws_recev.handle()
-async def _(bot: Bot, event: RecvEvent):
-    """ws推送事件"""
-    group_list = await bot.get_group_list()
-    async for group_id in GroupList_Async(group_list):
-        # 是否需要验证服务器
-        if event.server:
-            group_server = await GroupInfo.get_server(group_id)
-            if group_server != event.server:
-                continue
-
-        # 判断事件接受开启状态
-        status = await get_ws_status(group_id, event)
-        if status:
+    async def connect(self, loop):
+        while True:
             try:
-                await bot.send_group_msg(group_id=group_id, message=event.get_message())
-                await asyncio.sleep(random.uniform(0.3, 0.5))
-            except Exception:
-                pass
-    await ws_recev.finish()
+                ws = await websockets.connect('wss://socket.nicemoe.cn', extra_headers={'token': ''})
+                print(f'{self.title} > 建立连接成功！')
+                return loop.create_task(self.task(loop, ws))  # 创建数据接收任务
+            except (ConnectionRefusedError, OSError, asyncio.exceptions.TimeoutError) as echo:  # 异常捕获
+                print(f"{self.title} > [{self.count}] {echo}")
+                if self.count >= 100: return  # 退出连接
+                self.count += 1  # 统计连接次数
+                print(f"{self.title} < [{self.count}] 开始尝试向 WebSocket 服务端建立连接！")
+                await asyncio.sleep(10)  # 重连间隔
+
+    async def task(self, loop, ws):
+        try:
+            while True:
+                data = await ws.recv()  # 循环接收
+                print(f"WebSocket > {data}")
+                data = json.loads(data)
+                if data['type'] in self.handler.keys():
+                    loop.create_task(self.handler[data['type']](data))  # 创建分发任务
+                await asyncio.sleep(0.1)  # 每条消息进行一次睡眠，给服务器一点尊重
+        except (ConnectionClosedError, ConnectionClosedOK, ConnectionClosed) as echo:  # 异常捕获
+            if echo.code == 1000:  # 代码 1000 服务端正常关闭连接(关闭帧)
+                print(f"{self.title} > 连接被关闭！")  # 服务端主动关闭
+            else:  # 非正常关闭
+                print(f"{self.title} > 连接已断开！")  # 服务端内部错误
+                loop.create_task(self.connect(loop))  # 创建重连任务
+            print(echo)  # 打印错误代码
 
 
-@ws_notice.handle()
-async def _(bot: Bot, event: WsNotice):
-    """ws通知主人事件"""
-    superusers = list(bot.config.superusers)
-    msg = event.message
-    async for user_id in GroupList_Async(superusers):
-        await bot.send_private_msg(user_id=user_id, message=msg)
-    await ws_notice.finish()
+if __name__ == '__main__':
+    client = WebSocket()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(client.connect(loop))
+    loop.run_forever()

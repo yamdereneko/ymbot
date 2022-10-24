@@ -83,3 +83,13 @@ class API:
             * `server`：服务器名
             * `next`: 可选，查询天数，默认为0
         """
+
+    async def user_list9jx39topn9roles9info(self, *, cursor: int,size: int,gameVersion:int,zoneName: str,serverName:str,forceId:int = ...) -> Response:
+        """
+        说明：
+            今天、明天、后天等的日常任务，七点自动更新。
+
+        参数：
+            * `server`：服务器名
+            * `next`: 可选，查询天数，默认为0
+        """

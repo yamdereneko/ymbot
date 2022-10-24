@@ -1,4 +1,3 @@
-
 """
 @Software : PyCharm
 @File : 0.py
@@ -11,11 +10,13 @@ import time
 
 import nonebot
 from src.internal.tuilanapi import API
+from src.internal.jx3api import API as jx3API
 import src.Data.jxDatas as jxData
 from src.Data.database import DataBase as database
 
 # 请求头
 headers = jxData.headers
+jx3api = jx3API()
 api = API()
 
 
@@ -42,15 +43,39 @@ class GetJJCTopRecord:
                 school_top[i] = 0
             failure_list = []
 
-            for x, element in enumerate(data[:self.pvp_type],start=1):
+            for x, element in enumerate(data[:self.pvp_type], start=1):
+                print(x)
+                print(element)
                 school = element.get("personInfo").get("force")
+
                 name = element.get("personInfo").get("roleName")
                 role_id = element.get("personInfo").get("gameRoleId")
                 server = element.get("personInfo").get("server")
                 zone = element.get("personInfo").get("zone")
                 person_id = element.get('personId')
+
+                if school == "":
+                    response = await jx3api.data_role_roleInfo(server=server, name=name)
+                    print(response)
+                    if response.code != 200:
+                        nonebot.logger.error("API接口role_roleInfo获取信息失败，请查看错误")
+                        continue
+                    role_id = response.data['globalRoleId']
+
+                    response = await api.cc_mine_match_history(global_role_id=role_id, size=10, cursor=0)
+                    print(x)
+                    print(school)
+                    print(element)
+                    if response.data is []:
+                        nonebot.logger.error("API接口cc_mine_match_history获取信息失败，请查看错误")
+                        continue
+                    kungfu = response.data[0]["kungfu"]
+                    school_top[kungfu] = school_top.get(kungfu, 0) + 1
+                    continue
+
                 if school in jxData.much_school:
                     response = await api.role_indicator(role_id=role_id, server=server, zone=zone)
+
                     if response.msg != 'success' or response.data['person_info'] is None:
                         print(f'{name} 排名{str(x)}: {role_id} {school} {server} {zone} 不存在')
                         res = await api.mine_match_person9history(person_id=str(person_id), size=10, cursor=0)
@@ -63,13 +88,20 @@ class GetJJCTopRecord:
                     time.sleep(1)
 
                     response = await api.cc_mine_performance_kungfu(global_role_id=str(global_role_id))
+
                     if response.msg != 'success' or response.data == []:
                         print(f'{name} 排名{str(x)}: {role_id} {school} {server} {zone} 不存在')
                         failure_list.append(element)
                         continue
-
-                    print(response)
-                    kungfu = response.data[0]['name']
+                    #
+                    z = 0
+                    while len(response.data[z]["skills"]) < 8:
+                        z += 1
+                    print(z)
+                    print(response.data[z].values())
+                    print(response.data)
+                    print('====' * 30)
+                    kungfu = response.data[z]['name']
                     if kungfu is None or kungfu == []:
                         print(f'{name} 排名{str(x)}: {role_id} {school} {server} {zone} 不存在')
                         failure_list.append(element)
@@ -92,7 +124,7 @@ class GetJJCTopRecord:
         data = await self.get_top_history()
         print(data)
         # 判断连接池数据是否冲突
-        sql = "select week from JJC_rank50_weekly"
+        sql = f"select week from JJC_rank_weekly"
         await self.database.connect()
         weekly = await self.database.fetchall(sql)
         for week in weekly:
@@ -100,7 +132,7 @@ class GetJJCTopRecord:
                 print("该周数据已存在...")
                 return None
 
-        sql = "insert into JJC_rank50_weekly (week, 霸刀, 藏剑, 蓬莱, 无方,云裳,花间,少林,惊羽,丐帮,苍云,紫霞,相知,补天,凌雪,明教,毒经,灵素,天策,田螺,胎虚,离经,莫问,衍天,冰心) values ('%s','%s','%s',%s,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+        sql = "insert into JJC_rank_weekly (week, 霸刀, 藏剑, 蓬莱, 无方,云裳,花间,少林,惊羽,丐帮,苍云,紫霞,相知,补天,凌雪,明教,毒经,灵素,天策,田螺,胎虚,离经,莫问,衍天,冰心) values ('%s','%s','%s',%s,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
             self.weekly, data["霸刀"], data["藏剑"], data["蓬莱"], data["无方"], data["云裳"], data["花间"], data["少林"], data["惊羽"],
             data["丐帮"], data["苍云"], data["紫霞"], data["相知"], data["补天"], data["凌雪阁"], data["明教"], data["毒经"], data["灵素"],
             data["天策"], data["田螺"], data["胎虚"], data["离经"], data["莫问"], data["衍天宗"], data["冰心"])
@@ -111,5 +143,5 @@ class GetJJCTopRecord:
             print("门派汇总的人数不到正确值，请人工处理错误信息...")
 
 
-record = GetJJCTopRecord(39, 100)
+record = GetJJCTopRecord(42, 200)
 print(asyncio.run(record.main()))
