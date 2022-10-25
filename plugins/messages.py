@@ -386,7 +386,6 @@ async def onMessage_Strategy(matcher: Matcher, args: Message = CommandArg()):
 async def onMessage_Recruit(matcher: Matcher, args: Message = CommandArg()):
     if args.extract_plain_text() != "":
         plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
-
         if plain_text.find(" ") != -1:
             server = jx3Data.mainServer(re.split('[ ]+', plain_text)[0])
             recruit_text = re.split('[ ]+', plain_text)[1]
@@ -404,8 +403,14 @@ async def onMessage_Recruit(matcher: Matcher, args: Message = CommandArg()):
             msg = MessageSegment.text("获取不到招募信息，请稍后再试")
             await Recruit.reject(msg)
     else:
-        nonebot.logger.error("招募获取大区信息填写失败，请重试")
-        await Recruit.reject("招募获取大区信息填写失败，请重试")
+        recruit = jx3_Recruit.Recruit(server_binding)
+        recruit_total = await recruit.get_Fig()
+        if recruit_total:
+            recruit_image = f"/tmp/recruit{recruit_total}.png"
+            msg = MessageSegment.image('file:' + recruit_image)
+            await Recruit.finish(msg)
+        nonebot.logger.error("招募获取大区信息失败，请重试")
+        await Recruit.reject("招募获取大区填写失败，请重试")
 
 
 @Price.handle()

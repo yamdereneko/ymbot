@@ -20,7 +20,7 @@ class Recruit:
         * `keyword`：可选，参数
     """
 
-    def __init__(self, server, keyword):
+    def __init__(self, server, keyword=None):
         self.server = jxData.mainServer(server)
         self.zone = jxData.mainZone(self.server)
         self.keyword = keyword

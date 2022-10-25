@@ -15,7 +15,7 @@ from fastapi.responses import JSONResponse
 from fastapi import FastAPI, HTTPException, Request
 
 nonebot.init(_env_file=".env.dev", apscheduler_autostart=True)
-# app: FastAPI = nonebot.get_asgi()
+app: FastAPI = nonebot.get_asgi()
 
 
 class UnicornException(Exception):
