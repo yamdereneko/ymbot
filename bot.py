@@ -20,4 +20,4 @@ logger.add("logs/error.log")
 
 if __name__ == "__main__":
     nonebot.logger.warning("请使用指令[nb run]来运行此项目!")
-    nonebot.run(app=app, host="0.0.0.0", port=8081)
+    nonebot.run(app=app, host="0.0.0.0", port=8080)
