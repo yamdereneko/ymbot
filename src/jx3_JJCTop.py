@@ -32,10 +32,12 @@ class GetJJCTopRecord:
         try:
             # 准备请求参数
             response = await api.cc_mine_arena_top200(typeName='week', tag=self.weekly, heiMaBang=False)
+            print(response)
             if response.code != 0:
                 nonebot.logger.error("API接口cc_mine_arena_top200获取信息失败，请查看错误")
                 return None
             data = response.data
+
 
             school_top = {}
 

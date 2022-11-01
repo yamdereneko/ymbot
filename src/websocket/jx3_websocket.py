@@ -18,6 +18,7 @@ class Jx3WebSocket(object):
     jx3_api的ws链接封装
     """
 
+    _instance = None
     connect: Optional[WebSocketClientProtocol] = None
     """ws链接"""
     is_connecting: bool = False
@@ -27,7 +28,7 @@ class Jx3WebSocket(object):
         """单例"""
         if not hasattr(cls, "_instance"):
             orig = super(Jx3WebSocket, cls)
-            cls._instance = orig.__new__(cls, *args, **kwargs)
+            cls._instance = orig.__new__(cls)
         return cls._instance
 
     async def _task(self):
@@ -92,7 +93,7 @@ class Jx3WebSocket(object):
             return None
 
         ws_path = 'wss://socket.nicemoe.cn'
-        ws_token = None
+        ws_token = "5f2143314ebbec94b7aa80f7fd295856b03e567358a4f966fcbe597949e985e8"
         if ws_token is None:
             ws_token = ""
         headers = {"token": ws_token}

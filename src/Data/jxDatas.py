@@ -51,20 +51,21 @@ class Jx3ApiConfig(BaseModel, extra=Extra.ignore):
     jx3api的配置
     """
 
-    ws_path: str = Field("", alias="jx3api_ws_path")
+    ws_path: str = Field("wss://socket.nicemoe.cn", alias="jx3api_ws_path")
     """ws连接地址"""
-    ws_token: str = Field("", alias="jx3api_ws_token")
+    ws_token: str = Field("5f2143314ebbec94b7aa80f7fd295856b03e567358a4f966fcbe597949e985e8", alias="jx3api_ws_token")
     """ws的token"""
     api_url: str = Field("", alias="jx3api_url")
     """主站的url"""
     api_token: str = Field("", alias="jx3api_token")
     """主站的token"""
 
+
 #
 
-group_list = ["1077830347", "642668185"]
+# group_list = ["1077830347", "642668185"]
 
-# group_list = ["549242180"]
+group_list = [736734387, 642668185]
 # group_list = ["642668185"]
 
 config = {
@@ -82,8 +83,6 @@ config = {
 all_school = {'霸刀': 10, '少林': 12, '补天': 12, '蓬莱': 14, '紫霞': 14, '藏剑': 13, '明教': 7, '云裳': 17, '花间': 12, '丐帮': 5,
               '凌雪阁': 8, '田螺': 6, '惊羽': 5, '相知': 14, '胎虚': 5, '苍云': 5, '天策': 8, '无方': 11, '灵素': 6, '冰心': 3, '毒经': 6,
               '衍天宗': 2, '莫问': 1, '离经': 3}
-
-
 
 bodyType = {
     "成男": 1,
@@ -203,6 +202,7 @@ school_pinyin = {
 212 = 药宗
 213 = 刀宗
 '''
+
 
 def school(method):
     match method:

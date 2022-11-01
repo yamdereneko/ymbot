@@ -1,6 +1,5 @@
 import asyncio
 import json
-
 import nonebot
 import src.Data.jx3_Redis as redis
 from contextlib import closing, suppress
@@ -119,8 +118,7 @@ async def run_daily():
 
 async def async_run():
     task1 = asyncio.shield(run_daily())
-    task2 = asyncio.shield(main(["斗转星移"]))
-    res = await asyncio.gather(task1, task2, return_exceptions=True)
+    res = await asyncio.gather(task1, return_exceptions=True)
     bot, = get_bots().values()
     for group_id in group_list:
         for msg in res:

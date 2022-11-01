@@ -8,6 +8,7 @@
 @Docs : 请求推栏战绩例子
 """
 import asyncio
+from functools import partial
 import time
 import matplotlib.pyplot as plt
 import nonebot
@@ -72,3 +73,4 @@ class GetDaily:
             nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
             return None
         return response.data
+
