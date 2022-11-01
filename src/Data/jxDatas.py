@@ -102,6 +102,7 @@ class Jx3ApiConfig(BaseModel, extra=Extra.ignore):
 
 # group_list = ["1077830347", "642668185"]
 
+
 group_list = [736734387,642668185]
 # group_list = ["642668185"]
 
