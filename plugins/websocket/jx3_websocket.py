@@ -39,8 +39,7 @@ async def f1001(data):
         data["data"]["level"], data["data"]["time"]))
     bot, = get_bots().values()
     msg = MessageSegment.text(f'{adventure_id}触发了{adventure_serendipity}')
-    for group_id in group_list:
-        await bot.send_group_msg(group_id=group_id, message=msg)
+    await bot.send_group_msg(group_id=642668185, message=msg)
 
 
 async def f2001(data):
@@ -68,7 +67,7 @@ class WebSocket:
         self.title = "jx3api的ws服务器"
         self.count = 0
         self.handler = {
-            # 1001: f1001,  # 连接成功
+            1001: f1001,  # 连接成功
             2002: f2002,
             2001: f2001
         }
