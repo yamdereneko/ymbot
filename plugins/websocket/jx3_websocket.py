@@ -64,7 +64,6 @@ class WebSocket:
     """ws链接"""
     is_connecting: bool = False
 
-
     def __init__(self):
         self.title = "jx3api的ws服务器"
         self.count = 0
