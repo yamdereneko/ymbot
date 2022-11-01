@@ -6,32 +6,8 @@
 @Time : 2021/09/29 22:39:29
 @Docs : 请求推栏战绩例子
 """
-import asyncio
-import datetime
-import time
-import traceback
-import random
-import urllib
-from time import gmtime
-import dufte
-import nonebot
-import matplotlib
-import matplotlib.pyplot as plt
-import pytz
-import src.Data.jxDatas as jxData
-from src.Data.database import DataBase as database
-from src.internal.tuilanapi import API
-from matplotlib import font_manager
-import numpy as np
-import pandas as pd
-import networkx as nx
 
-import asyncio
-import websockets
 import websockets.exceptions
-from src.Data.jxDatas import jx3api_ticket
-
-import re
 
 # import tkinter as Tkinter
 # from tkinter import font as tkFont
@@ -271,12 +247,11 @@ from typing import Optional
 
 import nonebot
 import websockets
-from src.Data.jxDatas import group_list
 from nonebot import get_bots
 from nonebot.message import handle_event
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 from websockets.legacy.client import WebSocketClientProtocol
-from src.websocket._jx3_event import EventRister, WsData, WsNotice
+from plugins.websocket._jx3_event import EventRister, WsData, WsNotice
 
 
 class Jx3WebSocket(object):

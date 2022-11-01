@@ -2,6 +2,43 @@ import asyncio
 import random
 import redis
 from pydantic import BaseModel, Extra, Field
+from nonebot import get_driver
+
+config = get_driver().config
+
+
+class DefaultConfig(BaseModel, extra=Extra.ignore):
+    """
+    默认设置
+    """
+
+    server: str = Field("斗转星移", alias="default_server")
+    """默认绑定区服"""
+    access_firend: bool = Field(True, alias="default_access_firend")
+    """是否接受好友请求"""
+    access_group: bool = Field(True, alias="default_access_group")
+    """是否接受群请求"""
+    robot_status: bool = Field(True, alias="default_robot_status")
+    """机器人开关"""
+    robot_active: int = Field(10, alias="default_robot_active")
+    """机器人活跃"""
+    robot_welcome_status: bool = Field("", alias="default_robot_welcome_status")
+    """进群欢迎开关"""
+    robot_welcome: str = Field(True, alias="defualt_robot_welcome")
+    """进群欢迎语"""
+    robot_someone_left_status: bool = Field(
+        False, alias="defualt_robot_someone_left_status"
+    )
+    """群友离开说话开关"""
+    robot_someone_left: str = Field("", alias="defualt_robot_someone_left")
+    """群友离开内容"""
+    robot_goodnight_status: bool = Field(True, alias="defulat_robot_goodnight_status")
+    """晚安通知开关"""
+    robot_goodnight: str = Field("", alias="defulat_robot_goodnight")
+    """晚安通知内容"""
+
+
+default_config = DefaultConfig.parse_obj(config)
 
 """
     jx3apiToken
@@ -80,9 +117,9 @@ config = {
     'autocommit': True,  # 自动提交模式
 }
 
-all_school = {'霸刀': 10, '少林': 12, '补天': 12, '蓬莱': 14, '紫霞': 14, '藏剑': 13, '明教': 7, '云裳': 17, '花间': 12, '丐帮': 5,
-              '凌雪阁': 8, '田螺': 6, '惊羽': 5, '相知': 14, '胎虚': 5, '苍云': 5, '天策': 8, '无方': 11, '灵素': 6, '冰心': 3, '毒经': 6,
-              '衍天宗': 2, '莫问': 1, '离经': 3}
+all_school = {'霸刀': 0, '少林': 0, '补天': 0, '蓬莱': 0, '紫霞': 0, '藏剑': 0, '明教': 0, '云裳': 0, '花间': 0, '丐帮': 0,
+              '凌雪阁': 0, '田螺': 6, '惊羽': 0, '相知': 0, '胎虚': 0, '苍云': 0, '天策': 0, '无方': 0, '灵素': 0, '冰心': 0, '毒经': 0,
+              '衍天宗': 0, '莫问': 0, '离经': 0, '刀宗': 0}
 
 bodyType = {
     "成男": 1,
