@@ -40,7 +40,6 @@ async def f1001(data):
     bot, = get_bots().values()
     msg = MessageSegment.text(f'{adventure_id}触发了{adventure_serendipity}')
     nonebot.logger.info(msg)
-    #
     # for group_id in group_list:
     #     await bot.send_group_msg(group_id=group_id, message=msg)
 
