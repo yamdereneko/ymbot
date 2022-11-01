@@ -100,10 +100,10 @@ class Jx3ApiConfig(BaseModel, extra=Extra.ignore):
 
 #
 
-# group_list = ["1077830347", "642668185"]
+# group_list = ["736734387", "642668185"]
 
-group_list = [736734387,642668185]
-# group_list = ["642668185"]
+# group_list = [549242180]
+group_list = ["736734387", "642668185"]
 
 config = {
     'host': '114.115.181.82',  # 连接主机名。

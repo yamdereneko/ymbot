@@ -10,7 +10,7 @@
 import asyncio
 import nonebot
 from nonebot import get_driver, on_regex
-from nonebot.adapters.onebot.v11 import PrivateMessageEvent
+from nonebot.adapters.onebot.v11 import PrivateMessageEvent, MessageSegment
 from nonebot.permission import SUPERUSER
 from .jx3_websocket import ws_client
 
@@ -47,6 +47,7 @@ async def _(event: PrivateMessageEvent):
         msg = "jx3api > ws连接已关闭！"
     else:
         msg = "jx3api > ws连接正常！"
+    msg = MessageSegment.text(msg)
     await check_ws.finish(msg)
 
 
@@ -64,6 +65,7 @@ async def _(event: PrivateMessageEvent):
     msg = None
     if flag:
         msg = "jx3api > ws已连接！"
+    msg = MessageSegment.text(msg)
     await connect_ws.finish(msg)
 
 
@@ -72,5 +74,8 @@ async def _(event: PrivateMessageEvent):
     """关闭连接"""
     if not ws_client.closed:
         await ws_client.close()
-    await close_ws.finish()
+        msg = MessageSegment.text("jx3api > ws连接已关闭！")
+    else:
+        msg = MessageSegment.text("jx3api > ws连接未关闭！")
+    await close_ws.finish(msg)
 

@@ -3,7 +3,6 @@ import json
 from typing import Any
 
 from functools import partial
-import aiohttp
 import hashlib
 import hmac
 import datetime
@@ -11,7 +10,7 @@ from loguru import logger
 from typing_extensions import Protocol
 from pydantic import BaseModel
 from httpx import AsyncClient
-import src.Data.jxDatas as jxData
+from src.Data.jxDatas import headers
 
 
 class _ApiCall(Protocol):
@@ -53,7 +52,6 @@ class API:
         """请求api网站数据"""
 
         try:
-            headers = jxData.headers
             data['ts'] = await gen_ts()
             param = await format_body(data)
             headers['X-Sk'] = await gen_xsk(param)
