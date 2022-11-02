@@ -39,7 +39,8 @@ async def f1001(data):
         data["data"]["level"], data["data"]["time"]))
     bot, = get_bots().values()
     msg = MessageSegment.text(f'{adventure_id}触发了{adventure_serendipity}')
-    await bot.send_group_msg(group_id=642668185, message=msg)
+    for group_id in group_list:
+        await bot.send_group_msg(group_id=group_id, message=msg)
 
 
 async def f2001(data):
@@ -100,7 +101,7 @@ class WebSocket:
                             extra_headers=headers,
                             ping_interval=20,
                             ping_timeout=20,
-                            close_timeout=10,
+                            close_timeout=10
                         )
                         asyncio.create_task(self._task())
                         nonebot.logger.debug("<g>ws_server</g> | ws连接成功！")

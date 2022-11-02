@@ -11,7 +11,6 @@ import asyncio
 import nonebot
 from nonebot import get_driver, on_regex
 from nonebot.adapters.onebot.v11 import PrivateMessageEvent, MessageSegment
-from nonebot.permission import SUPERUSER
 from .jx3_websocket import ws_client
 
 
