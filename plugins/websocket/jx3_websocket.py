@@ -8,6 +8,8 @@
 """
 import asyncio
 import json
+import time
+
 import nonebot
 from nonebot import get_driver
 from nonebot.message import handle_event
@@ -46,7 +48,13 @@ async def f1001(data):
 async def f2001(data):
     bot, = get_bots().values()
     if data['data']['server'] == jxData.server_binding:
-        msg = MessageSegment.text(f'{jxData.server_binding}开服了,快冲！')
+        close_time = time.strftime("%H点%M分", time.localtime(data['data']['time']))
+        if data['data']['status'] == 0:
+            msg = MessageSegment.text(f'{jxData.server_binding} 在 {close_time}关服了,睡觉吧！')
+        elif data['data']['status'] == 1:
+            msg = MessageSegment.text(f'{jxData.server_binding} 在 {close_time} 开服了,快冲！')
+        else:
+            msg = MessageSegment.text(f'开服报错了，看下报错！')
         for group_id in group_list:
             await bot.send_group_msg(group_id=group_id, message=msg)
 
@@ -135,7 +143,7 @@ class WebSocket:
             * `message`：通知内容
         """
         event = WsNotice(message=message)
-        bots = get_bots()
+        bots, = get_bots().values()
         for _, one_bot in bots.items():
             await handle_event(one_bot, event)
 

@@ -118,12 +118,18 @@ class GetJJCTopRecord:
             print(school_top)
             print(e)
 
-    async def main(self):
+    async def create_top_history_to_database(self):
         # 获取所有的数据进行处理
         data = await self.get_top_history()
         print(data)
         # 判断连接池数据是否冲突
-        sql = f"select week from JJC_rank50_weekly"
+        if self.pvp_type == 50:
+            table_name = 'JJC_rank50_weekly'
+        elif self.pvp_type == 200:
+            table_name = 'JJC_rank_weekly'
+        else:
+            return None
+        sql = f"select week from {table_name}"
         await self.database.connect()
         weekly = await self.database.fetchall(sql)
         for week in weekly:
@@ -131,7 +137,7 @@ class GetJJCTopRecord:
                 print("该周数据已存在...")
                 return None
 
-        sql = "insert into JJC_rank50_weekly (week, 霸刀, 藏剑, 蓬莱, 无方,云裳,花间,少林,惊羽,丐帮,苍云,紫霞,相知,补天,凌雪,明教,毒经,灵素,天策,田螺,胎虚,离经,莫问,衍天,冰心,刀宗) values ('%s','%s','%s',%s,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+        sql = f"insert into {table_name} (week, 霸刀, 藏剑, 蓬莱, 无方,云裳,花间,少林,惊羽,丐帮,苍云,紫霞,相知,补天,凌雪,明教,毒经,灵素,天策,田螺,胎虚,离经,莫问,衍天,冰心,刀宗) values ('%s','%s','%s',%s,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
             self.weekly, data["霸刀"], data["藏剑"], data["蓬莱"], data["无方"], data["云裳"], data["花间"], data["少林"], data["惊羽"],
             data["丐帮"], data["苍云"], data["紫霞"], data["相知"], data["补天"], data["凌雪阁"], data["明教"], data["毒经"], data["灵素"],
             data["天策"], data["田螺"], data["胎虚"], data["离经"], data["莫问"], data["衍天宗"], data["冰心"], data["刀宗"])
@@ -140,7 +146,3 @@ class GetJJCTopRecord:
             await self.database.execute(sql)
         else:
             print("门派汇总的人数不到正确值，请人工处理错误信息...")
-
-
-record = GetJJCTopRecord(44, 50)
-print(asyncio.run(record.main()))

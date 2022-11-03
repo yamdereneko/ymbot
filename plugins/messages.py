@@ -28,6 +28,7 @@ import src.jx3_Fireworks as jx3_Fireworks
 import src.jx3_Multifunction as jx3_Multifunction
 import src.jx3_Recruit as jx3_Recruit
 import src.jx3_Price as jx3_Price
+import src.jx3_JJCTop as jx3_JJCTop
 
 RoleJJCRecord = on_command("RoleJJCRecord", rule=keyword("战绩", "JJC信息"), aliases={"战绩", "JJC信息"}, priority=5)
 JJCTop = on_command("JJCTop", rule=keyword("JJC趋势图"), aliases={"JJC趋势图"}, priority=5)
@@ -45,6 +46,8 @@ Recruit = on_command("Recruit", rule=keyword("招募"), aliases={"招募"}, prio
 Price = on_command("Price", rule=keyword("物价"), aliases={"物价"}, priority=5)
 Flatterer = on_command("Flatterer", rule=keyword("舔狗日志"), aliases={"舔狗日志"}, priority=5)
 Announce = on_command("Announce", rule=keyword("公告"), aliases={"公告"}, priority=5)
+CreateJJCTopDataToDataBase = on_command("CreateJJCTopDataToDataBase", rule=keyword("生成JJC趋势图"), aliases={"生成JJC趋势图"},
+                                        priority=5)
 
 
 @RoleJJCRecord.handle()
@@ -351,7 +354,7 @@ async def onMessage_Flatterer():
 @Announce.handle()
 async def onMessage_Announce():
     announce = await jx3_Multifunction.get_announce()
-    text = announce[0]['type'] + '\n' + announce[0]['title'] + '\n' + announce[0]['date']+ '\n' + announce[0]['url']
+    text = announce[0]['type'] + '\n' + announce[0]['title'] + '\n' + announce[0]['date'] + '\n' + announce[0]['url']
     msg = MessageSegment.text(text)
     await Flatterer.finish(msg)
 
@@ -441,6 +444,28 @@ async def onMessage_Price(args: Message = CommandArg()):
     else:
         nonebot.logger.error("物价信息填写失败，请重试")
         await Price.reject("物价信息填写失败，请重试")
+
+
+@CreateJJCTopDataToDataBase.handle()
+async def onMessage_CreateJJCTopDataToDataBase(args: Message = CommandArg()):
+    plain_text = args.extract_plain_text()
+    if plain_text != "":
+        if plain_text.find(" ") != -1:
+            pvp_type = re.split('[ ]+', plain_text)[0]
+            weekly = re.split('[ ]+', plain_text)[1]
+        else:
+            pvp_type = 200
+            weekly = plain_text
+        top_data = jx3_JJCTop.GetJJCTopRecord(weekly=weekly, pvp_type=pvp_type)
+        top_data_to_database = await top_data.create_top_history_to_database()
+        if top_data_to_database is None:
+            msg = MessageSegment.text('JJC数据同步失败，请查看报错')
+            await CreateJJCTopDataToDataBase.finish(msg)
+        else:
+            msg = MessageSegment.text('JJC数据同步成果')
+            await CreateJJCTopDataToDataBase.finish(msg)
+    else:
+        await CreateJJCTopDataToDataBase.finish("1111")
 
 # @roleJJCRecord.got("role", prompt="你想查询哪个角色信息呢？")
 # async def handle_city(role: Message = Arg(), roleName: str = ArgPlainText("role")):
