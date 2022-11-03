@@ -39,11 +39,10 @@ class API:
             headers = {
                 'token': jx3api_ticket
             }
-            res = await self.client.get(url=url, params=data, headers=headers)
+            res = await self.client.get(url=url, params=data, headers=headers,timeout=1000)
             return Response.parse_obj(res.json())
         except Exception as e:
             logger.error(f"<y>JX3API请求出错：</y> | {str(e)}")
-            logger.error(res)
             return Response(code=0, msg=f"{str(e)}", data={}, time=0)
 
     def __getattr__(self, name: str) -> _ApiCall:

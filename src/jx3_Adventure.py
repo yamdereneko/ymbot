@@ -25,22 +25,11 @@ class Adventure:
         if response.code != 200:
             nonebot.logger.error("API接口next_serendipity获取信息失败，请查看错误")
             return None
-
-        with closing(
-                open("src/Data/serendipity.json")
-        ) as resp:
-            serendipity_json = json.load(resp)
-
-        serendipity_independent = []
-        for line in serendipity_json:
-            if line["type"] == "绝世奇遇" or line["type"] == "世界奇遇":
-                serendipity_independent.append(line["name"])
-
-        serendipity = []
-        for task in response.data:
-            if task['serendipity'] in serendipity_independent:
-                serendipity.append(task)
-        return serendipity
+        adventure_info = []
+        for _ in response.data:
+            if _['level'] < 3:
+                adventure_info.append(_)
+        return adventure_info
 
     async def get_Fig(self):
         try:

@@ -14,6 +14,7 @@ nonebot.load_from_toml("pyproject.toml")
 
 # nonebot.load_plugins("plugins")
 
+
 logger.add("logs/error.log")
 
 if __name__ == "__main__":
