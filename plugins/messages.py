@@ -275,6 +275,9 @@ async def onMessage_Adventure(matcher: Matcher, args: Message = CommandArg()):
             user = plain_text
         adventure = jx3_Adventure.Adventure(server, user)
         user_adventure_data = await adventure.query_user_info()
+        if user_adventure_data is None:
+            await Adventure.reject('数据异常，请联系管理员')
+        nonebot.logger.info(user_adventure_data)
         red = redis.Redis()
         frame = f"/tmp/adventure{user}.png"
         redis_adventure_data = await red.query('adventure_' + user)
@@ -287,9 +290,8 @@ async def onMessage_Adventure(matcher: Matcher, args: Message = CommandArg()):
             else:
                 await red.delete('adventure_' + user)
                 await red.delete('adventure_' + user + '_image')
-
         await red.add('adventure_' + user, user_adventure_data)
-        user_adventure_image = await adventure.get_Fig()
+        user_adventure_image = await adventure.get_Fig(user_adventure_data)
         frame = f"/tmp/adventure{user_adventure_image}.png"
         await red.insert_image('adventure_' + user + '_image', frame)
         msg = MessageSegment.image('file:' + frame)

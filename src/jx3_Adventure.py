@@ -1,15 +1,15 @@
+# -*- coding: utf-8 -*-
 import asyncio
 import json
 import time
 import traceback
-from contextlib import closing
-
 import dufte
 import nonebot
 import random
 import src.Data.jxDatas as jxData
 from src.internal.jx3api import API
 from matplotlib import pyplot as plt
+from functools import partial
 
 api = API()
 
@@ -21,7 +21,8 @@ class Adventure:
         self.user = user
 
     async def query_user_info(self):
-        response = await api.data_lucky_serendipity(server=self.server, name=self.user, ticket=random.choice(jxData.ticket))
+        response = await api.data_lucky_serendipity(server=self.server, name=self.user,
+                                                    ticket=random.choice(jxData.ticket))
         if response.code != 200:
             nonebot.logger.error("API接口next_serendipity获取信息失败，请查看错误")
             return None
@@ -31,9 +32,8 @@ class Adventure:
                 adventure_info.append(_)
         return adventure_info
 
-    async def get_Fig(self):
+    async def get_Fig(self, task):
         try:
-            task = await self.query_user_info()
             if task is None:
                 nonebot.logger.error("获取用户信息失败，请查看问题.")
                 return None
