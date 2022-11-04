@@ -8,15 +8,15 @@
 """
 import asyncio
 import nonebot
+from plugins.brower import browser
 from nonebot import get_driver, on_regex
 from nonebot.adapters.onebot.v11 import PrivateMessageEvent, MessageSegment
 from .jx3_websocket import ws_client
 
-
 driver = get_driver()
 
-check_ws = on_regex(pattern=r"^查看连接$",  priority=2, block=True)
-connect_ws = on_regex(pattern=r"^连接服务$",  priority=2, block=True)
+check_ws = on_regex(pattern=r"^查看连接$", priority=2, block=True)
+connect_ws = on_regex(pattern=r"^连接服务$", priority=2, block=True)
 close_ws = on_regex(pattern=r"^关闭连接$", priority=2, block=True)
 
 
@@ -35,7 +35,26 @@ async def _():
     """等定时插件和数据加载完毕后"""
     nonebot.logger.info("<g>正在初始化WS...</g>")
     asyncio.create_task(ws_init())
+    nonebot.logger.info("<g>正在初始化浏览器...</g>")
+    await browser.init()
     # scheduler.add_job(func=ws_init, next_run_time=datetime.now() + timedelta(seconds=2))
+
+
+@driver.on_shutdown
+async def _():
+    """结束进程"""
+    nonebot.logger.info("检测到进程关闭，正在清理...")
+    nonebot.logger.info("<y>正在关闭浏览器...</y>")
+    await browser.shutdown()
+    nonebot.logger.info("<g>浏览器关闭成功。</g>")
+
+    # nonebot.logger.info("<y>正在关闭数据库...</y>")
+    # await Tortoise.close_connections()
+    # nonebot.logger.info("<g>数据库关闭成功。</g>")
+
+    nonebot.logger.info("<y>关闭ws链接...</y>")
+    await ws_client.close()
+    nonebot.logger.info("<g>ws链接关闭成功。</g>")
 
 
 @check_ws.handle()
@@ -76,4 +95,3 @@ async def _(event: PrivateMessageEvent):
     else:
         msg = MessageSegment.text("jx3api > ws连接未关闭！")
     await close_ws.finish(msg)
-

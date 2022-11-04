@@ -23,6 +23,8 @@ from nonebot import get_bots
 from src.Data.jxDatas import group_list
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 from .jx3_event import WsData, WsNotice
+import src.Data.jx3_Redis as redis
+from ..brower import browser
 
 driver = get_driver()
 
@@ -34,13 +36,15 @@ async def f1001(data):
     # 插入数据
     adventure_id = data["data"]["name"]
     adventure_serendipity = data["data"]["serendipity"]
+    adventure_time = data["data"]["time"]
     sql = "INSERT INTO `Adventure_History` (`zone`, `server`, `name`, `serendipity`, `level`, `time`) VALUES (%s, %s, %s, %s, %s, %s) "
     await database.execute(sql, (
         data["data"]["zone"], data["data"]["server"],
         adventure_id, adventure_serendipity,
-        data["data"]["level"], data["data"]["time"]))
+        data["data"]["level"], adventure_time))
     bot, = get_bots().values()
-    msg = MessageSegment.text(f'{adventure_id}触发了{adventure_serendipity}')
+    start_time = time.strftime("%H时%M分%S秒", time.localtime(adventure_time))
+    msg = MessageSegment.text(f'{adventure_id} {start_time} 触发了 {adventure_serendipity}!')
     for group_id in group_list:
         await bot.send_group_msg(group_id=group_id, message=msg)
 
@@ -61,10 +65,14 @@ async def f2001(data):
 
 async def f2002(data):
     bot, = get_bots().values()
-    text = data["data"]['type'] + '\n' + data["data"]['title'] + '\n' + data["data"]['url']
-    msg = MessageSegment.text(text)
+    url = data["data"]['url']
+    announce_title = data["data"]['title']
+    text = data["data"]['type'] + '\n' + announce_title + '\n' + url
+    image = await browser.get_image_from_url(url)
+    msg = MessageSegment.image(image)
+
     for group_id in group_list:
-        await bot.send_group_msg(group_id=group_id, message=msg)
+        await bot.send_group_msg(group_id=group_id, message=text + msg)
 
 
 class WebSocket:
@@ -143,7 +151,7 @@ class WebSocket:
             * `message`：通知内容
         """
         event = WsNotice(message=message)
-        bots, = get_bots().values()
+        bots = get_bots()
         for _, one_bot in bots.items():
             await handle_event(one_bot, event)
 

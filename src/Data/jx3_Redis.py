@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import asyncio
-import base64
 import json
 import nonebot
+import io
+import base64
+from PIL import Image
 from src.Data.jxDatas import redis_config
 
 
@@ -18,6 +20,12 @@ class Redis:
             self.conn.set(key, json.dumps(data))  # 添加
             nonebot.logger.info(f"Redis添加成功!:{key}")
             return True
+
+    async def exist(self, key):
+        if self.conn.exists(key) == 1:
+            return True
+        else:
+            return False
 
     async def query(self, key):
         return self.conn.get(key)  # 拿出key对应所有值
@@ -43,10 +51,21 @@ class Redis:
         with open(frame, "wb") as f:  # 写入生成一个jd.png
             f.write(image_data)
 
+    async def insert_image_encode(self, frame_id, image):
+        base64_data = base64.b64encode(image)
+        self.conn.set(frame_id, base64_data)
+
+    async def get_image_encode(self, frame_id):
+        # 从redis中取出序列化的图片并进行反序列化
+        # im = pickle.loads(self.conn.get(frame_id))
+        image_data = self.conn.get(frame_id)
+        image = Image.open(io.BytesIO(image_data))
+        return image
+
 #
 # red = Redis()
-# res = asyncio.run(red.query('top_JJC_rank_weekly'))
-# asyncio.run(red.delete('top_JJC_rank_weekly'))
+# res = asyncio.run(red.exist('adventure_幽谷'))
+# print(res)
 # #
 
 # print(res)

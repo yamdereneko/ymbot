@@ -38,8 +38,22 @@ class DefaultConfig(BaseModel, extra=Extra.ignore):
     """晚安通知内容"""
 
 
-default_config = DefaultConfig.parse_obj(config)
+class PathConfig(BaseModel, extra=Extra.ignore):
+    """
+    路径设置
+    """
 
+    data: str = Field("", alias="path_data")
+    """数据文件"""
+    logs: str = Field("", alias="path_logs")
+    """日志文件"""
+    templates: str = Field("", alias="path_templates")
+    """html模板文件"""
+
+
+default_config = DefaultConfig.parse_obj(config)
+path_config = PathConfig.parse_obj(config)
+"""路径设置"""
 """
     jx3apiToken
 """

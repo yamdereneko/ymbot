@@ -15,6 +15,7 @@ from nonebot.rule import keyword
 from nonebot.matcher import Matcher
 from nonebot.adapters import Message
 from nonebot.params import CommandArg
+from plugins.brower import browser
 from src.Data.jxDatas import server_binding
 import src.Data.jx3_Redis as redis
 import src.Data.jxDatas as jx3Data
@@ -356,9 +357,32 @@ async def onMessage_Flatterer():
 @Announce.handle()
 async def onMessage_Announce():
     announce = await jx3_Multifunction.get_announce()
+    announce_title = announce[0]['title']
     text = announce[0]['type'] + '\n' + announce[0]['title'] + '\n' + announce[0]['date'] + '\n' + announce[0]['url']
-    msg = MessageSegment.text(text)
-    await Flatterer.finish(msg)
+    frame = f"/tmp/Announce_{announce_title}.png"
+    red = redis.Redis()
+    redis_announce_title = await red.exist('announce_' + announce_title)
+    if redis_announce_title:
+        await red.get_image('announce_' + announce_title, frame)
+        msg = MessageSegment.image('file:' + frame)
+    else:
+        images = await browser.get_image_from_url(announce[0]['url'])
+        await red.insert_image_encode('announce_' + announce_title, images)
+        msg = MessageSegment.image(images)
+    await Announce.finish(text + msg)
+
+
+@Strategy.handle()
+async def onMessage_Strategy(matcher: Matcher, args: Message = CommandArg()):
+    if args.extract_plain_text() != "":
+        plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
+        strategy = await jx3_Multifunction.get_strategy(plain_text)
+        image_url = strategy['url']
+        msg = MessageSegment.image(image_url)
+        await Strategy.finish(msg)
+    else:
+        nonebot.logger.error("请求错误,请参考: 奇遇攻略 奇遇名")
+        await Strategy.reject("请求错误,请参考: 奇遇攻略 奇遇名")
 
 
 @Strategy.handle()
