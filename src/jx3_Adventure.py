@@ -29,7 +29,7 @@ class Adventure:
         adventure_info = []
         for _ in response.data:
             if _['level'] < 3:
-                adventure_info.append(_)
+                adventure_info.append(json.load(_))
         return adventure_info
 
     async def get_Fig(self, task):

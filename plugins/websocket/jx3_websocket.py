@@ -43,7 +43,7 @@ async def f1001(data):
         adventure_id, adventure_serendipity,
         data["data"]["level"], adventure_time))
     bot, = get_bots().values()
-    start_time = time.strftime("%H时%M分%S秒", time.localtime(adventure_time))
+    start_time = time.strftime("%H:%M", time.localtime(adventure_time))
     msg = MessageSegment.text(f'{adventure_id} {start_time} 触发了 {adventure_serendipity}!')
     for group_id in group_list:
         await bot.send_group_msg(group_id=group_id, message=msg)

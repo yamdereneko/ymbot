@@ -48,6 +48,7 @@ class MyBrowser:
             获取新页面，使用上下文管理器
         """
         browser = await self._get_browser()
+
         page = await browser.new_page(**kwargs)
         try:
             yield page
@@ -171,7 +172,8 @@ class MyBrowser:
         返回:
             * `bytes`：图片数据
         """
-        async with self._get_new_page() as page:
+        iphone = self._playwright.devices["iPhone 13 Pro"]
+        async with self._get_new_page(**iphone) as page:
             await page.goto(url)
             await page.wait_for_load_state("networkidle")
             img = await page.screenshot(type="jpeg", quality=100, full_page=True)

@@ -76,6 +76,7 @@ class GetRoleEquip:
     async def get_Fig(self):
         try:
             data = await self.equips()
+            print('==' * 30)
             print(data)
             equip = data['Equips']
             for _ in equip:
@@ -86,11 +87,12 @@ class GetRoleEquip:
             print(kungfu)
 
             PersonalPanel = data['PersonalPanel']
+            for _ in PersonalPanel:
+                print(_)
             print(PersonalPanel)
 
             TotalEquipsScore = data['TotalEquipsScore']
             print(TotalEquipsScore)
-
         except Exception as e:
             nonebot.logger.error(e)
             nonebot.logger.error("获取用户信息失败，请查看报错.")
@@ -98,5 +100,5 @@ class GetRoleEquip:
             return None
 
 
-role_equip = GetRoleEquip("小疏竹", "姨妈")
+role_equip = GetRoleEquip("时南星", "姨妈")
 asyncio.run(role_equip.get_Fig())

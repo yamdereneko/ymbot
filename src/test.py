@@ -6,28 +6,15 @@
 @Time : 2021/09/29 22:39:29
 @Docs : 请求推栏战绩例子
 """
-
+import asyncio
 import time
+import nonebot
+from src.internal.tuilanapi import API
+from src.internal.jx3api import API as jx3API
+from src.Data.jxDatas import all_school, much_school, school_pinyin, config
+from src.Data.database import DataBase as database
+api = API()
 
-#
-# def time_logger(flag=0):
-#     def showtime(func):
-#         def wrapper(a):
-#             func(a)
-#             end_time = time.time()
-#             print('spend is {}'.format(end_time - start_time))
-#             if flag:
-#                 print('将此操作保留至日志')
-#
-#         return wrapper
-#
-#     return showtime
-#
-#
-# @time_logger(0)  # 得到闭包函数showtime,add = showtime(add)
-# def add(a, b):
-#     print(a + b)
-#     time.sleep(1)
-#
-#
-# add(3, 4)
+
+response = asyncio.run(api.cc_mine_arena_top200(typeName='week', tag=45, heiMaBang=False))
+print(response)
