@@ -47,6 +47,7 @@ Recruit = on_command("Recruit", rule=keyword("招募"), aliases={"招募"}, prio
 Price = on_command("Price", rule=keyword("物价"), aliases={"物价"}, priority=5)
 Flatterer = on_command("Flatterer", rule=keyword("舔狗日志"), aliases={"舔狗日志"}, priority=5)
 Announce = on_command("Announce", rule=keyword("公告"), aliases={"公告"}, priority=5)
+Sand = on_command("Sand", rule=keyword("沙盘"), aliases={"沙盘"}, priority=5)
 CreateJJCTopDataToDataBase = on_command("CreateJJCTopDataToDataBase", rule=keyword("生成JJC趋势图"), aliases={"生成JJC趋势图"},
                                         priority=5)
 
@@ -409,6 +410,20 @@ async def onMessage_Strategy(matcher: Matcher, args: Message = CommandArg()):
     else:
         nonebot.logger.error("请求错误,请参考: 奇遇前置 奇遇名")
         await Require.reject("请求错误,请参考: 奇遇前置 奇遇名")
+
+
+@Sand.handle()
+async def onMessage_Sand(matcher: Matcher, args: Message = CommandArg()):
+    if args.extract_plain_text() != "":
+        plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
+
+        sand = await jx3_Multifunction.get_sand_map(jx3Data.mainServer(plain_text))
+        image_url = sand['url']
+        msg = MessageSegment.image(image_url)
+        await Sand.finish(msg)
+    else:
+        nonebot.logger.error("请求错误,请参考: 沙盘 服务器")
+        await Sand.reject("请求错误,请参考: 沙盘 服务器")
 
 
 @Recruit.handle()

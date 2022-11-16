@@ -46,7 +46,6 @@ class GetJJCTopRecord:
                 print(x)
                 print(element)
                 school = element.get("personInfo").get("force")
-
                 name = element.get("personInfo").get("roleName")
                 role_id = element.get("personInfo").get("gameRoleId")
                 server = element.get("personInfo").get("server")
@@ -87,20 +86,31 @@ class GetJJCTopRecord:
                     time.sleep(1)
 
                     response = await api.cc_mine_performance_kungfu(global_role_id=str(global_role_id))
-
+                    print(response.data)
                     if response.msg != 'success' or response.data == []:
                         print(f'{name} 排名{str(x)}: {role_id} {school} {server} {zone} 不存在')
                         failure_list.append(element)
                         continue
                     #
-                    z = 0
-                    while len(response.data[z]["skills"]) < 8:
-                        z += 1
-                    print(z)
-                    print(response.data[z].values())
-                    print(response.data)
-                    print('====' * 30)
-                    kungfu = response.data[z]['name']
+                    if len(response.data) == 1:
+                        kungfu = response.data[0]['name']
+                    else:
+                        if response.data[0]['name'] != response.data[1]['name']:
+                            response = await api.cc_mine_match_history(global_role_id=global_role_id, size=10, cursor=0)
+                            res = {}
+                            for i in range(0, 10):
+                                value = response.data[i]['kungfu']
+                                res[value] = res.get(value, 0) + 1
+                            if len(res.keys()) == 1:
+                                kungfu = ''.join(res.keys())
+
+                            else:
+                                print('这个人玩了多心法，仔细人工查找下')
+                                failure_list.append(element)
+                                kungfu = None
+                        else:
+                            kungfu = response.data[0]['name']
+
                     if kungfu is None or kungfu == []:
                         print(f'{name} 排名{str(x)}: {role_id} {school} {server} {zone} 不存在')
                         failure_list.append(element)
@@ -108,8 +118,10 @@ class GetJJCTopRecord:
 
                     if kungfu in school_pinyin:
                         value = school_pinyin[kungfu]
+                        print(value)
                         school_top[value] = school_top.get(value, 0) + 1
                 else:
+                    print(school)
                     school_top[school] = school_top.get(school, 0) + 1
             print(failure_list)
             print(school_top)
@@ -146,3 +158,7 @@ class GetJJCTopRecord:
             await self.database.execute(sql)
         else:
             print("门派汇总的人数不到正确值，请人工处理错误信息...")
+
+
+# record = GetJJCTopRecord(45, 50)
+# asyncio.run(record.create_top_history_to_database())

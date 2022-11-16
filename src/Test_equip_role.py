@@ -18,11 +18,14 @@ import src.Data.jxDatas as jxData
 from src.Data.database import DataBase as database
 from src.internal.tuilanapi import API
 from src.internal.jx3api import API as jx3API
+from rich import print
+from rich.columns import Columns
 
 # 请求头
 
 api = API()
 jx3api = jx3API()
+
 
 class GetRoleEquip:
     def __init__(self, role: str, server: str):
@@ -34,34 +37,49 @@ class GetRoleEquip:
         self.role_id = None
         self.person_id = None
         self.role_name = None
+        self.globalRoleId = None
 
     async def equips(self):
         try:
             response = await jx3api.data_role_roleInfo(server=self.server, name=self.role)
-            print(response)
             if response.code != 200:
                 nonebot.logger.error("API接口role_roleInfo获取信息失败，请查看错误")
                 return None
-
+            self.globalRoleId = response.data["globalRoleId"]
             self.role_id = response.data["roleId"]
-
             response = await api.role_indicator(role_id=self.role_id, server=self.server, zone=self.zone)
             if response.code != 0:
                 nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
                 return None
-            self.person_id = response.data['person_info']['person_id']
-
-            response = await api.mine_match_person9history(person_id=str(self.person_id), size=10, cursor=0)
-            if response.code != 0:
-                nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
-                return None
+            # self.person_id = response.data['person_info']['person_id']
+            #
+            # response = await api.mine_match_person9history(person_id=str(self.person_id), size=10, cursor=0)
+            # if response.code != 0:
+            #     nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
+            #     return None
+            # print(response.data)
+            # # self.role_id = response.data[0]["role_id"]
+            # self.server = response.data[0]["server"]
+            # self.zone = response.data[0]["zone"]
+            # print(response.data[0]["role_name"])
+            print('==' * 50)
+            response = await api.cc_mine_match_history(global_role_id=self.globalRoleId, size=10, cursor=0)
             print(response.data)
-            self.role_id = response.data[0]["role_id"]
-            self.server = response.data[0]["server"]
-            self.zone = response.data[0]["zone"]
-            print(response.data[0]["role_name"])
+            res = {}
+            for i in range(0, 10):
+                value = response.data[i]['kungfu']
+                res[value] = res.get(value, 0) + 1
 
-            response = await api.mine_equip_get9role9equip(game_role_id=self.role_id,server=self.server,zone=self.zone)
+            print(res)
+            if len(res.keys()) == 1:
+                print(''.join(res.keys()))
+            if response.data is []:
+                nonebot.logger.error("API接口cc_mine_match_history获取信息失败，请查看错误")
+                return None
+
+            print('==' * 50)
+            response = await api.mine_equip_get9role9equip(game_role_id=self.role_id, server=self.server,
+                                                           zone=self.zone)
             if response.code != 0:
                 nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
                 return None
@@ -76,6 +94,7 @@ class GetRoleEquip:
     async def get_Fig(self):
         try:
             data = await self.equips()
+            print(data)
             print('==' * 30)
             print(data)
             equip = data['Equips']
@@ -87,8 +106,6 @@ class GetRoleEquip:
             print(kungfu)
 
             PersonalPanel = data['PersonalPanel']
-            for _ in PersonalPanel:
-                print(_)
             print(PersonalPanel)
 
             TotalEquipsScore = data['TotalEquipsScore']
@@ -100,5 +117,5 @@ class GetRoleEquip:
             return None
 
 
-role_equip = GetRoleEquip("时南星", "姨妈")
+role_equip = GetRoleEquip("青夏弥生", "双梦")
 asyncio.run(role_equip.get_Fig())

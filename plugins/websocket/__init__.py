@@ -13,6 +13,7 @@ from nonebot import get_driver, on_regex
 from nonebot.adapters.onebot.v11 import PrivateMessageEvent, MessageSegment
 from .jx3_websocket import ws_client
 
+
 driver = get_driver()
 
 check_ws = on_regex(pattern=r"^查看连接$", priority=2, block=True)

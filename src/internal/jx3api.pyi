@@ -362,6 +362,16 @@ class API:
             * `name`：角色名
         """
         ...
+
+    async def view_sand_search(self, *, server: str) -> Response:
+        """
+        说明:
+            搜索沙盘信息。
+
+        参数:
+            * `server`：服务器名
+        """
+        ...
     async def role_attribute(self, *, server: str, name: str, ticket: str) -> Response:
         """
         说明:

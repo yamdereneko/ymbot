@@ -56,6 +56,14 @@ async def get_announce():
     return response.data
 
 
+async def get_sand_map(server: str):
+    response = await api.view_sand_search(server=server)
+    if response.code != 200:
+        nonebot.logger.error("API接口get_sand_map获取信息失败，请查看错误")
+        return None
+    return response.data
+
+
 class Multifunction:
     def __init__(self):
         print('调用多功能场景')
