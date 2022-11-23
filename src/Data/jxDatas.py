@@ -63,10 +63,10 @@ jx3api_ticket = "nrje86v129l78x4g9m"
     推栏token连接池
 """
 
-ticket = ['143d202ba5034faea12dc232cd8f0429:yandereneko:kingsoft::dzEyNG43ZWxuYXp5ZGN0Mw==',
+ticket = ['d44bfd5c36a04558a0ee7a91430ddc89:yandereneko:kingsoft::cjh0NWJlemJsYnp3ZGJweA==',
           '9d57f8159597435889bd0b7e77ad92db:yamdereneko:kingsoft::dTByZXBhemFkNjY0dGdseA==',
-          '2a1ca92bf2114d3eaacb0be40e04319f:yandereneko1:kingsoft::MGxmbnQ1NGRoZ2Rpa3ZrZA==',
-          'f4f2a4465f4f464a99f50691024792d1:yandereneko2:kingsoft::bmRqcDA2aG9zcXRjeHFjag==']
+          '538e558efd0c4d0d88de9c4852a8a129:yandereneko1:kingsoft::d3NsYTZlcXl3b2ZxZTM2Zw==',
+          '3d5c0220d9784acfb2c7de3b01fe62ea:yandereneko2:kingsoft::OXZ4Zmt2Z3Q2bXBzenAzZg==']
 
 server_binding = "斗转星移"
 
@@ -104,7 +104,7 @@ class Jx3ApiConfig(BaseModel, extra=Extra.ignore):
 
     ws_path: str = Field("wss://socket.nicemoe.cn", alias="jx3api_ws_path")
     """ws连接地址"""
-    ws_token: str = Field("", alias="jx3api_ws_token")
+    ws_token: str = Field("5f2143314ebbec94b7aa80f7fd295856b03e567358a4f966fcbe597949e985e8", alias="jx3api_ws_token")
     """ws的token"""
     api_url: str = Field("", alias="jx3api_url")
     """主站的url"""
@@ -116,8 +116,8 @@ class Jx3ApiConfig(BaseModel, extra=Extra.ignore):
 
 # group_list = ["736734387", "642668185"]
 
-# group_list = [549242180]
-group_list = ["736734387", "642668185"]
+group_list = [549242180]
+# group_list = ["736734387", "642668185"]
 # group_list = ["642668185"]
 
 config = {

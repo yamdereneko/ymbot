@@ -45,12 +45,14 @@ class GetRoleEquip:
             if response.code != 200:
                 nonebot.logger.error("API接口role_roleInfo获取信息失败，请查看错误")
                 return None
+            print(response)
             self.globalRoleId = response.data["globalRoleId"]
             self.role_id = response.data["roleId"]
             response = await api.role_indicator(role_id=self.role_id, server=self.server, zone=self.zone)
             if response.code != 0:
-                nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
+                nonebot.logger.error("API接口role_indicator获取信息失败，请查看错误")
                 return None
+            print(response)
             # self.person_id = response.data['person_info']['person_id']
             #
             # response = await api.mine_match_person9history(person_id=str(self.person_id), size=10, cursor=0)
@@ -62,26 +64,12 @@ class GetRoleEquip:
             # self.server = response.data[0]["server"]
             # self.zone = response.data[0]["zone"]
             # print(response.data[0]["role_name"])
-            print('==' * 50)
-            response = await api.cc_mine_match_history(global_role_id=self.globalRoleId, size=10, cursor=0)
-            print(response.data)
-            res = {}
-            for i in range(0, 10):
-                value = response.data[i]['kungfu']
-                res[value] = res.get(value, 0) + 1
-
-            print(res)
-            if len(res.keys()) == 1:
-                print(''.join(res.keys()))
-            if response.data is []:
-                nonebot.logger.error("API接口cc_mine_match_history获取信息失败，请查看错误")
-                return None
 
             print('==' * 50)
             response = await api.mine_equip_get9role9equip(game_role_id=self.role_id, server=self.server,
                                                            zone=self.zone)
             if response.code != 0:
-                nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
+                nonebot.logger.error("API接口mine_equip_get9role9equip获取信息失败，请查看错误")
                 return None
             return response.data
 
@@ -117,5 +105,5 @@ class GetRoleEquip:
             return None
 
 
-role_equip = GetRoleEquip("青夏弥生", "双梦")
+role_equip = GetRoleEquip("小疏竹", "姨妈")
 asyncio.run(role_equip.get_Fig())
