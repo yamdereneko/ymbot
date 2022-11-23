@@ -104,7 +104,7 @@ class Jx3ApiConfig(BaseModel, extra=Extra.ignore):
 
     ws_path: str = Field("wss://socket.nicemoe.cn", alias="jx3api_ws_path")
     """ws连接地址"""
-    ws_token: str = Field("5f2143314ebbec94b7aa80f7fd295856b03e567358a4f966fcbe597949e985e8", alias="jx3api_ws_token")
+    ws_token: str = Field("", alias="jx3api_ws_token")
     """ws的token"""
     api_url: str = Field("", alias="jx3api_url")
     """主站的url"""
