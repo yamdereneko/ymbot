@@ -37,9 +37,11 @@ class API:
         """请求api网站数据"""
         try:
             headers = {
-                'token': jx3api_ticket
+                'token': jx3api_ticket,
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
+                'Content-Type': 'application/json'
             }
-            res = await self.client.get(url=url, params=data, headers=headers,timeout=1000)
+            res = await self.client.get(url=url, params=data, headers=headers)
             return Response.parse_obj(res.json())
         except Exception as e:
             logger.error(f"<y>JX3API请求出错：</y> | {str(e)}")
