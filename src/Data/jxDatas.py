@@ -51,6 +51,7 @@ class PathConfig(BaseModel, extra=Extra.ignore):
     """html模板文件"""
 
 
+#
 default_config = DefaultConfig.parse_obj(config)
 path_config = PathConfig.parse_obj(config)
 """路径设置"""
@@ -104,7 +105,7 @@ class Jx3ApiConfig(BaseModel, extra=Extra.ignore):
 
     ws_path: str = Field("wss://socket.nicemoe.cn", alias="jx3api_ws_path")
     """ws连接地址"""
-    ws_token: str = Field("", alias="jx3api_ws_token")
+    ws_token: str = Field("5f2143314ebbec94b7aa80f7fd295856b03e567358a4f966fcbe597949e985e8", alias="jx3api_ws_token")
     """ws的token"""
     api_url: str = Field("", alias="jx3api_url")
     """主站的url"""
@@ -114,10 +115,10 @@ class Jx3ApiConfig(BaseModel, extra=Extra.ignore):
 
 #
 
-# group_list = ["736734387", "642668185"]
+group_list = ["736734387", "642668185"]
 
 # group_list = [549242180]
-group_list = ["736734387", "642668185"]
+# group_list = ["736734387", "642668185"]
 # group_list = ["642668185"]
 
 config = {
