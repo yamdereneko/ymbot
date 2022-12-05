@@ -51,7 +51,7 @@ class PathConfig(BaseModel, extra=Extra.ignore):
     """html模板文件"""
 
 
-#
+
 default_config = DefaultConfig.parse_obj(config)
 path_config = PathConfig.parse_obj(config)
 """路径设置"""
@@ -65,7 +65,7 @@ jx3api_ticket = "nrje86v129l78x4g9m"
 """
 
 ticket = ['d44bfd5c36a04558a0ee7a91430ddc89:yandereneko:kingsoft::cjh0NWJlemJsYnp3ZGJweA==',
-          '9d57f8159597435889bd0b7e77ad92db:yamdereneko:kingsoft::dTByZXBhemFkNjY0dGdseA==',
+          '2855868e14774545ba54ad995df0c333:yamdereneko:kingsoft::dGsxM3Y3cG01NWwzNWsxZw==',
           '538e558efd0c4d0d88de9c4852a8a129:yandereneko1:kingsoft::d3NsYTZlcXl3b2ZxZTM2Zw==',
           '3d5c0220d9784acfb2c7de3b01fe62ea:yandereneko2:kingsoft::OXZ4Zmt2Z3Q2bXBzenAzZg==']
 
@@ -114,11 +114,8 @@ class Jx3ApiConfig(BaseModel, extra=Extra.ignore):
 
 
 #
-
-group_list = ["736734387", "642668185"]
-
 # group_list = [549242180]
-# group_list = ["736734387", "642668185"]
+group_list = ["736734387", "642668185"]
 # group_list = ["642668185"]
 
 config = {
@@ -259,53 +256,53 @@ school_pinyin = {
 
 def school(method):
     match method:
-        case "凌雪" | "0雪" | "野猪":
+        case "凌雪" | "0雪" | "野猪" | "lingxue":
             return "凌雪"
-        case "霸刀" | "刀刀" | "貂貂":
+        case "霸刀" | "刀刀" | "貂貂" | "badao":
             return "霸刀"
-        case "和尚" | "灯泡" | "大师":
+        case "和尚" | "灯泡" | "大师" | "yijin":
             return "少林"
-        case "奶毒" | "毒奶" | "补天决":
+        case "奶毒" | "毒奶" | "补天决" | "butian":
             return "补天"
-        case "蓬莱" | "鸟人" | "雕雕" | "凌海决" | "凌海":
+        case "蓬莱" | "鸟人" | "雕雕" | "凌海决" | "凌海" | "linghai":
             return "蓬莱"
-        case "气纯" | "道长" | "咩咩":
+        case "气纯" | "道长" | "咩咩" | "zixia":
             return "紫霞"
-        case "黄鸡" | "鸡哥" | "山居":
+        case "黄鸡" | "鸡哥" | "山居" | "cangjian":
             return "藏剑"
-        case "喵喵" | "焚影" | "喵哥" | "喵姐":
+        case "喵喵" | "焚影" | "喵哥" | "喵姐" | "fenying":
             return "明教"
-        case "奶秀" | "秀奶" | "秀人":
+        case "奶秀" | "秀奶" | "秀人" | "yunshang":
             return "云裳"
-        case "盆栽" | "花间游":
+        case "盆栽" | "花间游" | "huajian":
             return "花间"
-        case "丐狗" | "丐人" | "笑尘":
+        case "丐狗" | "丐人" | "笑尘" | "xiaochen":
             return "丐帮"
-        case "田螺" | "天罗":
+        case "田螺" | "天罗" | "tianluo":
             return "田螺"
-        case "鲸鱼" | "唐门" | "惊羽决":
+        case "鲸鱼" | "唐门" | "惊羽决" | "jingyu":
             return "惊羽"
-        case "奶歌" | "歌奶" | "奶哥" | "奶鸽" | "鸽奶":
+        case "奶歌" | "歌奶" | "奶哥" | "奶鸽" | "鸽奶" | "xiangzhi":
             return "相知"
-        case "太虚" | "剑纯" | "阿胎" | "阿胎" | "太虚剑意":
+        case "太虚" | "剑纯" | "阿胎" | "阿胎" | "太虚剑意" | "taixu":
             return "胎虚"
-        case "铁王八" | "王八" | "分山":
+        case "铁王八" | "王八" | "分山" | "fenshan":
             return "苍云"
-        case "狗策" | "狗人" | "策人":
+        case "狗策" | "狗人" | "策人" | "aoxue":
             return "天策"
-        case "无方门" | "药毒" | "毒药":
+        case "无方门" | "药毒" | "毒药" | "wufang":
             return "无方"
-        case "奶药" | "药奶" | "药药":
+        case "奶药" | "药奶" | "药药" | "lingsu":
             return "灵素"
-        case "冰心决":
+        case "冰心决" | "冰心" | "bingxin":
             return "冰心"
-        case "毒人" | "毒毒":
+        case "毒人" | "毒毒" | "dujing":
             return "毒经"
-        case "衍天" | "灯灯":
+        case "衍天" | "灯灯" | "taixuan":
             return "衍天"
-        case "长歌门" | "莫问决" | "长歌":
+        case "长歌门" | "莫问决" | "长歌" | "mowen":
             return "莫问"
-        case "奶花" | "花奶" | "花花" | "离经易道":
+        case "奶花" | "花奶" | "花花" | "离经易道" | "lijing":
             return "离经"
         case _:
             return method

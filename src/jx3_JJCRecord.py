@@ -8,6 +8,7 @@
 @Docs : 请求推栏战绩例子
 """
 import asyncio
+from functools import partial
 import time
 import matplotlib.pyplot as plt
 import nonebot
@@ -61,7 +62,8 @@ class GetPersonRecord:
         plt.style.use(dufte.style)
         ax.axis([0, 10, 0, 10])
 
-        ax.set_title(f"{data[0]['server']}  " + self.role + '  近10场JJC战绩', fontsize=19, color='#303030', fontweight="heavy",
+        ax.set_title(f"{data[0]['server']}  " + self.role + '  近10场JJC战绩', fontsize=19, color='#303030',
+                     fontweight="heavy",
                      verticalalignment='top')
         ax.axis('off')
         for x, y in enumerate(data):
@@ -69,23 +71,26 @@ class GetPersonRecord:
             pvp_type = y.get("pvp_type")
             avg_grade = y.get("avg_grade")
             total_mmr = y.get("total_mmr")
+            kungfu = jxData.school(y.get("kungfu"))
             won = y.get("won") is True and "胜利" or "失败"
             consume_time = time.strftime("%M分%S秒", gmtime(y.get("end_time") - y.get("start_time")))
             if time.altzone == 0:
-                start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(y.get("start_time") + 28800))
+                start_time = time.strftime("%m-%d %H:%M", time.localtime(y.get("start_time") + 28800))
             else:
-                start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(y.get("start_time")))
+                start_time = time.strftime("%m-%d %H:%M", time.localtime(y.get("start_time")))
 
-            ax.text(0, floor, f'{pvp_type}V{pvp_type}', verticalalignment='bottom', horizontalalignment='left',
+            ax.text(0.5, floor, f'{pvp_type}V{pvp_type}', verticalalignment='bottom', horizontalalignment='left',
                     color='#404040')
-            ax.text(1, floor, f'{avg_grade}段局 ', verticalalignment='bottom', horizontalalignment='left',
+            ax.text(1.5, floor, f'{avg_grade}段局 ', verticalalignment='bottom', horizontalalignment='left',
                     color='#404040')
-            ax.text(2, floor, f'{total_mmr}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
+            ax.text(2.5, floor, f'{total_mmr}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
             font_color = won == "胜利" and 'blue' or 'red'
-            ax.text(3, floor, f'{won}', verticalalignment='bottom', horizontalalignment='left', color=font_color)
-            ax.text(4, floor, f'{consume_time}', verticalalignment='bottom', horizontalalignment='left',
+            ax.text(3.5, floor, f'{won}', verticalalignment='bottom', horizontalalignment='left', color=font_color)
+            ax.text(4.5, floor, f'{consume_time}', verticalalignment='bottom', horizontalalignment='left',
                     color='#404040')
-            ax.text(6, floor, f'{start_time}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
+            ax.text(6, floor, f'{kungfu}', verticalalignment='bottom', horizontalalignment='left',
+                    color='#404040')
+            ax.text(7, floor, f'{start_time}', verticalalignment='bottom', horizontalalignment='left', color='#404040')
         datetime = int(time.time())
         plt.savefig(f"/tmp/record{datetime}.png")
         return datetime

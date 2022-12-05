@@ -53,8 +53,10 @@ class GetRoleEquip:
                 nonebot.logger.error("API接口role_indicator获取信息失败，请查看错误")
                 return None
             print(response)
+
+
             # self.person_id = response.data['person_info']['person_id']
-            #
+
             # response = await api.mine_match_person9history(person_id=str(self.person_id), size=10, cursor=0)
             # if response.code != 0:
             #     nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
@@ -105,5 +107,5 @@ class GetRoleEquip:
             return None
 
 
-role_equip = GetRoleEquip("小疏竹", "姨妈")
+role_equip = GetRoleEquip("花语", "梦江南")
 asyncio.run(role_equip.get_Fig())

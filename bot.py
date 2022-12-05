@@ -7,6 +7,7 @@ from nonebot.log import logger, default_format
 
 nonebot.init(_env_file=".env.dev", apscheduler_autostart=True)
 app = nonebot.get_asgi()
+
 driver = nonebot.get_driver()
 driver.register_adapter(Adapter)
 nonebot.load_from_toml("pyproject.toml")
@@ -15,7 +16,6 @@ nonebot.load_from_toml("pyproject.toml")
 
 logger.add("logs/error.log")
 
-
 if __name__ == "__main__":
     nonebot.logger.warning("请使用指令[nb run]来运行此项目!")
-    nonebot.run(port=8080)
+    nonebot.run(app="__main__:app", port=8080)
