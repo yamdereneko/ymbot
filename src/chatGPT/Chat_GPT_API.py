@@ -25,7 +25,7 @@ class ChatGPTAPI:
 
     def __init__(self):
         self.client = AsyncClient()
-        self.apikey = "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"
+        self.apikey = "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"
 
         self.url = "https://api.openai.com/v1/completions"
 
@@ -33,6 +33,7 @@ class ChatGPTAPI:
         """请求api网站数据"""
         headers = {
             'Authorization': f'Bearer {self.apikey}',
+            'OpenAI-Organization': 'org-edezPivp1WlSWoGOgDLfzmz5',
             'Content-Type': 'application/json'
         }
         data = {
