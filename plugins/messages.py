@@ -30,6 +30,7 @@ import src.jx3_Multifunction as jx3_Multifunction
 import src.jx3_Recruit as jx3_Recruit
 import src.jx3_Price as jx3_Price
 import src.jx3_JJCTop as jx3_JJCTop
+import src.chatGPT.Chat_GPT_API as Chat_API
 
 RoleJJCRecord = on_command("RoleJJCRecord", rule=keyword("战绩", "JJC信息"), aliases={"战绩", "JJC信息"}, priority=5)
 JJCTop = on_command("JJCTop", rule=keyword("JJC趋势图"), aliases={"JJC趋势图"}, priority=5)
@@ -48,6 +49,7 @@ Price = on_command("Price", rule=keyword("物价"), aliases={"物价"}, priority
 Flatterer = on_command("Flatterer", rule=keyword("舔狗日志"), aliases={"舔狗日志"}, priority=5)
 Announce = on_command("Announce", rule=keyword("公告"), aliases={"公告"}, priority=5)
 Sand = on_command("Sand", rule=keyword("沙盘"), aliases={"沙盘"}, priority=5)
+Chat = on_command("Chat", rule=keyword("提问", "疑问"), aliases={"提问", "疑问"}, priority=5)
 CreateJJCTopDataToDataBase = on_command("CreateJJCTopDataToDataBase", rule=keyword("生成JJC趋势图"), aliases={"生成JJC趋势图"},
                                         priority=5)
 
@@ -485,6 +487,22 @@ async def onMessage_Price(args: Message = CommandArg()):
     else:
         nonebot.logger.error("物价信息填写失败，请重试")
         await Price.reject("物价信息填写失败，请重试")
+
+
+@Chat.handle()
+async def onMessage_Chat(args: Message = CommandArg()):
+    if args.extract_plain_text() != "":
+        plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
+        await Chat.send("正在思考中...")
+        chat = Chat_API.ChatGPTAPI()
+        chat_result = await chat.call_api(plain_text)
+        msg_text = chat_result.choices
+        for _ in msg_text:
+            msg = _["text"]
+            await Chat.finish(msg)
+    else:
+        nonebot.logger.error("信息填写失败，请重试")
+        await Chat.reject("信息填写失败，请重试")
 
 
 @CreateJJCTopDataToDataBase.handle()

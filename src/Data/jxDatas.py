@@ -51,7 +51,6 @@ class PathConfig(BaseModel, extra=Extra.ignore):
     """html模板文件"""
 
 
-
 default_config = DefaultConfig.parse_obj(config)
 path_config = PathConfig.parse_obj(config)
 """路径设置"""

@@ -54,8 +54,7 @@ class GetRoleEquip:
                 return None
             print(response)
 
-
-            # self.person_id = response.data['person_info']['person_id']
+            self.person_id = response.data['person_info']['person_id']
 
             # response = await api.mine_match_person9history(person_id=str(self.person_id), size=10, cursor=0)
             # if response.code != 0:
@@ -65,7 +64,7 @@ class GetRoleEquip:
             # # self.role_id = response.data[0]["role_id"]
             # self.server = response.data[0]["server"]
             # self.zone = response.data[0]["zone"]
-            # print(response.data[0]["role_name"])
+            # print(response)
 
             print('==' * 50)
             response = await api.mine_equip_get9role9equip(game_role_id=self.role_id, server=self.server,
@@ -107,5 +106,5 @@ class GetRoleEquip:
             return None
 
 
-role_equip = GetRoleEquip("花语", "梦江南")
+role_equip = GetRoleEquip("时今朝", "龙虎")
 asyncio.run(role_equip.get_Fig())
