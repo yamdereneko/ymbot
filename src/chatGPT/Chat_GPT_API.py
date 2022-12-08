@@ -25,7 +25,7 @@ class ChatGPTAPI:
 
     def __init__(self):
         self.client = AsyncClient()
-        self.apikey = "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"
+        self.apikey = "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"
 
         self.url = "https://api.openai.com/v1/completions"
 
@@ -43,5 +43,5 @@ class ChatGPTAPI:
         }
 
         res = await self.client.post(url=self.url, json=data, headers=headers, timeout=3000)
-        nonebot.logger.info(res)
+        nonebot.logger.info(res.text)
         return Response.parse_obj(res.json())
