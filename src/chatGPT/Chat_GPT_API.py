@@ -25,8 +25,7 @@ class ChatGPTAPI:
 
     def __init__(self):
         self.client = AsyncClient()
-        # self.apikey = "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"
-        self.apikey = "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"
+        self.apikey = "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"
 
         self.url = "https://api.openai.com/v1/completions"
 
