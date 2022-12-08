@@ -4,7 +4,7 @@ import asyncio
 import nonebot
 from pydantic import BaseModel
 from httpx import AsyncClient
-from src.Data.jxDatas import chat_gpt_apikey
+import src.Data.jx3_Redis as redis
 
 
 class Response(BaseModel):
@@ -26,15 +26,17 @@ class ChatGPTAPI:
 
     def __init__(self):
         self.client = AsyncClient()
-        self.apikey = chat_gpt_apikey
 
         self.url = "https://api.openai.com/v1/completions"
 
     async def call_api(self, prompt) -> Response:
+        red = redis.Redis()
+        chat_gpt_apikey = await red.query("chat_gpt_apikey")
+        Organization = await red.query("OpenAI-Organization")
         """请求api网站数据"""
         headers = {
-            'Authorization': f'Bearer {self.apikey}',
-            'OpenAI-Organization': 'org-edezPivp1WlSWoGOgDLfzmz5',
+            'Authorization': f'Bearer {chat_gpt_apikey}',
+            'OpenAI-Organization': Organization,
             'Content-Type': 'application/json'
         }
         data = {

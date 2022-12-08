@@ -59,7 +59,6 @@ path_config = PathConfig.parse_obj(config)
 """
 jx3api_ticket = "nrje86v129l78x4g9m"
 
-chat_gpt_apikey = "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"
 
 """
     推栏token连接池
@@ -115,8 +114,8 @@ class Jx3ApiConfig(BaseModel, extra=Extra.ignore):
 
 
 #
-# group_list = [549242180]
-group_list = ["736734387", "642668185"]
+group_list = [549242180]
+# group_list = ["736734387", "642668185"]
 # group_list = ["642668185"]
 
 config = {
