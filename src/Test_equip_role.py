@@ -106,5 +106,5 @@ class GetRoleEquip:
             return None
 
 
-role_equip = GetRoleEquip("时今朝", "龙虎")
+role_equip = GetRoleEquip("小丛兰", "姨妈")
 asyncio.run(role_equip.get_Fig())
