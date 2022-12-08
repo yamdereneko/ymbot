@@ -4,6 +4,7 @@ import asyncio
 import nonebot
 from pydantic import BaseModel
 from httpx import AsyncClient
+from src.Data.jxDatas import chat_gpt_apikey
 
 
 class Response(BaseModel):
@@ -25,7 +26,7 @@ class ChatGPTAPI:
 
     def __init__(self):
         self.client = AsyncClient()
-        self.apikey = "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"
+        self.apikey = chat_gpt_apikey
 
         self.url = "https://api.openai.com/v1/completions"
 

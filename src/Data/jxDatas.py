@@ -59,6 +59,8 @@ path_config = PathConfig.parse_obj(config)
 """
 jx3api_ticket = "nrje86v129l78x4g9m"
 
+chat_gpt_apikey = "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"
+
 """
     推栏token连接池
 """
