@@ -497,7 +497,7 @@ async def onMessage_Chat(args: Message = CommandArg()):
         chat = Chat_API.ChatGPTAPI()
         chat_result = await chat.call_api(plain_text)
         msg_text = chat_result.choices
-        msg = msg_text[0]["text"]
+        msg = msg_text[0]["text"].replace('\n\n', '\n')
         await Chat.finish(msg)
     else:
         nonebot.logger.error("信息填写失败，请重试")

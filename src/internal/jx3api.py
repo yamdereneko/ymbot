@@ -2,11 +2,11 @@
 
 from typing import Any
 from functools import partial
-from src.Data.jxDatas import jx3api_ticket
 from loguru import logger
 from typing_extensions import Protocol
 from pydantic import BaseModel
 from httpx import AsyncClient
+import src.Data.jx3_Redis as redis
 
 
 class _ApiCall(Protocol):
@@ -36,12 +36,14 @@ class API:
     async def call_api(self, url: str, **data: Any) -> Response:
         """请求api网站数据"""
         try:
+            red = redis.Redis()
+            jx3api_ticket = await red.query("jx3api_ticket")
             headers = {
                 'token': jx3api_ticket,
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
                 'Content-Type': 'application/json'
             }
-            res = await self.client.get(url=url, params=data, headers=headers)
+            res = await self.client.get(url=url, params=data, headers=headers, timeout=3000)
             return Response.parse_obj(res.json())
         except Exception as e:
             logger.error(f"<y>JX3API请求出错：</y> | {str(e)}")

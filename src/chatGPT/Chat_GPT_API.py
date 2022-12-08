@@ -42,7 +42,7 @@ class ChatGPTAPI:
         data = {
             "model": "text-davinci-003",
             "prompt": prompt,
-            "max_tokens": 1000,
+            "max_tokens": 4000,
             "temperature": 0
         }
 
