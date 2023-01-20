@@ -1,16 +1,12 @@
-import asyncio
-import os
 import time
-
-import matplotlib
 import matplotlib.pyplot as plt
 import nonebot
 import src.Data.jxDatas as jxData
 from src.Data.database import DataBase as database
 import dufte
 from matplotlib.ticker import MultipleLocator
-import pandas as pd
-from sqlalchemy import create_engine
+# import pandas as pd
+# from sqlalchemy import create_engine
 
 
 class GetJJCTopInfo:
@@ -72,31 +68,31 @@ class GetJJCTopInfo:
         nonebot.logger.info(self.school + "JJC趋势图重新创建")
         return datetime
 
-    async def Test_figure(self):
-        df_raw = pd.read_csv("Data/JJC_rank_weekly.csv")
-        df = df_raw[['门派', '数量']].groupby('门派').apply(lambda x: x.mean()).astype(int)
-        df.sort_values('数量', inplace=True)
-        df.reset_index(inplace=True)
-
-        # Draw plot
-        fig, ax = plt.subplots(figsize=(18, 10), dpi=200)
-        ax.vlines(x=df.门派, ymin=0, ymax=df.数量, color='firebrick', alpha=0.7, linewidth=2)
-        ax.scatter(x=df.门派, y=df.数量, s=75, color='firebrick', alpha=0.7)
-
-        # Title, Label, Ticks and Ylim
-        ax.set_title('【横刀断浪】第11周个人前200数据', fontdict={'size': 30})
-        ax.set_ylabel('人数', fontdict={'size': 18})
-        ax.set_xticks(df.门派)
-        ax.set_xticklabels(df.门派, rotation=60, fontdict={'horizontalalignment': 'right', 'size': 16})
-        ax.set_ylim(0, 50)
-
-        # Annotate
-        for row in df.itertuples():
-            ax.text(row.Index, row.数量 + .5, s=round(row.数量, 2), horizontalalignment='center',
-                    verticalalignment='bottom',
-                    fontsize=18)
-
-        plt.show()
+    # async def Test_figure(self):
+    #     df_raw = pd.read_csv("Data/JJC_rank_weekly.csv")
+    #     df = df_raw[['门派', '数量']].groupby('门派').apply(lambda x: x.mean()).astype(int)
+    #     df.sort_values('数量', inplace=True)
+    #     df.reset_index(inplace=True)
+    #
+    #     # Draw plot
+    #     fig, ax = plt.subplots(figsize=(18, 10), dpi=200)
+    #     ax.vlines(x=df.门派, ymin=0, ymax=df.数量, color='firebrick', alpha=0.7, linewidth=2)
+    #     ax.scatter(x=df.门派, y=df.数量, s=75, color='firebrick', alpha=0.7)
+    #
+    #     # Title, Label, Ticks and Ylim
+    #     ax.set_title('【横刀断浪】第11周个人前200数据', fontdict={'size': 30})
+    #     ax.set_ylabel('人数', fontdict={'size': 18})
+    #     ax.set_xticks(df.门派)
+    #     ax.set_xticklabels(df.门派, rotation=60, fontdict={'horizontalalignment': 'right', 'size': 16})
+    #     ax.set_ylim(0, 50)
+    #
+    #     # Annotate
+    #     for row in df.itertuples():
+    #         ax.text(row.Index, row.数量 + .5, s=round(row.数量, 2), horizontalalignment='center',
+    #                 verticalalignment='bottom',
+    #                 fontsize=18)
+    #
+    #     plt.show()
 
 
 # JJCData = GetJJCTopInfo("JJC_rank_weekly", 2, "")
