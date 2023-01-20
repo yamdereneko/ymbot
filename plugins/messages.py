@@ -52,6 +52,8 @@ Sand = on_command("Sand", rule=keyword("沙盘"), aliases={"沙盘"}, priority=5
 Chat = on_command("Chat", rule=keyword("提问", "疑问"), aliases={"提问", "疑问"}, priority=5)
 CreateJJCTopDataToDataBase = on_command("CreateJJCTopDataToDataBase", rule=keyword("生成JJC趋势图"), aliases={"生成JJC趋势图"},
                                         priority=5)
+Chutianshe = on_command("Chutianshe", rule=keyword("楚天社", "行侠"), aliases={"楚天社", "行侠"},
+                        priority=5)
 
 
 @RoleJJCRecord.handle()
@@ -340,6 +342,14 @@ async def onMessage_Fireworks(matcher: Matcher, args: Message = CommandArg()):
     else:
         nonebot.logger.error("请求错误,请参考: 烟花 区服 角色名")
         await Fireworks.reject("请求错误,请参考: 烟花 区服 角色名")
+
+
+# 楚天社部分
+@Chutianshe.handle()
+async def onMessage_Chutianshe():
+    chutianshe_data = await jx3_Multifunction.get_chutianshe()
+    msg = MessageSegment.text(chutianshe_data)
+    await Chutianshe.finish(msg)
 
 
 # 骚话部分

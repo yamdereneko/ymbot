@@ -64,6 +64,24 @@ async def get_sand_map(server: str):
     return response.data
 
 
+async def get_chutianshe():
+    response = await api.data_active_chutianshe()
+    if response.code != 200:
+        nonebot.logger.error("API接口data_active_chutianshe获取信息失败，请查看错误")
+        return None
+    text_now_list = ["目前", "地图：" + response.data['now']['map'], "名称：" + response.data['now']['name'],
+                     "地点：" + response.data['now']['site'], "任务：" + response.data['now']['desc'],
+                     "任务内容：" + response.data['now']['tasks'],
+                     "时间：" + response.data['now']['time'],
+                     "接下来", "地图：" + response.data['next']['map'],
+                     "名称：" + response.data['next']['name'],
+                     "地点：" + response.data['next']['site'], "任务：" + response.data['next']['desc'],
+                     "任务内容：" + response.data['next']['tasks'],
+                     "时间：" + response.data['next']['time']]
+    text_now = '\n'.join(text_now_list)
+    return text_now
+
+
 class Multifunction:
     def __init__(self):
         print('调用多功能场景')

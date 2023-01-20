@@ -220,6 +220,17 @@ class API:
             * `name`： 外观简称
         """
         ...
+
+    async def data_active_chutianshe(self) -> Response:
+        """
+        说明:
+            搜索外观物品最新价格，统计了各个来源的数据，补充了更多的关键字。
+
+        参数:
+            * `name`： 外观简称
+        """
+        ...
+
     async def next_strategy(self, *, name: str) -> Response:
         """
         说明:

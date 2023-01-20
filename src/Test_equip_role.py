@@ -7,19 +7,14 @@
 @Docs : 请求推栏战绩例子
 """
 import asyncio
-import time
 import traceback
-from time import gmtime
-import dufte
 import nonebot
-import matplotlib
-import matplotlib.pyplot as plt
+from PIL import Image
 import src.Data.jxDatas as jxData
 from src.Data.database import DataBase as database
 from src.internal.tuilanapi import API
 from src.internal.jx3api import API as jx3API
 from rich import print
-from rich.columns import Columns
 
 # 请求头
 
@@ -83,13 +78,22 @@ class GetRoleEquip:
     async def get_Fig(self):
         try:
             data = await self.equips()
-            print(data)
             print('==' * 30)
             print(data)
             equip = data['Equips']
             for _ in equip:
-                print(_['Name'])
-                print(_['Quality'])
+                print("名称: " + _.get('Name'))
+                print("品质: " + _.get('Quality'))
+                source = _.get('equipBelongs')
+                if source is None:
+                    source = "未知"
+                else:
+                    source = [i.get("source") for i in _.get('equipBelongs')]
+                print("来源: " + ''.join(source))
+                print("类型: " + _.get("Icon").get("SubKind"))
+                print(_.get("Icon").get("FileName"))
+                print(("属性: \n" + '\n'.join([i.get("Attrib").get("GeneratedMagic") for i in _.get("ModifyType")])))
+                print("*" * 20)
 
             kungfu = data['Kungfu']
             print(kungfu)
@@ -106,5 +110,5 @@ class GetRoleEquip:
             return None
 
 
-role_equip = GetRoleEquip("小丛兰", "姨妈")
+role_equip = GetRoleEquip("芋泥泥", "姨妈")
 asyncio.run(role_equip.get_Fig())
