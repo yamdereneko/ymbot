@@ -139,6 +139,8 @@ class GetJJCTopRecord:
             table_name = 'JJC_rank50_weekly'
         elif self.pvp_type == 200:
             table_name = 'JJC_rank_weekly'
+        elif self.pvp_type == 100:
+            table_name = 'JJC_rank100_weekly'
         else:
             return None
         sql = f"select week from {table_name}"
@@ -161,5 +163,5 @@ class GetJJCTopRecord:
 
 
 # #
-# Record = GetJJCTopRecord(2, 50)
+# Record = GetJJCTopRecord(7, 50)
 # asyncio.run(Record.create_top_history_to_database())

@@ -34,7 +34,6 @@ import src.chatGPT.Chat_GPT_API as Chat_API
 
 RoleJJCRecord = on_command("RoleJJCRecord", rule=keyword("战绩", "JJC信息"), aliases={"战绩", "JJC信息"}, priority=5)
 JJCTop = on_command("JJCTop", rule=keyword("JJC趋势图"), aliases={"JJC趋势图"}, priority=5)
-JJCTop50 = on_command("JJCTop50", rule=keyword("JJC50趋势图"), aliases={"JJC50趋势图"}, priority=5)
 ServerCheck = on_command("ServerCheck", rule=keyword("开服"), aliases={"开服"}, priority=5)
 AllServerState = on_command("AllServerState", rule=keyword("区服"), aliases={"区服"}, priority=5)
 PersonInfo = on_command("PersonInfo", rule=keyword("角色"), aliases={"角色"}, priority=5)
@@ -102,73 +101,35 @@ async def onMessage_RoleJJCRecord(matcher: Matcher, args: Message = CommandArg()
 # 图片形式发送
 @JJCTop.handle()
 async def onMessage_JJCTop(matcher: Matcher, args: Message = CommandArg()):
-    if args.extract_plain_text() != "":
-        plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
-        if plain_text is not None:
-            if plain_text.find(" ") != -1:
-                plain_text = re.sub(r'[ ]+', ' ', plain_text)
-                top_type = plain_text.split(" ")[0]
-                week = plain_text.split(" ")[1]
-                table = "JJC_rank_weekly"
-                if top_type == "200":
-                    table = "JJC_rank_weekly"
-                elif top_type == "50":
-                    table = "JJC_rank50_weekly"
+    plain_text = args.extract_plain_text()
+    if plain_text:
+        # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
+        if len(plain_text.split(' ')) >= 3:
+            plain_text = re.sub(r'[ ]+', ' ', plain_text)
+            top_type = plain_text.split(" ")[0]
+            week = plain_text.split(" ")[1]
+            school_type = plain_text.split(" ")[2]
 
-                jjc_info = jx3JJCInfo.GetJJCTopInfo(table, int(week), "")
-                record = await jjc_info.get_JJCWeeklyRecord()
-                red = redis.Redis()
-                frame = f"/tmp/top{table}.png"
-                redis_record_data = await red.query('top_' + table + '_' + week)
-                if redis_record_data:
-                    res = json.loads(redis_record_data)
-                    if res == record:
-                        await red.get_image('top_' + table + '_image_' + week, frame)
-                        msg = MessageSegment.image('file:' + frame)
-                        await JJCTop.finish(msg)
-                    else:
-                        await red.delete('top_' + table + '_' + week)
-                        await red.delete('top_' + table + '_image_' + week)
+            jjc_info = jx3JJCInfo.GetJJCTopInfo(table=int(top_type), weekly=int(week), school_type=school_type)
+            record = await jjc_info.from_sql_create_figure()
 
-                await red.add('top_' + table + '_' + week, record)
-                person_image = await jjc_info.get_JJCWeeklyRecord_figure(record)
-                frame = f"/tmp/top{person_image}.png"
-                await red.insert_image('top_' + table + '_image_' + week, frame)
-                msg = MessageSegment.image('file:' + frame)
-                await JJCTop.finish(msg)
-            else:
-                if jx3Data.school(plain_text) in jx3Data.all_school.keys():
-                    table = "JJC_rank_weekly"
-                    jjc_info = jx3JJCInfo.GetJJCTopInfo(table, 0, plain_text)
-
-                    record = await jjc_info.get_JJCWeeklySchoolRecord()
-                    red = redis.Redis()
-                    frame = f"/tmp/SchoolTop{table}.png"
-                    redis_record_data = await red.query('SchoolTop_' + table + '_' + plain_text)
-                    if redis_record_data:
-                        res = json.loads(redis_record_data)
-                        if res == record:
-                            await red.get_image('SchoolTop_' + table + '_image_' + plain_text, frame)
-                            msg = MessageSegment.image('file:' + frame)
-                            await JJCTop.finish(msg)
-                        else:
-                            await red.delete('SchoolTop_' + table + '_' + plain_text)
-                            await red.delete('SchoolTop_' + table + '_image_' + plain_text)
-
-                    await red.add('SchoolTop_' + table + '_' + plain_text, record)
-                    person_image = await jjc_info.get_JJCWeeklySchoolRecord_figure(record)
-                    frame = f"/tmp/SchoolTop{person_image}.png"
-                    await red.insert_image('SchoolTop_' + table + '_image_' + plain_text, frame)
+            red = redis.Redis()
+            frame = f"/tmp/top{record}.png"
+            redis_record_data = await red.query('top_' + top_type + '_' + week)
+            if redis_record_data:
+                res = json.loads(redis_record_data)
+                if res == record:
+                    await red.get_image('top_' + top_type + '_image_' + week, frame)
                     msg = MessageSegment.image('file:' + frame)
                     await JJCTop.finish(msg)
                 else:
-                    nonebot.logger.error("输入错误，请检查报错")
-        else:
-            nonebot.logger.error("参数错误，请重新输入正确参数")
-            await JJCTop.reject("参数错误，请重新输入正确参数")
-    else:
-        nonebot.logger.error("请求错误,请参考: JJC趋势图 31或者门派")
-        await JJCTop.reject("请求错误,请参考: JJC趋势图 31或者门派")
+                    await red.delete('top_' + top_type + '_' + week)
+                    await red.delete('top_' + top_type + '_image_' + week)
+
+            await red.add('top_' + top_type + '_' + week, record)
+            await red.insert_image('top_' + top_type + '_image_' + week, frame)
+            msg = MessageSegment.image('file:' + frame)
+            await JJCTop.finish(msg)
 
 
 # 接收 角色信息 查询本地角色最近游玩的角色的JJC战绩

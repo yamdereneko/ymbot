@@ -1,99 +1,63 @@
+import asyncio
 import time
 import matplotlib.pyplot as plt
-import nonebot
+import pandas as pd
 import src.Data.jxDatas as jxData
-from src.Data.database import DataBase as database
-import dufte
-from matplotlib.ticker import MultipleLocator
-# import pandas as pd
-# from sqlalchemy import create_engine
+from sqlalchemy import create_engine
 
 
 class GetJJCTopInfo:
-    def __init__(self, table: str, weekly: int, school: str):
+    def __init__(self, table: int, weekly: int, school_type: str):
         self.table = table
         self.weekly = weekly
-        self.school = jxData.school(school)
-        config = jxData.config
-        self.database = database(config)
+        self.school_type = school_type
 
     # 获取每周每个门派趋势图，返回DICT结果，并打印趋势图至相关目录
-    async def get_JJCWeeklyRecord(self):
-        sql = "select * from %s where week='%s'" % (self.table, self.weekly)
-        await self.database.connect()
-        res = await self.database.fetchone(sql)
-        if res is None:
-            return None
-        tuples = sorted(res.items(), key=lambda x: x[1], reverse=True)
-        res_total = dict(tuples)
-        del res_total["week"]
-        return res_total
+    async def from_sql_create_figure(self):
+        db_config = jxData.sql_config
+        engine = create_engine(
+            f"mysql+pymysql://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['db']}")
 
-    async def get_JJCWeeklyRecord_figure(self, data: dict):
-        plt.style.use(dufte.style)
-        fig, ax = plt.subplots(figsize=(22, 10), facecolor='white', edgecolor='white')
-        ax.set_title("推栏第" + str(self.weekly) + "周JJC排名", fontsize=22)
-        ax.yaxis.set_major_locator(MultipleLocator(5))
-        for x, y in data.items():
-            plt.text(x, y, '%.0f' % y, ha="center", va="bottom")
-        bar_width = 0.3
-        ax.bar(data.keys(), data.values(), width=bar_width, label='AudienceScore')
-        ax.set_xlabel("门派", fontsize=22)
+        if self.school_type == "奶妈":
+            match self.table:
+                case 50:
+                    table_name = 'JJC_rank50_weekly'
+                    ylim_size = 20
+                case 100:
+                    table_name = 'JJC_rank100_weekly'
+                    ylim_size = 20
+                case _:
+                    table_name = 'JJC_rank_weekly'
+                    ylim_size = 30
+            query = f"SELECT 云裳, 相知, 补天, 灵素, 离经 FROM {table_name} where week='{self.weekly}'"
+
+        else:
+            match self.table:
+                case 50:
+                    table_name = 'JJC_rank50_weekly'
+                    ylim_size = 20
+                case 100:
+                    table_name = 'JJC_rank100_weekly'
+                    ylim_size = 30
+                case _:
+                    table_name = 'JJC_rank_weekly'
+                    ylim_size = 50
+            query = f"SELECT 霸刀, 藏剑, 蓬莱, 无方,花间,少林,惊羽,丐帮,苍云,紫霞,凌雪,明教,毒经,天策,田螺,胎虚,莫问,衍天,冰心,刀宗 FROM {table_name} where week='{self.weekly}'"
+
+        df_raw = pd.read_sql(query, engine)
+        df_raw.index = ['数量']
+        df = df_raw.transpose()
+        df.sort_values(by='数量', inplace=True, ascending=False)
+        fig, ax = plt.subplots(figsize=(22, 10), facecolor='white', dpi=150)
+        ax.vlines(x=df.index, ymin=0, ymax=df.数量, color='firebrick', alpha=0.7, linewidth=32)
+        for i, cty in enumerate(df.数量):
+            ax.text(i, cty + 0.5, round(cty, 1), horizontalalignment='center', fontdict={'size': 22})
+        ax.set_title(f'【横刀断浪】第{self.weekly + 9}周 个人前{self.table} {self.school_type}数据', fontdict={'size': 30})
+        ax.set(ylim=(0, ylim_size))
+
+        ax.set_ylabel('人数', fontdict={'size': 22, 'horizontalalignment': 'right'}, loc="center")
+
+        plt.xticks(df.index, df.index.str.upper(), rotation=60, horizontalalignment='right', fontsize=22)
         datetime = int(time.time())
         plt.savefig(f"/tmp/top{datetime}.png")
         return datetime
-
-    # 获取门派每周个数趋势图，返回DICT结果，并打印趋势图至相关目录
-    async def get_JJCWeeklySchoolRecord(self):
-        sql = "select week,%s from %s " % (self.school, self.table)
-        await self.database.connect()
-        res = await self.database.fetchall(sql)
-        return res
-
-    async def get_JJCWeeklySchoolRecord_figure(self, data):
-        plt.style.use(dufte.style)
-        fig, ax = plt.subplots(figsize=(44, 20), facecolor='white', edgecolor='white')
-        x = []
-        y = []
-        ax.set_xlabel('周', fontsize=16)
-        ax.set_ylabel('数量', fontsize=16)
-        ax.set_title(f"推栏第" + str(self.school) + f"JJC趋势图", fontsize=18)
-        for data in data:
-            x.append(data["week"])
-            y.append(data[self.school])
-            plt.text(data["week"], data[self.school], '%.0f' % data[self.school], ha="center", va="bottom")
-        ax.plot(x, y, "o-", color='#607d8b')
-        datetime = int(time.time())
-        plt.savefig(f"/tmp/SchoolTop{datetime}.png")
-        nonebot.logger.info(self.school + "JJC趋势图重新创建")
-        return datetime
-
-    # async def Test_figure(self):
-    #     df_raw = pd.read_csv("Data/JJC_rank_weekly.csv")
-    #     df = df_raw[['门派', '数量']].groupby('门派').apply(lambda x: x.mean()).astype(int)
-    #     df.sort_values('数量', inplace=True)
-    #     df.reset_index(inplace=True)
-    #
-    #     # Draw plot
-    #     fig, ax = plt.subplots(figsize=(18, 10), dpi=200)
-    #     ax.vlines(x=df.门派, ymin=0, ymax=df.数量, color='firebrick', alpha=0.7, linewidth=2)
-    #     ax.scatter(x=df.门派, y=df.数量, s=75, color='firebrick', alpha=0.7)
-    #
-    #     # Title, Label, Ticks and Ylim
-    #     ax.set_title('【横刀断浪】第11周个人前200数据', fontdict={'size': 30})
-    #     ax.set_ylabel('人数', fontdict={'size': 18})
-    #     ax.set_xticks(df.门派)
-    #     ax.set_xticklabels(df.门派, rotation=60, fontdict={'horizontalalignment': 'right', 'size': 16})
-    #     ax.set_ylim(0, 50)
-    #
-    #     # Annotate
-    #     for row in df.itertuples():
-    #         ax.text(row.Index, row.数量 + .5, s=round(row.数量, 2), horizontalalignment='center',
-    #                 verticalalignment='bottom',
-    #                 fontsize=18)
-    #
-    #     plt.show()
-
-
-# JJCData = GetJJCTopInfo("JJC_rank_weekly", 2, "")
-# asyncio.run(JJCData.Test_figure())

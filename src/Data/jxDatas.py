@@ -59,10 +59,11 @@ path_config = PathConfig.parse_obj(config)
     推栏token连接池
 """
 
-ticket = ['d44bfd5c36a04558a0ee7a91430ddc89:yandereneko:kingsoft::cjh0NWJlemJsYnp3ZGJweA==',
-          '2855868e14774545ba54ad995df0c333:yamdereneko:kingsoft::dGsxM3Y3cG01NWwzNWsxZw==',
-          '538e558efd0c4d0d88de9c4852a8a129:yandereneko1:kingsoft::d3NsYTZlcXl3b2ZxZTM2Zw==',
-          '3d5c0220d9784acfb2c7de3b01fe62ea:yandereneko2:kingsoft::OXZ4Zmt2Z3Q2bXBzenAzZg==']
+ticket = ['966925c532564a26bdcae0062f1d0519:yandereneko:kingsoft::Nzc3Y2pkNHkxZmU3a2JpdA==',
+          '8b0be03e42824a1ca262cc051cc2d248:yamdereneko:kingsoft::OG43ZmZheWZ5cmsyZ3hyZw==',
+          'a6268a43bb2549a19bf9fdd6a42d273c:yandereneko1:kingsoft::aW52djM3NXo4NTd1N2x4eg==',
+          'acd21e7af47948599dfac9f8b813aa14:yandereneko2:kingsoft::bXlxaWZqdDY0Mnk4anI3aw==']
+
 
 server_binding = "斗转星移"
 
