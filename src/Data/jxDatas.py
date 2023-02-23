@@ -67,6 +67,7 @@ ticket = ['966925c532564a26bdcae0062f1d0519:yandereneko:kingsoft::Nzc3Y2pkNHkxZm
 
 server_binding = "斗转星移"
 
+
 redis_config = redis.Redis(
     host='114.115.181.82',  # ip地址
     port=6379,  # 端口号
