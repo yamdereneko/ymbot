@@ -15,8 +15,7 @@ class GetJJCTopInfo:
     # 获取每周每个门派趋势图，返回DICT结果，并打印趋势图至相关目录
     async def from_sql_create_figure(self):
         db_config = jxData.sql_config
-        engine = create_engine(
-            f"mysql+pymysql://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['db']}")
+        engine = create_engine(f"mysql+mysqlconnector://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['db']}")
 
         if self.school_type == "奶妈":
             match self.table:
