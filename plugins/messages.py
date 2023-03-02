@@ -29,10 +29,12 @@ import src.jx3_Fireworks as jx3_Fireworks
 import src.jx3_Multifunction as jx3_Multifunction
 import src.jx3_Recruit as jx3_Recruit
 import src.jx3_Price as jx3_Price
+import src.jx3_Equip as jx3_Equip
 import src.jx3_JJCTop as jx3_JJCTop
 import src.chatGPT.Chat_GPT_API as Chat_API
 
 RoleJJCRecord = on_command("RoleJJCRecord", rule=keyword("战绩", "JJC信息"), aliases={"战绩", "JJC信息"}, priority=5)
+Equip = on_command("Equip", rule=keyword("装备"), aliases={"装备"}, priority=5)
 JJCTop = on_command("JJCTop", rule=keyword("JJC趋势图"), aliases={"JJC趋势图"}, priority=5)
 ServerCheck = on_command("ServerCheck", rule=keyword("开服"), aliases={"开服"}, priority=5)
 AllServerState = on_command("AllServerState", rule=keyword("区服"), aliases={"区服"}, priority=5)
@@ -428,6 +430,28 @@ async def onMessage_Recruit(matcher: Matcher, args: Message = CommandArg()):
             await Recruit.finish(msg)
         nonebot.logger.error("招募获取大区信息失败，请重试")
         await Recruit.reject("招募获取大区填写失败，请重试")
+
+
+@Equip.handle()
+async def onMessage_Equip(matcher: Matcher, args: Message = CommandArg()):
+    plain_text = args.extract_plain_text()
+    if plain_text:
+        # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
+        if plain_text.find(" ") != -1:
+            server = jx3Data.mainServer(re.split('[ ]+', plain_text)[0])
+            role_name = re.split('[ ]+', plain_text)[1]
+            equip_info = jx3_Equip.GetRoleEquip(server, role_name)
+            equip_info_time = await equip_info.create_images()
+            if equip_info_time:
+                equip_image = f"/tmp/equip_image_{equip_info_time}.png"
+                msg = MessageSegment.image('file:' + equip_image)
+                await Equip.finish(msg)
+        else:
+            nonebot.logger.error("格式错误，请尝试: 装备 大区 名字")
+            await Equip.reject("格式错误，请尝试: 装备 大区 名字")
+    else:
+        nonebot.logger.error("格式错误，请尝试: 装备 大区 名字")
+        await Equip.reject("格式错误，请尝试: 装备 大区 名字")
 
 
 @Price.handle()

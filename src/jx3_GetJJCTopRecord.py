@@ -3,7 +3,7 @@ import time
 import matplotlib.pyplot as plt
 import pandas as pd
 import src.Data.jxDatas as jxData
-from sqlalchemy import create_engine
+import mysql.connector
 
 
 class GetJJCTopInfo:
@@ -15,7 +15,9 @@ class GetJJCTopInfo:
     # 获取每周每个门派趋势图，返回DICT结果，并打印趋势图至相关目录
     async def from_sql_create_figure(self):
         db_config = jxData.sql_config
-        engine = create_engine(f"mysql+mysqlconnector://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['db']}")
+        cnx = mysql.connector.connect(user=db_config['user'], password=db_config['password'],
+                                      host=db_config['host'], database=db_config['db'])
+        # engine = create_engine('mysql+mysqlconnector://', creator=lambda: cnx)
 
         if self.school_type == "奶妈":
             match self.table:
@@ -34,16 +36,16 @@ class GetJJCTopInfo:
             match self.table:
                 case 50:
                     table_name = 'JJC_rank50_weekly'
-                    ylim_size = 20
+                    ylim_size = 30
                 case 100:
                     table_name = 'JJC_rank100_weekly'
-                    ylim_size = 30
+                    ylim_size = 40
                 case _:
                     table_name = 'JJC_rank_weekly'
                     ylim_size = 50
             query = f"SELECT 霸刀, 藏剑, 蓬莱, 无方,花间,少林,惊羽,丐帮,苍云,紫霞,凌雪,明教,毒经,天策,田螺,胎虚,莫问,衍天,冰心,刀宗 FROM {table_name} where week='{self.weekly}'"
 
-        df_raw = pd.read_sql(query, engine)
+        df_raw = pd.read_sql(query, cnx)
         df_raw.index = ['数量']
         df = df_raw.transpose()
         df.sort_values(by='数量', inplace=True, ascending=False)
