@@ -195,6 +195,14 @@ school_pinyin = {
     "taixu": "胎虚",
 }
 
+treat_pinyin = {
+    "lijing": "离经",
+    "yunshang": "云裳",
+    "lingsu": "灵素",
+    "xiangzhi": "相知",
+    "butian": "补天",
+}
+
 '''
 0101 = 长安城
 0115 = 龙争虎斗

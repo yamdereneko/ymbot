@@ -114,38 +114,76 @@ class GetRoleEquip:
             traceback.print_exc()
             return None
 
+    async def circle_corner(self, img, radii):
+        # 画圆（用于分离4个角）
+        circle = Image.new('L', (radii * 2, radii * 2), 0)  # 创建黑色方形
+        # circle.save('1.jpg','JPEG',qulity=100)
+        draw = ImageDraw.Draw(circle)
+        draw.ellipse((0, 0, radii * 2, radii * 2), fill=255)  # 黑色方形内切白色圆形
+        # circle.save('2.jpg','JPEG',qulity=100)
+
+        # 原图转为带有alpha通道（表示透明程度）
+        img = img.convert("RGBA")
+        w, h = img.size
+
+        # 画4个角（将整圆分离为4个部分）
+        alpha = Image.new('L', img.size, 255)  # 与img同大小的白色矩形，L 表示黑白图
+        # alpha.save('3.jpg','JPEG',qulity=100)
+        alpha.paste(circle.crop((0, 0, radii, radii)), (0, 0))  # 左上角
+        alpha.paste(circle.crop((radii, 0, radii * 2, radii)), (w - radii, 0))  # 右上角
+        alpha.paste(circle.crop((radii, radii, radii * 2, radii * 2)), (w - radii, h - radii))  # 右下角
+        alpha.paste(circle.crop((0, radii, radii, radii * 2)), (0, h - radii))  # 左下角
+        # alpha.save('4.jpg','JPEG',qulity=100)
+
+        img.putalpha(alpha)  # 白色区域透明可见，黑色区域不可见
+
+        return img
+
     async def create_images(self):
         data = await self.equips()
         kungfu = data.get("Kungfu").get("Name")
         equip_score = data.get("MatchDetail").get("score")
-        images = Image.open("images/equip.jpg").convert("RGBA")
-        print(kungfu)
-        print(equip_score)
-        kungfu_image = Image.open(f"images/KungfuIcon/{kungfu}.png").convert("RGBA").resize((48 * 4, 48 * 4))
 
+        equip_treat = 0
+
+        if kungfu in jxData.treat_pinyin.keys():
+            images = Image.open("images/equip_treat.jpg").convert("RGBA")
+            equip_treat = 1
+        else:
+            images = Image.open("images/equip.jpg").convert("RGBA")
+
+        # 大区以及主大区
+        main_zone = jxData.mainZone(self.server)
+        main_server = jxData.mainServer(self.server)
+
+        # 给心法图标去背景
+        kungfu_image = Image.open(f"images/KungfuIcon/{kungfu}.png").convert("RGBA").resize((54 * 4, 54 * 4))
         im2 = Image.new('RGBA', kungfu_image.size, (242, 246, 255, 255))
         im2.paste(kungfu_image, (0, 0), kungfu_image)
-        images.paste(im2, (280 * 4, 40 * 4))
+        images.paste(im2, (291 * 4, 53 * 4))
 
         # 创建一个可绘制的对象
         draw = ImageDraw.Draw(images)
 
         # 定义要添加的文本和字体
-        font = ImageFont.truetype("fonts/pingfang_regular.ttf", size=55)
-        src_font = ImageFont.truetype("fonts/pingfang_bold.ttf", size=100)
-        equip_score_font = ImageFont.truetype("fonts/pingfang_bold.ttf", size=54)
+        font = ImageFont.truetype("fonts/pingfang_regular.ttf", size=60)
+        src_font = ImageFont.truetype("fonts/pingfang_bold.ttf", size=120)
+        equip_score_font = ImageFont.truetype("fonts/pingfang_bold.ttf", size=84)
+        title_font = ImageFont.truetype("fonts/pingfang_regular.ttf", size=68)
 
-        # 指定文本的颜色为红色
+        # 指定文本的颜色为黑色
         fill_color = (0, 0, 0)
 
         flag = 0
         kind_flag = 0
 
         # 标题 名字
-        draw.text((337 * 4, 47 * 4), self.role, font=src_font, fill=fill_color)
+        title_color = (61, 62, 66)
+        draw.text((356 * 4, 43 * 4), self.role, font=src_font, fill=title_color)
+        draw.text((356 * 4, 82 * 4), main_zone + " " + main_server, font=title_font, fill=title_color)
 
         # 装备分数
-        draw.text((136 * 4, 472 * 4), str(equip_score), font=equip_score_font, fill=fill_color)
+        draw.text((105 * 4, 515 * 4), str(equip_score), font=equip_score_font, fill=fill_color)
 
         for equip in data['Equips']:
             equips_name = equip.get('Name')
@@ -153,7 +191,7 @@ class GetRoleEquip:
             sub_kind = equip.get("Icon").get("SubKind")
             equip_url = equip.get("Icon").get("FileName")
 
-            if equip.get("Icon").get("Kind") == "武器" and kind_flag == 0:
+            if equip.get("Icon").get("Kind") == "武器" or equip.get("Icon").get("Kind") == "任务特殊" and kind_flag == 0:
                 if "囊" in sub_kind:
                     print(1)
                 else:
@@ -169,59 +207,63 @@ class GetRoleEquip:
             print(sub_kind)
             response = httpx.get(equip_url)
 
-            width = 40 * 4
-            height = 40 * 4
-            overlay_image = Image.open(BytesIO(response.read())).resize((width, height))
+            width = 46 * 4
+            height = 46 * 4
+            overlay_image = await self.circle_corner(Image.open(BytesIO(response.read())).resize((width, height)), 40)
 
             match sub_kind:
                 case "帽子":
-                    x = 101 * 4
-                    y = 543 * 4
+                    x = 81 * 4
+                    y = 572 * 4
                 case "护臂":
-                    x = 342 * 4
-                    y = 543 * 4
+                    x = 313 * 4
+                    y = 572 * 4
                 case "项链":
-                    x = 583 * 4
-                    y = 543 * 4
+                    x = 545 * 4
+                    y = 572 * 4
 
                 case "上衣":
-                    x = 101 * 4
-                    y = 608 * 4
+                    x = 81 * 4
+                    y = 637 * 4
                 case "裤子":
-                    x = 342 * 4
-                    y = 608 * 4
+                    x = 313 * 4
+                    y = 637 * 4
                 case "腰坠":
-                    x = 583 * 4
-                    y = 608 * 4
+                    x = 545 * 4
+                    y = 637 * 4
 
                 case "腰带":
-                    x = 101 * 4
-                    y = 674 * 4
+                    x = 81 * 4
+                    y = 702 * 4
                 case "鞋":
-                    x = 342 * 4
-                    y = 674 * 4
+                    x = 313 * 4
+                    y = 702 * 4
                 case "戒指1":
-                    x = 583 * 4
-                    y = 674 * 4
+                    x = 545 * 4
+                    y = 702 * 4
 
                 case x if "囊" in x:
-                    x = 101 * 4
-                    y = 739 * 4
+                    x = 81 * 4
+                    y = 767 * 4
                 case "武器":
-                    x = 342 * 4
-                    y = 739 * 4
+                    x = 313 * 4
+                    y = 767 * 4
                 case "戒指2":
-                    x = 583 * 4
-                    y = 739 * 4
+                    x = 545 * 4
+                    y = 767 * 4
                 case _:
                     x = 0
                     y = 0
                     equips_name = ""
                     quality = ""
 
-            draw.text((x, y), equips_name, font=font, fill=fill_color)
-            draw.text((x, y + 25 * 4), quality, font=font, fill=fill_color)
-            images.paste(overlay_image, (x - 52 * 4, y + 4 * 4))
+            # images.paste(overlay_image, (x, y))
+            image1 = Image.new('RGBA', overlay_image.size, (242, 246, 255, 255))
+            image1.paste(overlay_image, (0, 0), overlay_image)
+            images.paste(image1, (x, y))
+
+            draw.text((x + 58 * 4, y), equips_name, font=font, fill=fill_color)
+            draw.text((x + 58 * 4, y + 26 * 4), quality, font=font, fill=fill_color)
 
             # source = equip.get('equipBelongs')
             # if source is None:
@@ -229,7 +271,7 @@ class GetRoleEquip:
             # else:
             #     source = [i.get("source") for i in equip.get('equipBelongs')]
             # print("来源: " + ''.join(source))
-            print(("属性: \n" + '\n'.join([i.get("Attrib").get("GeneratedMagic") for i in equip.get("ModifyType")])))
+            # print(("属性: \n" + '\n'.join([i.get("Attrib").get("GeneratedMagic") for i in equip.get("ModifyType")])))
 
         personal_panel = data['PersonalPanel']
         for element in personal_panel:
@@ -237,41 +279,68 @@ class GetRoleEquip:
             panel_value = str(element.get("value"))
             match panel_name:
                 case "气血":
-                    x = 140 * 4
-                    y = 166 * 4
+                    x = 141 * 4
+                    y = 215 * 4
                 case "攻击力":
-                    x = 340 * 4
-                    y = 166 * 4
+                    x = 371 * 4
+                    y = 215 * 4
+
                 case "基础攻击力":
-                    x = 540 * 4
-                    y = 166 * 4
+                    x = 606 * 4
+                    y = 215 * 4
+                case "治疗量":
+                    x = 371 * 4
+                    y = 215 * 4
+
                 case "会心":
-                    x = 140 * 4
-                    y = 230 * 4
+                    x = 141 * 4
+                    y = 277 * 4
                 case "会心效果":
-                    x = 340 * 4
-                    y = 230 * 4
+                    x = 371 * 4
+                    y = 277 * 4
                 case "破防":
-                    x = 540 * 4
-                    y = 230 * 4
+                    x = 606 * 4
+                    y = 277 * 4
+
                 case "加速":
-                    x = 140 * 4
-                    y = 295 * 4
+                    if equip_treat == 1:
+                        x = 606 * 4
+                        y = 277 * 4
+                    else:
+                        x = 141 * 4
+                        y = 341 * 4
                 case "破招":
-                    x = 340 * 4
-                    y = 295 * 4
+                    if equip_treat == 1:
+                        x = 606 * 4
+                        y = 341 * 4
+                    else:
+                        x = 371 * 4
+                        y = 341 * 4
                 case "无双":
-                    x = 540 * 4
-                    y = 295 * 4
+                    x = 606 * 4
+                    y = 341 * 4
+
                 case "根骨" | "身法" | "元气" | "力道":
-                    x = 140 * 4
-                    y = 359 * 4
+                    if equip_treat == 1:
+                        x = 606 * 4
+                        y = 215 * 4
+                    else:
+                        x = 141 * 4
+                        y = 405 * 4
                 case "化劲":
-                    x = 340 * 4
-                    y = 359 * 4
+                    if equip_treat == 1:
+                        x = 141 * 4
+                        y = 341 * 4
+                    else:
+                        x = 371 * 4
+                        y = 405 * 4
                 case "御劲":
-                    x = 540 * 4
-                    y = 359 * 4
+                    if equip_treat == 1:
+                        x = 371 * 4
+                        y = 341 * 4
+                    else:
+                        x = 606 * 4
+                        y = 405 * 4
                 case _:
                     panel_name = ""
                     panel_value = ""
@@ -279,7 +348,7 @@ class GetRoleEquip:
                     y = 0
 
             draw.text((x, y), panel_name, font=font, fill=fill_color)
-            draw.text((x, y + 25 * 4), panel_value, font=font, fill=fill_color)
+            draw.text((x, y + 27 * 4), panel_value, font=font, fill=fill_color)
 
         dpi = (2000, 2000)
 
@@ -287,12 +356,13 @@ class GetRoleEquip:
 
         # # 保存图像
         datetime = int(time.time())
-        images.save(f"/tmp/equip_image_{datetime}.png", dpi=dpi)
+        images.save(f"images/new_image.png", dpi=dpi)
+        # images.show()
 
         # 使用系统默认的图像查看器显示图像
         return datetime
 
 
-role_equip = GetRoleEquip("小疏竹", "姨妈")
+role_equip = GetRoleEquip("小丛兰", "姨妈")
 # asyncio.run(role_equip.get_Fig())
 asyncio.run(role_equip.create_images())

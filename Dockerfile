@@ -1,4 +1,4 @@
-FROM yamdereneko/nb2:latest
+FROM yamdereneko/nb2:1.0
 
 ENV PATH="${PATH}:/root/.local/bin"
 
