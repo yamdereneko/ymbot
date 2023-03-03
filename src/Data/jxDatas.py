@@ -4,7 +4,7 @@ import redis
 from pydantic import BaseModel, Extra, Field
 from nonebot import get_driver
 
-config = get_driver().config
+# config = get_driver().config
 
 
 class DefaultConfig(BaseModel, extra=Extra.ignore):
@@ -51,8 +51,8 @@ class PathConfig(BaseModel, extra=Extra.ignore):
     """html模板文件"""
 
 
-default_config = DefaultConfig.parse_obj(config)
-path_config = PathConfig.parse_obj(config)
+# default_config = DefaultConfig.parse_obj(config)
+# path_config = PathConfig.parse_obj(config)
 """路径设置"""
 
 """

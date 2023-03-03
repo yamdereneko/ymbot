@@ -54,8 +54,22 @@ class GetPersonRecord:
         if response.data is []:
             nonebot.logger.error("API接口cc_mine_match_history获取信息失败，请查看错误")
             return None
-        record = response.data
-        return record
+
+        for element in response.data:
+            team1 = {}
+            team2 = {}
+            match_id = element.get("match_id")
+            response = await api.cc_mine_match_detail(match_id=match_id)
+            for team_info in response.data.get("team1").get("players_info"):
+                team1[team_info.get("role_name")] = team_info.get("kungfu")
+            for team_info in response.data.get("team2").get("players_info"):
+                team2[team_info.get("role_name")] = team_info.get("kungfu")
+            print(team1)
+            print(team2)
+            for _ in team1.values():
+                print(_)
+            print("**" * 20)
+        return response.data
 
     async def get_person_record_figure(self, data):
         fig, ax = plt.subplots(figsize=(8, 9), facecolor='white', edgecolor='white')
@@ -94,3 +108,7 @@ class GetPersonRecord:
         datetime = int(time.time())
         plt.savefig(f"/tmp/record{datetime}.png")
         return datetime
+
+
+record = GetPersonRecord("小疏竹", "姨妈")
+total = asyncio.run(record.get_person_record())
