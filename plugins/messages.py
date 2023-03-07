@@ -225,8 +225,8 @@ async def onMessage_Daily():
             await red.delete('daily_image')
 
     await red.add('daily', daily_data)
-    daily_image = await daily.query_daily_figure(daily_data)
-    frame = f"/tmp/daily{daily_image}.png"
+    daily_image = await daily.query_daily_figure()
+    frame = f"/tmp/daily_{daily_image}.png"
     await red.insert_image('daily_image', frame)
     msg = MessageSegment.image('file:' + frame)
     await Daily.finish(msg)

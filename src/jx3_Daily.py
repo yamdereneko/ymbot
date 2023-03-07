@@ -8,16 +8,22 @@
 @Docs : 请求推栏战绩例子
 """
 import asyncio
-from functools import partial
 import time
 import matplotlib.pyplot as plt
 import nonebot
 import src.Data.jxDatas as jxData
-import dufte
 from src.internal.jx3api import API
+from PIL import ImageFont
+from PIL import Image, ImageDraw
 
 # 请求头
 api = API()
+
+
+async def image_prospect(image):
+    im2 = Image.new('RGBA', image.size, (255, 255, 255, 255))
+    im2.paste(image, (0, 0), image)
+    return im2
 
 
 class GetDaily:
@@ -35,36 +41,42 @@ class GetDaily:
             return None
         return response.data
 
-    async def query_daily_figure(self, data):
+    async def query_daily_figure(self):
+        data = await self.get_daily()
         if data is None:
             nonebot.logger.error(self.server + "日常未得到，将返回None")
             return None
-        team = ":".join(data.get("team"))
-        fig, ax = plt.subplots(figsize=(8, 9), facecolor='white', edgecolor='white')
-        plt.style.use(dufte.style)
-        ax.axis([0, 2, 0, 4])
-        ax.set_title(f'今天是{data.get("date")},星期{data.get("week")}', fontsize=19, color='#303030', fontweight="heavy",
-                     verticalalignment='top')
-        ax.axis('off')
-        ax.text(0.1, 3.5, f'「大战」:{data.get("war")}', verticalalignment='bottom', horizontalalignment='left',
-                color='#404040')
-        ax.text(0.1, 3, f'「战场」:{data.get("battle")}', verticalalignment='bottom', horizontalalignment='left',
-                color='#404040')
-        ax.text(0.1, 2.5, f'「阵营日常」:{data.get("camp")}', verticalalignment='bottom', horizontalalignment='left',
-                color='#404040')
-        ax.text(0.1, 2, f'「驰援」:{data.get("relief")}', verticalalignment='bottom', horizontalalignment='left',
-                color='#404040')
-        ax.text(0.1, 1.5, f'「公共日常周常」:{team.split(":")[0]}', verticalalignment='bottom',
-                horizontalalignment='left', color='#404040')
-        ax.text(0.1, 1, f'「5人周常副本」:{team.split(":")[1]}', verticalalignment='bottom',
-                horizontalalignment='left', color='#404040')
-        ax.text(0.1, 0.5, f'「10人周常副本」:{team.split(":")[2]}', verticalalignment='bottom',
-                horizontalalignment='left', color='#404040')
-        beautifulWoman = data.get("draw") is None and '无' or data.get("draw")
-        ax.text(0.1, 0, f'「美人图」:{beautifulWoman}', verticalalignment='bottom', horizontalalignment='left',
-                color='#404040')
+        images = await image_prospect(Image.open("src/images/daily.png").convert("RGBA"))
+        draw = ImageDraw.Draw(images)
+        today = data.get("date") + " 星期" + data.get("week")
+        war = data.get("war")
+        battle = data.get("battle")
+        five_persons_instance = "\n".join(str(data.get("team")[1]).split(';'))
+        ten_persons_instance = "\n".join(str(data.get("team")[2]).split(';'))
+
+        daily_font = ImageFont.truetype("src/fonts/pingfang_regular.ttf", size=100)
+        fill_color = (0, 0, 0)
+
+        # 时间设置
+        draw.text((69 * 4, 143 * 4), today, font=daily_font, fill=fill_color)
+
+        # 大战
+        draw.text((69 * 4, 299 * 4), war, font=daily_font, fill=fill_color)
+
+        # 大战
+        draw.text((69 * 4, 459 * 4), battle, font=daily_font, fill=fill_color)
+
+        # 五人周常
+        draw.text((69 * 4, 619 * 4), five_persons_instance, font=daily_font, fill=fill_color)
+
+        # 十人周常
+        draw.text((69 * 4, 862 * 4), ten_persons_instance, font=daily_font, fill=fill_color)
+
+        dpi = (1000, 1000)
+
+        # # 保存图像
         datetime = int(time.time())
-        plt.savefig(f"/tmp/daily{datetime}.png")
+        images.save(f"/tmp/daily_{datetime}.png", dpi=dpi)
         return datetime
 
     async def query_weekly_daily(self):
@@ -73,4 +85,3 @@ class GetDaily:
             nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
             return None
         return response.data
-
