@@ -163,5 +163,5 @@ class GetJJCTopRecord:
 
 
 # #
-# Record = GetJJCTopRecord(8, 50)
+# Record = GetJJCTopRecord(9, 50)
 # asyncio.run(Record.create_top_history_to_database())

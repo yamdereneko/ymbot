@@ -73,7 +73,7 @@ async def onMessage_RoleJJCRecord(matcher: Matcher, args: Message = CommandArg()
         record = await jjc_record.get_person_record()
         if record:
             red = redis.Redis()
-            frame = f"/tmp/record{role_name}.png"
+            frame = f"/tmp/record_{role_name}.png"
             redis_record_data = await red.query('record_' + role_name)
             if redis_record_data:
                 res = json.loads(redis_record_data)
@@ -86,8 +86,8 @@ async def onMessage_RoleJJCRecord(matcher: Matcher, args: Message = CommandArg()
                     await red.delete('record_' + role_name + '_image')
 
             await red.add('record_' + role_name, record)
-            record_image = await jjc_record.get_person_record_figure(record)
-            frame = f"/tmp/record{record_image}.png"
+            record_image = await jjc_record.get_person_record_figure()
+            frame = f"/tmp/record_{record_image}.png"
             await red.insert_image('record_' + role_name + '_image', frame)
             msg = MessageSegment.image('file:' + frame)
             await RoleJJCRecord.finish(msg)
