@@ -183,7 +183,7 @@ class GetPersonRecord:
             if delta_time < 60:
                 # 少于1分钟
                 war_time = f"{delta_time}秒前"
-                draw.text((1222 * 4, 111 * 4 + floor * 80 * 4), war_time, font=won_font, fill=won_font_color)
+                draw.text((1232 * 4, 111 * 4 + floor * 80 * 4), war_time, font=won_font, fill=won_font_color)
             elif delta_time < 3600:
                 # 少于1小时
                 delta_time //= 60
@@ -198,8 +198,7 @@ class GetPersonRecord:
                 # 大于等于1天
                 delta_time //= 86400
                 war_time = f"{delta_time}天前"
-                draw.text((1222 * 4, 111 * 4 + floor * 80 * 4), war_time, font=won_font, fill=won_font_color)
-
+                draw.text((1232 * 4, 111 * 4 + floor * 80 * 4), war_time, font=won_font, fill=won_font_color)
 
         dpi = (1000, 1000)
 
