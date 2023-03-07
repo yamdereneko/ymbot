@@ -64,7 +64,6 @@ ticket = ['966925c532564a26bdcae0062f1d0519:yandereneko:kingsoft::Nzc3Y2pkNHkxZm
           'a6268a43bb2549a19bf9fdd6a42d273c:yandereneko1:kingsoft::aW52djM3NXo4NTd1N2x4eg==',
           'acd21e7af47948599dfac9f8b813aa14:yandereneko2:kingsoft::bXlxaWZqdDY0Mnk4anI3aw==']
 
-
 server_binding = "斗转星移"
 
 redis_config = redis.Redis(
@@ -357,6 +356,171 @@ def mainServer(method):
         case _:
             return None
 
+
+def peerless_adventure(adventure):
+    match adventure:
+        case "阴阳" | "阴阳两界":
+            return "yinyangliangjie"
+        case "追魂骨" | "追魂" | "追魂股":
+            return "zhuihungu"
+        case "济苍生" | "95CW奇遇":
+            return "jicangsheng"
+        case "流年如虹" | "六年如虹":
+            return "liunianruhong"
+        case "千秋铸" | "千秋" | "120CW奇遇":
+            return "qianqiuzhu"
+        case "塞外宝驹" | "塞外":
+            return "saiwaibaoju"
+        case "三尺青锋" | "三尺" | "90CW奇遇":
+            return "sanchiqingfeng"
+        case "三山四海" | "三山" | "33"| "3344":
+            return "sanshansihai"
+        case "兔江湖" | "江湖":
+            return "tujianghu"
+        case "万灵当歌" | "万灵":
+            return "wanglingdangge"
+        case "侠行囧途" | "侠行" :
+            return "xiaxing"
+        case "争铸吴钩" | "争铸" | "100CW奇遇":
+            return "zhengzhuwugou"
+        case _:
+            return None
+
+
+def normal_adventure(adventure):
+    match adventure:
+        case "白日梦"| "白日做梦" | "白日" | "百日":
+            return "bairimeng"
+        case "茶馆奇缘" | "茶馆" | "茶馆奇遇":
+            return "chaguanqiyuan"
+        case "度人心" | "读人心":
+            return "durenxin"
+        case "扶摇九天" | "扶摇":
+            return "fuyaojiutian"
+        case "故园风雨" | "故园":
+            return "guyuanfengyu"
+        case "黑白路" | "黑白":
+            return "heibailu"
+        case "红尘不渡" | "红尘":
+            return "hongchenbudu"
+        case "虎啸山林" | "虎啸" | "呼啸":
+            return "huxiaoshanlin"
+        case "护佑苍生" | "护佑" | "苍生":
+            return "huyoucangsheng"
+        case "镜中琴音" | "琴音":
+            return "jingzhongqinyin"
+        case "旧宴承欢" | "旧宴":
+            return "jiuyanchenghuan"
+        case "炼狱厨神" | "炼狱" | "厨神":
+            return "lianyuchushen"
+        case "凌云梯" | "凌云":
+            return "lingyunti"
+        case "乱世舞姬" | "乱世" | "舞姬":
+            return "luanshiwuji"
+        case "平生心愿" | "平生":
+            return "pingshengxinyuan"
+        case "清风捕王" | "清风" | "捕王":
+            return "qingfengbuwang"
+        case "庆舞良宵" | "庆舞" | "良宵":
+            return "qingwuliangxiao"
+        case "劝学记" | "劝学":
+            return "quanxueji"
+        case "韶华故" | "韶华":
+            return "shaohuagu"
+        case "少年行" | "少年":
+            return "shaonianxing"
+        case "生死判" | "生死":
+            return "shengsipan"
+        case "天涯无归" | "天涯":
+            return "tianyawugui"
+        case "舞众生" | "扭秧歌":
+            return "wuzongsheng"
+        case "惜往日" | "摸头杀":
+            return "xiwangri"
+        case "雪山恩仇" | "雪山":
+            return "xueshanenchou"
+        case _:
+            return None
+
+
+def adventure(adventure_total):
+    match adventure_total:
+        case "阴阳" | "阴阳两界":
+            return "yinyangliangjie"
+        case "追魂骨" | "追魂" | "追魂股":
+            return "zhuihungu"
+        case "济苍生" | "95CW奇遇":
+            return "jicangsheng"
+        case "流年如虹" | "六年如虹":
+            return "liunianruhong"
+        case "千秋铸" | "千秋" | "120CW奇遇":
+            return "qianqiuzhu"
+        case "塞外宝驹" | "塞外":
+            return "saiwaibaoju"
+        case "三尺青锋" | "三尺" | "90CW奇遇":
+            return "sanchiqingfeng"
+        case "三山四海" | "三山" | "33"| "3344":
+            return "sanshansihai"
+        case "兔江湖" | "江湖":
+            return "tujianghu"
+        case "万灵当歌" | "万灵":
+            return "wanglingdangge"
+        case "侠行囧途" | "侠行" :
+            return "xiaxing"
+        case "争铸吴钩" | "争铸" | "100CW奇遇":
+            return "zhengzhuwugou"
+        case "白日梦"| "白日做梦" | "白日" | "百日":
+            return "bairimeng"
+        case "茶馆奇缘" | "茶馆" | "茶馆奇遇":
+            return "chaguanqiyuan"
+        case "度人心" | "读人心":
+            return "durenxin"
+        case "扶摇九天" | "扶摇":
+            return "fuyaojiutian"
+        case "故园风雨" | "故园":
+            return "guyuanfengyu"
+        case "黑白路" | "黑白":
+            return "heibailu"
+        case "红尘不渡" | "红尘":
+            return "hongchenbudu"
+        case "虎啸山林" | "虎啸" | "呼啸":
+            return "huxiaoshanlin"
+        case "护佑苍生" | "护佑" | "苍生":
+            return "huyoucangsheng"
+        case "镜中琴音" | "琴音":
+            return "jingzhongqinyin"
+        case "旧宴承欢" | "旧宴":
+            return "jiuyanchenghuan"
+        case "炼狱厨神" | "炼狱" | "厨神":
+            return "lianyuchushen"
+        case "凌云梯" | "凌云":
+            return "lingyunti"
+        case "乱世舞姬" | "乱世" | "舞姬":
+            return "luanshiwuji"
+        case "平生心愿" | "平生":
+            return "pingshengxinyuan"
+        case "清风捕王" | "清风" | "捕王":
+            return "qingfengbuwang"
+        case "庆舞良宵" | "庆舞" | "良宵":
+            return "qingwuliangxiao"
+        case "劝学记" | "劝学":
+            return "quanxueji"
+        case "韶华故" | "韶华":
+            return "shaohuagu"
+        case "少年行" | "少年":
+            return "shaonianxing"
+        case "生死判" | "生死":
+            return "shengsipan"
+        case "天涯无归" | "天涯":
+            return "tianyawugui"
+        case "舞众生" | "扭秧歌":
+            return "wuzongsheng"
+        case "惜往日" | "摸头杀":
+            return "xiwangri"
+        case "雪山恩仇" | "雪山":
+            return "xueshanenchou"
+        case _:
+            return None
 
 def mainZone(method):
     match method:

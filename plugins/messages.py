@@ -8,6 +8,7 @@
 """
 import json
 import re
+import pathlib
 import nonebot
 from nonebot import on_command
 from nonebot.adapters.onebot.v11 import MessageSegment
@@ -43,7 +44,7 @@ Daily = on_command("Daily", rule=keyword("日常"), aliases={"日常"}, priority
 Adventure = on_command("Adventure", rule=keyword("奇遇"), aliases={"奇遇"}, priority=5)
 Fireworks = on_command("Fireworks", rule=keyword("烟花"), aliases={"烟花"}, priority=5)
 SaoHua = on_command("SaoHua", rule=keyword("骚话"), aliases={"骚话"}, priority=5)
-Strategy = on_command("Strategy", rule=keyword("奇遇攻略"), aliases={"奇遇攻略"}, priority=5)
+Strategy = on_command("Strategy", rule=keyword("奇遇攻略", "攻略"), aliases={"奇遇攻略", "攻略"}, priority=5)
 Require = on_command("Require", rule=keyword("奇遇前置"), aliases={"奇遇前置"}, priority=5)
 Recruit = on_command("Recruit", rule=keyword("招募"), aliases={"招募"}, priority=5)
 Price = on_command("Price", rule=keyword("物价"), aliases={"物价"}, priority=5)
@@ -352,23 +353,17 @@ async def onMessage_Announce():
 async def onMessage_Strategy(matcher: Matcher, args: Message = CommandArg()):
     if args.extract_plain_text() != "":
         plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
-        strategy = await jx3_Multifunction.get_strategy(plain_text)
-        image_url = strategy['url']
-        msg = MessageSegment.image(image_url)
-        await Strategy.finish(msg)
-    else:
-        nonebot.logger.error("请求错误,请参考: 奇遇攻略 奇遇名")
-        await Strategy.reject("请求错误,请参考: 奇遇攻略 奇遇名")
-
-
-@Strategy.handle()
-async def onMessage_Strategy(matcher: Matcher, args: Message = CommandArg()):
-    if args.extract_plain_text() != "":
-        plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
-        strategy = await jx3_Multifunction.get_strategy(plain_text)
-        image_url = strategy['url']
-        msg = MessageSegment.image(image_url)
-        await Strategy.finish(msg)
+        adventure = jx3Data.adventure(plain_text)
+        if adventure is None:
+            await Strategy.reject("请重新输入正确的奇遇名词")
+        else:
+            frame = f"/tmp/{adventure}.png"
+            file_obj = pathlib.Path(frame)
+            if not file_obj.exists():
+                red = redis.Redis()
+                await red.get_image(adventure, frame)
+            msg = MessageSegment.image('file:' + frame)
+            await Strategy.finish(msg)
     else:
         nonebot.logger.error("请求错误,请参考: 奇遇攻略 奇遇名")
         await Strategy.reject("请求错误,请参考: 奇遇攻略 奇遇名")
