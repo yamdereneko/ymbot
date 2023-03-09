@@ -54,9 +54,8 @@ Sand = on_command("Sand", rule=keyword("沙盘"), aliases={"沙盘"}, priority=5
 Chat = on_command("Chat", rule=keyword("提问", "疑问"), aliases={"提问", "疑问"}, priority=5)
 CreateJJCTopDataToDataBase = on_command("CreateJJCTopDataToDataBase", rule=keyword("生成JJC趋势图"), aliases={"生成JJC趋势图"},
                                         priority=5)
-Chutianshe = on_command("Chutianshe", rule=keyword("楚天社", "行侠"), aliases={"楚天社", "行侠"},
-                        priority=5)
-
+Chutianshe = on_command("Chutianshe", rule=keyword("楚天社", "行侠"), aliases={"楚天社", "行侠"}, priority=5)
+Serverd_Group = on_command("Serverd_Group", rule=keyword("群组"), aliases={"群组"}, priority=5)
 
 @RoleJJCRecord.handle()
 async def onMessage_RoleJJCRecord(matcher: Matcher, args: Message = CommandArg()):
@@ -249,7 +248,7 @@ async def onMessage_Adventure(matcher: Matcher, args: Message = CommandArg()):
             await Adventure.reject('数据异常，请联系管理员')
         nonebot.logger.info(user_adventure_data)
         red = redis.Redis()
-        frame = f"/tmp/adventure{user}.png"
+        frame = f"/tmp/adventure_{user}.png"
         redis_adventure_data = await red.query('adventure_' + user)
         if redis_adventure_data:
             res = json.loads(redis_adventure_data)
@@ -261,8 +260,8 @@ async def onMessage_Adventure(matcher: Matcher, args: Message = CommandArg()):
                 await red.delete('adventure_' + user)
                 await red.delete('adventure_' + user + '_image')
         await red.add('adventure_' + user, user_adventure_data)
-        user_adventure_image = await adventure.get_Fig(user_adventure_data)
-        frame = f"/tmp/adventure{user_adventure_image}.png"
+        user_adventure_image = await adventure.create_figure()
+        frame = f"/tmp/adventure_{user_adventure_image}.png"
         await red.insert_image('adventure_' + user + '_image', frame)
         msg = MessageSegment.image('file:' + frame)
         await Adventure.finish(msg)
@@ -514,6 +513,37 @@ async def onMessage_CreateJJCTopDataToDataBase(args: Message = CommandArg()):
             await CreateJJCTopDataToDataBase.finish(msg)
     else:
         await CreateJJCTopDataToDataBase.finish("1111")
+
+@Serverd_Group.handle()
+async def onMessage_Serverd_Group(args: Message = CommandArg()):
+    plain_text = args.extract_plain_text()
+    red = redis.Redis()
+    command = plain_text.split(' ')[0]
+    if command:
+        match command:
+            case "查看":
+                group_list = await red.query_list("group_list")
+                group_list_text = '\n'.join(group_list)
+                msg = f"目前正在提供服务的群: \n{group_list_text}"
+            case "添加":
+                if plain_text.find(" ") != -1:
+                    command_info = plain_text.split(' ')[1]
+                    await red.insert_list("group_list", command_info)
+                    msg = f"添加服务的群为: {command_info}"
+                else:
+                    msg = f"请在命令后面添加具体的群组信息"
+            case "移除" | "删除":
+                if plain_text.find(" ") != -1:
+                    command_info = plain_text.split(' ')[1]
+                    await red.delete_list("group_list", command_info)
+                    msg = f"正在移除服务的群为: {command_info}"
+                else:
+                    msg = f"请在命令后面添加具体的群组信息"
+            case _:
+                msg = f"错误的命令: {command}, 正确的命令有： 添加 移除 查看"
+        await Serverd_Group.finish(msg)
+    else:
+        await Serverd_Group.reject("命令失败，请重试")
 
 # @roleJJCRecord.got("role", prompt="你想查询哪个角色信息呢？")
 # async def handle_city(role: Message = Arg(), roleName: str = ArgPlainText("role")):

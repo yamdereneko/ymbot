@@ -4,6 +4,7 @@ import redis
 from pydantic import BaseModel, Extra, Field
 from nonebot import get_driver
 
+
 config = get_driver().config
 
 
@@ -107,11 +108,6 @@ class Jx3ApiConfig(BaseModel, extra=Extra.ignore):
     api_token: str = Field("", alias="jx3api_token")
     """主站的token"""
 
-
-#
-# group_list = [549242180]
-group_list = ["736734387", "642668185"]
-# group_list = ["642668185"]
 
 config = {
     'host': '114.115.181.82',  # 连接主机名。
@@ -269,6 +265,48 @@ treat_pinyin = {
 '''
 
 
+def total_kungfu(kungfu):
+    match kungfu:
+        case "yinlong":
+            return "yinlong"
+        case "beiao":
+            return "beiao"
+        case "yijin" | "xisui":
+            return "shaolin"
+        case "butian" | "dujing":
+            return "wudu"
+        case "linghai":
+            return "linghai"
+        case "zixia" | "taixu":
+            return "chunyang"
+        case "cangjian":
+            return "cangjian"
+        case "fenying" | "mingzun":
+            return "mingjiao"
+        case "yunshang" | "bingxin":
+            return "qixiu"
+        case "huajian" | "lijing":
+            return "wanhuua"
+        case "xiaochen":
+            return "xiaochen"
+        case "tianluo"| "jingyu":
+            return "tangmen"
+        case "xiangzhi"| "mowen":
+            return "changge"
+        case "fenshan":
+            return "fenshan"
+        case "aoxue":
+            return "aoxue"
+        case "wufang"| "lingsu":
+            return "yaozong"
+        case "taixuan":
+            return "taixuan"
+        case "linghai":
+            return "linghai"
+        case _:
+            return None
+
+
 def school(method):
     match method:
         case "凌雪" | "0雪" | "野猪" | "lingxue":
@@ -373,13 +411,13 @@ def peerless_adventure(adventure):
             return "saiwaibaoju"
         case "三尺青锋" | "三尺" | "90CW奇遇":
             return "sanchiqingfeng"
-        case "三山四海" | "三山" | "33"| "3344":
+        case "三山四海" | "三山" | "33" | "3344":
             return "sanshansihai"
         case "兔江湖" | "江湖":
             return "tujianghu"
         case "万灵当歌" | "万灵":
             return "wanglingdangge"
-        case "侠行囧途" | "侠行" :
+        case "侠行囧途" | "侠行":
             return "xiaxing"
         case "争铸吴钩" | "争铸" | "100CW奇遇":
             return "zhengzhuwugou"
@@ -389,7 +427,7 @@ def peerless_adventure(adventure):
 
 def normal_adventure(adventure):
     match adventure:
-        case "白日梦"| "白日做梦" | "白日" | "百日":
+        case "白日梦" | "白日做梦" | "白日" | "百日":
             return "bairimeng"
         case "茶馆奇缘" | "茶馆" | "茶馆奇遇":
             return "chaguanqiyuan"
@@ -459,17 +497,17 @@ def adventure(adventure_total):
             return "saiwaibaoju"
         case "三尺青锋" | "三尺" | "90CW奇遇":
             return "sanchiqingfeng"
-        case "三山四海" | "三山" | "33"| "3344":
+        case "三山四海" | "三山" | "33" | "3344":
             return "sanshansihai"
         case "兔江湖" | "江湖":
             return "tujianghu"
         case "万灵当歌" | "万灵":
             return "wanglingdangge"
-        case "侠行囧途" | "侠行" :
+        case "侠行囧途" | "侠行":
             return "xiaxing"
         case "争铸吴钩" | "争铸" | "100CW奇遇":
             return "zhengzhuwugou"
-        case "白日梦"| "白日做梦" | "白日" | "百日":
+        case "白日梦" | "白日做梦" | "白日" | "百日":
             return "bairimeng"
         case "茶馆奇缘" | "茶馆" | "茶馆奇遇":
             return "chaguanqiyuan"
@@ -521,6 +559,7 @@ def adventure(adventure_total):
             return "xueshanenchou"
         case _:
             return None
+
 
 def mainZone(method):
     match method:

@@ -36,6 +36,15 @@ class Redis:
     async def exit(self, key, data):
         return self.conn.sismember(key, data)  # 判断key里是否有data，有则返回true
 
+    async def insert_list(self, list_name, info):
+        self.conn.rpush(list_name, info)
+
+    async def query_list(self, list_name):
+        return self.conn.lrange(list_name, 0, -1)
+
+    async def delete_list(self, list_name, element):
+        return self.conn.lrem(list_name, 0, element)
+
     async def insert_image(self, frame_id, frame):
         with open(frame, "rb") as f:  # 打开01.png图片
             # b64encode是编码，b64decode是解码
@@ -64,9 +73,11 @@ class Redis:
 
 #
 # red = Redis()
-# res = asyncio.run(red.exist('adventure_幽谷'))
+# my_list = ["736734387", "642668185"]
+# # res = asyncio.run(red.insert_list("group_list", my_list))
+# res = asyncio.run(red.query_list("group_list"))
 # print(res)
-# #
+#
 
 # print(res)
 # print(res)

@@ -1,5 +1,4 @@
 import asyncio
-import json
 import nonebot
 import src.Data.jx3_Redis as redis
 from contextlib import closing, suppress
@@ -8,7 +7,6 @@ from functools import wraps
 from itertools import count
 from typing import Callable, List
 from urllib.request import urlopen
-from src.Data.jxDatas import group_list
 from src import jx3_Daily as jx3_Daily
 from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot import require, get_bots
@@ -120,6 +118,8 @@ async def async_run():
     task1 = asyncio.shield(run_daily())
     res = await asyncio.gather(task1, return_exceptions=True)
     bot, = get_bots().values()
+    red = redis.Redis()
+    group_list = await red.query_list("group_list")
     for group_id in group_list:
         for msg in res:
             await bot.send_group_msg(group_id=group_id, message=msg)
