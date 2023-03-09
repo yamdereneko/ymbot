@@ -20,7 +20,6 @@ from websockets.legacy.client import WebSocketClientProtocol
 import src.Data.jxDatas as jxData
 from src.Data.database import DataBase
 from nonebot import get_bots
-from src.Data.jxDatas import group_list
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 from .jx3_event import WsData, WsNotice
 import src.Data.jx3_Redis as redis
@@ -45,6 +44,8 @@ async def f1001(data):
     bot, = get_bots().values()
     start_time = time.strftime("%H:%M", time.localtime(adventure_time))
     msg = MessageSegment.text(f'{adventure_id} {start_time} 触发了 {adventure_serendipity}!')
+    red = redis.Redis()
+    group_list = await red.query_list("group_list")
     for group_id in group_list:
         await bot.send_group_msg(group_id=group_id, message=msg)
 
@@ -59,6 +60,8 @@ async def f2001(data):
             msg = MessageSegment.text(f'{jxData.server_binding} 在 {close_time} 开服了,快冲！')
         else:
             msg = MessageSegment.text(f'开服报错了，看下报错！')
+        red = redis.Redis()
+        group_list = await red.query_list("group_list")
         for group_id in group_list:
             await bot.send_group_msg(group_id=group_id, message=msg)
 
@@ -70,7 +73,8 @@ async def f2002(data):
     text = data["data"]['type'] + '\n' + announce_title + '\n' + url
     image = await browser.get_image_from_url(url)
     msg = MessageSegment.image(image)
-
+    red = redis.Redis()
+    group_list = await red.query_list("group_list")
     for group_id in group_list:
         await bot.send_group_msg(group_id=group_id, message=text + msg)
 
