@@ -76,18 +76,18 @@ class Adventure:
         topn = f'资历：{value}'
         topn_text_width = server_font.getlength(topn)
         topn_size_width = (images_width - topn_text_width) / 2
-        draw.text((topn_size_width, 123 * flag), topn, fill=(101, 109, 121), font=server_font)
+        draw.text((topn_size_width, 140 * flag), topn, fill=(101, 109, 121), font=server_font)
 
         # 区服
         server = f'{self.zone} {self.server}'
         server_text_width = server_font.getlength(server)
         server_size_width = (images_width - server_text_width) / 2
-        draw.text((server_size_width, 168 * flag), server, fill=(101, 109, 121), font=server_font)
+        draw.text((server_size_width, 185 * flag), server, fill=(101, 109, 121), font=server_font)
 
         # 标题设置
-        draw.text((110 * flag, 252 * flag), '奇遇', fill=(166, 166, 166), font=bold_font)
-        draw.text((371 * flag, 252 * flag), '时间', fill=(166, 166, 166), font=bold_font)
-        draw.text((632 * flag, 252 * flag), '距今', fill=(166, 166, 166), font=bold_font)
+        draw.text((110 * flag, 273 * flag), '奇遇', fill=(166, 166, 166), font=bold_font)
+        draw.text((371 * flag, 273 * flag), '时间', fill=(166, 166, 166), font=bold_font)
+        draw.text((632 * flag, 273 * flag), '距今', fill=(166, 166, 166), font=bold_font)
 
         # 绝世奇遇小图标显示
         precious = await image_prospect(
@@ -127,11 +127,11 @@ class Adventure:
 
             # 计算时间戳是多久的
             delta_time = int(time.time() - adventure_time)
-            ago_time_x = 602 * flag
+            ago_time_x = 622 * flag
             ago_time_y = 337 * flag + h * 60 * flag
 
             if adventure_time == 0:
-                draw.text((ago_time_x + 27 * flag, ago_time_y), "未知", font=font, fill="black")
+                draw.text((ago_time_x, ago_time_y), "未知", font=font, fill="black")
             elif delta_time < 86400:
                 # 少于1天
                 delta_time //= 3600
@@ -141,7 +141,9 @@ class Adventure:
                 # 大于等于1天
                 delta_time //= 86400
                 war_time = f"{delta_time}天前"
-                draw.text((ago_time_x, ago_time_y), war_time, font=font, fill="black")
+                indentation = len(war_time) - 3
+                draw.text((ago_time_x - indentation * 20, ago_time_y), war_time, font=font, fill="black")
+
         dpi = (2000, 2000)
         # 保存图像
         datetime = int(time.time())
