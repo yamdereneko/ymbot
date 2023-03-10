@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*
+
 """
 @Software : PyCharm
 @File : 0.py
@@ -15,6 +16,7 @@ from src.internal.tuilanapi import API as tuilanAPI
 from src.internal.jx3api import API as jx3API
 from src.Data.database import DataBase as database
 from PIL import ImageFont
+from io import BytesIO
 from PIL import Image, ImageDraw
 
 # 请求头
@@ -57,6 +59,20 @@ class GetPersonRecord:
 
         images = Image.open("src/images/record.png").convert("RGBA")
         draw = ImageDraw.Draw(images)
+        title_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=212)
+        small_title_font = ImageFont.truetype("src/fonts/pingfang_regular.ttf", size=128)
+        title_color = (143, 151, 163)
+
+        images_width, _ = images.size
+        # Set title
+        title_text_width = title_font.getlength(self.role)
+        title_width = (images_width - title_text_width) / 2
+        draw.text((title_width, 39 * 4), self.role, font=title_font, fill=title_color)
+
+        # Set Small title
+        small_title_text_width = small_title_font.getlength(self.zone + " " + self.server)
+        small_title_width = (images_width - small_title_text_width) / 2
+        draw.text((small_title_width, 99 * 4), self.zone + " " + self.server, font=small_title_font, fill=title_color)
 
         for floor, element in enumerate(data):
             won = element.get("won")
@@ -71,14 +87,14 @@ class GetPersonRecord:
             kungfu_image = await image_prospect(
                 Image.open(f"src/images/KungfuIcon/{kungfu}.png").convert("RGBA").resize((41 * 4, 41 * 4)))
             kungfu_x = 37
-            kungfu_y = 108
+            kungfu_y = 267
             images.paste(kungfu_image, (kungfu_x * 4, kungfu_y * 4 + floor * 80 * 4))
 
             # 段位的添加
             avg_grade_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=100)
             avg_grade_font_color = (69, 75, 84)
             avg_grade_x = 152
-            avg_grade_y = 110
+            avg_grade_y = 269
             draw.text((avg_grade_x * 4, avg_grade_y * 4 + floor * 80 * 4), str(avg_grade), font=avg_grade_font,
                       fill=avg_grade_font_color)
 
@@ -108,18 +124,18 @@ class GetPersonRecord:
                     rescue_image = await image_prospect(
                         Image.open(f"src/images/KungfuIcon/{kungfu_team}.png").convert("RGBA").resize((41 * 4, 41 * 4)))
                     rescue_x = 358
-                    rescue_y = 108
+                    rescue_y = 265
                     images.paste(rescue_image, (rescue_x * 4, rescue_y * 4 + floor * 80 * 4))
                 else:
                     dps_image = await image_prospect(
                         Image.open(f"src/images/KungfuIcon/{kungfu_team}.png").convert("RGBA").resize((41 * 4, 41 * 4)))
                     dps_x = 260 + team_flag * 49
-                    dps_y = 108
+                    dps_y = 265
                     images.paste(dps_image, (dps_x * 4, dps_y * 4 + floor * 80 * 4))
                     team_flag += 1
                 vs_image = await image_prospect(
                     Image.open(f"src/images/VS.png").convert("RGBA").resize((41 * 4, 41 * 4)))
-                images.paste(vs_image, (422 * 4, 107 * 4 + floor * 80 * 4))
+                images.paste(vs_image, (422 * 4, 264 * 4 + floor * 80 * 4))
 
             # 副队伍
             team_flag = 0
@@ -128,13 +144,13 @@ class GetPersonRecord:
                     rescue_image = await image_prospect(
                         Image.open(f"src/images/KungfuIcon/{kungfu_team}.png").convert("RGBA").resize((41 * 4, 41 * 4)))
                     rescue_x = 580
-                    rescue_y = 108
+                    rescue_y = 265
                     images.paste(rescue_image, (rescue_x * 4, rescue_y * 4 + floor * 80 * 4))
                 else:
                     dps_image = await image_prospect(
                         Image.open(f"src/images/KungfuIcon/{kungfu_team}.png").convert("RGBA").resize((41 * 4, 41 * 4)))
                     dps_x = 482 + team_flag * 49
-                    dps_y = 108
+                    dps_y = 267
                     images.paste(dps_image, (dps_x * 4, dps_y * 4 + floor * 80 * 4))
                     team_flag += 1
                 # defeated_image = await image_prospect(
@@ -143,9 +159,9 @@ class GetPersonRecord:
                     Image.open(f"src/images/won.png").convert("RGBA").resize((16 * 4, 16 * 4)))
                 if won is False:
                     # images.paste(defeated_image, (252 * 4, 100 * 4 + floor * 80 * 4))
-                    images.paste(won_image, (616 * 4, 100 * 4 + floor * 80 * 4))
+                    images.paste(won_image, (616 * 4, 257 * 4 + floor * 80 * 4))
                 else:
-                    images.paste(won_image, (252 * 4, 100 * 4 + floor * 80 * 4))
+                    images.paste(won_image, (252 * 4, 257 * 4 + floor * 80 * 4))
                     # images.paste(defeated_image, (616 * 4, 100 * 4 + floor * 80 * 4))
 
             # 胜负添加
@@ -156,26 +172,26 @@ class GetPersonRecord:
             won_font = ImageFont.truetype("src/fonts/pingfang_regular.ttf", size=100)
             won_font_color = (69, 75, 84)
             won_x = 726
-            won_y = 111
+            won_y = 270
             if won is False:
-                images.paste(defeated_ellipse_image, (699 * 4, 121 * 4 + floor * 80 * 4))
+                images.paste(defeated_ellipse_image, (699 * 4, 280 * 4 + floor * 80 * 4))
                 won_text = "失败"
             else:
-                images.paste(won_ellipse_image, (699 * 4, 121 * 4 + floor * 80 * 4))
+                images.paste(won_ellipse_image, (699 * 4, 280 * 4 + floor * 80 * 4))
                 won_text = "胜利"
                 mmr = "+" + str(mmr)
             draw.text((won_x * 4, won_y * 4 + floor * 80 * 4), won_text, font=won_font, fill=won_font_color)
             draw.text((789 * 4, won_y * 4 + floor * 80 * 4), str(mmr), font=won_font, fill=won_font_color)
 
             # 分数添加
-            draw.text((904 * 4, 111 * 4 + floor * 80 * 4), str(total_mmr), font=won_font, fill=won_font_color)
+            draw.text((904 * 4, 270 * 4 + floor * 80 * 4), str(total_mmr), font=won_font, fill=won_font_color)
 
             # 战斗时间添加
             seconds = time.mktime(time.localtime(end_time)) - time.mktime(time.localtime(start_time))
             expect_seconds = seconds % 60
             minutes = seconds // 60
             finally_time = f"{int(minutes)}分{int(expect_seconds)}秒"
-            draw.text((1033 * 4, 111 * 4 + floor * 80 * 4), finally_time, font=won_font, fill=won_font_color)
+            draw.text((1033 * 4, 270 * 4 + floor * 80 * 4), finally_time, font=won_font, fill=won_font_color)
 
             # 计算时间戳是多少秒前的
 
@@ -183,24 +199,21 @@ class GetPersonRecord:
             if delta_time < 60:
                 # 少于1分钟
                 war_time = f"{delta_time}秒前"
-                draw.text((1232 * 4, 111 * 4 + floor * 80 * 4), war_time, font=won_font, fill=won_font_color)
             elif delta_time < 3600:
                 # 少于1小时
                 delta_time //= 60
-                war_time = f"{delta_time}分钟前"
-                draw.text((1210 * 4, 111 * 4 + floor * 80 * 4), war_time, font=won_font, fill=won_font_color)
+                war_time = f"{delta_time}秒前"
             elif delta_time < 86400:
                 # 少于1天
                 delta_time //= 3600
                 war_time = f"{delta_time}小时前"
-                draw.text((1210 * 4, 111 * 4 + floor * 80 * 4), war_time, font=won_font, fill=won_font_color)
             else:
                 # 大于等于1天
                 delta_time //= 86400
                 war_time = f"{delta_time}天前"
-                draw.text((1232 * 4, 111 * 4 + floor * 80 * 4), war_time, font=won_font, fill=won_font_color)
+            draw.text((1210 * 4, 270 * 4 + floor * 80 * 4), war_time, font=won_font, fill=won_font_color)
 
-        dpi = (1000, 1000)
+        dpi = (2000, 2000)
 
         # # 保存图像
         datetime = int(time.time())
