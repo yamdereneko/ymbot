@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 import asyncio
-import json
 import time
-import traceback
-import dufte
 import nonebot
 import random
 import src.Data.jxDatas as jxData
 from src.internal.tuilanapi import API
 from src.internal.jx3api import API as jx3API
-from matplotlib import pyplot as plt
-from functools import partial
+from src.jx3_TopnRoles import GetTopnRoles
 from PIL import Image, ImageDraw, ImageFont
 
 api = API()
@@ -56,27 +52,42 @@ class Adventure:
 
         # 定义字体
         font = ImageFont.truetype("src/fonts/pingfang_regular.ttf", size=32 * flag)
-        bold_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=42 * flag)
-        id_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=58 * flag)
+        bold_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=29 * flag)
+        id_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=52 * flag)
         server_font = ImageFont.truetype("src/fonts/pingfang_regular.ttf", size=32 * flag)
 
         # 创建一个空白的图像对象
-        image = Image.new("RGB", (800 * flag, 288 * flag + len(task) * 62 * flag), "white").convert("RGBA")
+        image = Image.new("RGB", (800 * flag, 337 * flag + len(task) * 62 * flag), "white").convert("RGBA")
         draw = ImageDraw.Draw(image)
-
+        images_width, _ = image.size
         # 心法图标
-        total_kungfu_icon = await image_prospect(
-            Image.open(f"src/images/TotalKungfu/{force_id}.png").convert("RGBA").resize((75 * flag, 50 * flag)))
-        image.paste(total_kungfu_icon, (269 * flag, 80 * flag))
+        # total_kungfu_icon = await image_prospect(
+        #     Image.open(f"images/TotalKungfu/{force_id}.png").convert("RGBA").resize((75 * flag, 50 * flag)))
+        # image.paste(total_kungfu_icon, (269 * flag, 80 * flag))
 
-        # ID还有区服
-        draw.text((340 * flag, 60 * flag), self.user, fill=(61, 62, 66), font=id_font)
-        draw.text((342 * flag, 125 * flag), self.server, fill=(0, 0, 0), font=server_font)
+        # ID
+        id_text_width = id_font.getlength(self.user)
+        id_size_width = (images_width - id_text_width) / 2
+        draw.text((id_size_width, 58 * flag), self.user, fill=(101, 109, 121), font=id_font)
+
+        # 资历
+        roles = GetTopnRoles(self.server, self.user)
+        value = await roles.get_topn_data()
+        topn = f'资历：{value}'
+        topn_text_width = server_font.getlength(topn)
+        topn_size_width = (images_width - topn_text_width) / 2
+        draw.text((topn_size_width, 123 * flag), topn, fill=(101, 109, 121), font=server_font)
+
+        # 区服
+        server = f'{self.zone} {self.server}'
+        server_text_width = server_font.getlength(server)
+        server_size_width = (images_width - server_text_width) / 2
+        draw.text((server_size_width, 168 * flag), server, fill=(101, 109, 121), font=server_font)
 
         # 标题设置
-        draw.text((99 * flag, 200 * flag), '奇遇', fill=(166, 166, 166), font=bold_font)
-        draw.text((358 * flag, 200 * flag), '时间', fill=(166, 166, 166), font=bold_font)
-        draw.text((612.5 * flag, 200 * flag), '距今', fill=(166, 166, 166), font=bold_font)
+        draw.text((110 * flag, 252 * flag), '奇遇', fill=(166, 166, 166), font=bold_font)
+        draw.text((371 * flag, 252 * flag), '时间', fill=(166, 166, 166), font=bold_font)
+        draw.text((632 * flag, 252 * flag), '距今', fill=(166, 166, 166), font=bold_font)
 
         # 绝世奇遇小图标显示
         precious = await image_prospect(
@@ -91,9 +102,9 @@ class Adventure:
 
             # 奇遇的排列
             adventure_x = 79 * flag
-            adventure_y = 288 * flag + h * 60 * flag
+            adventure_y = 337 * flag + h * 60 * flag
             if len(adventure_name) == 3:
-                adventure_x += 16
+                adventure_x += 20
                 draw.text((adventure_x, adventure_y), adventure_name, fill="black", font=font)
             if len(adventure_name) == 4:
                 draw.text((adventure_x, adventure_y), adventure_name, fill="black", font=font)
@@ -108,7 +119,7 @@ class Adventure:
             # 构造日期字符串
             date_string = time.strftime('%Y-%m-%d', time_tuple)
             adventure_time_x = 306 * flag
-            adventure_time_y = 288 * flag + h * 60 * flag
+            adventure_time_y = 337 * flag + h * 60 * flag
             if adventure_time == 0:
                 draw.text((adventure_time_x + 62 * flag, adventure_time_y), "未知", fill="black", font=font)
             else:
@@ -117,7 +128,7 @@ class Adventure:
             # 计算时间戳是多久的
             delta_time = int(time.time() - adventure_time)
             ago_time_x = 602 * flag
-            ago_time_y = 288 * flag + h * 60 * flag
+            ago_time_y = 337 * flag + h * 60 * flag
 
             if adventure_time == 0:
                 draw.text((ago_time_x + 27 * flag, ago_time_y), "未知", font=font, fill="black")
@@ -135,5 +146,5 @@ class Adventure:
         # 保存图像
         datetime = int(time.time())
         image.save(f"/tmp/adventure_{datetime}.png", dpi=dpi)
+        # image.save(f"images/adventure.png", dpi=dpi)
         return datetime
-

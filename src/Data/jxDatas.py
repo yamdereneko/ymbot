@@ -52,6 +52,7 @@ class PathConfig(BaseModel, extra=Extra.ignore):
     """html模板文件"""
 
 
+#
 default_config = DefaultConfig.parse_obj(config)
 path_config = PathConfig.parse_obj(config)
 """路径设置"""
@@ -163,6 +164,7 @@ school_number = {
     "衍天宗": 16,
     "北天药宗": 17
 }
+
 much_school = {
     "长歌": 4,
     "唐门": 8,
@@ -264,6 +266,27 @@ treat_pinyin = {
 213 = 刀宗
 '''
 
+school_force = {
+    "少林": 1,
+    "万花": 2,
+    "天策": 3,
+    "纯阳": 4,
+    "七秀": 5,
+    "五毒": 6,
+    "唐门": 7,
+    "藏剑": 8,
+    "丐帮": 9,
+    "明教": 10,
+    "苍云": 21,
+    "长歌": 22,
+    "霸刀": 23,
+    "蓬莱": 24,
+    "凌雪": 25,
+    "衍天": 211,
+    "药宗": 212,
+    "刀宗": 213,
+}
+
 
 def total_kungfu(kungfu):
     match kungfu:
@@ -289,15 +312,15 @@ def total_kungfu(kungfu):
             return "wanhuua"
         case "xiaochen":
             return "xiaochen"
-        case "tianluo"| "jingyu":
+        case "tianluo" | "jingyu":
             return "tangmen"
-        case "xiangzhi"| "mowen":
+        case "xiangzhi" | "mowen":
             return "changge"
         case "fenshan":
             return "fenshan"
         case "aoxue":
             return "aoxue"
-        case "wufang"| "lingsu":
+        case "wufang" | "lingsu":
             return "yaozong"
         case "taixuan":
             return "taixuan"
