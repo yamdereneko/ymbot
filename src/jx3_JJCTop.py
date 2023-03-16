@@ -162,6 +162,6 @@ class GetJJCTopRecord:
             print("门派汇总的人数不到正确值，请人工处理错误信息...")
 
 
-# #
-# Record = GetJJCTopRecord(9, 50)
+# # #
+# Record = GetJJCTopRecord(10, 50)
 # asyncio.run(Record.create_top_history_to_database())

@@ -211,7 +211,7 @@ class API:
             * `name`：奇遇名称
         """
         ...
-    async def data_trade_search(self, *, name: str) -> Response:
+    async def data_trade_record(self, *, name: str) -> Response:
         """
         说明:
             搜索外观物品最新价格，统计了各个来源的数据，补充了更多的关键字。
@@ -240,7 +240,7 @@ class API:
             * `name`：奇遇名称
         """
         ...
-    async def data_lucky_serendipity(
+    async def data_luck_adventure(
         self, *, server: str, name: str, ticket: str
     ) -> Response:
         """
@@ -364,6 +364,16 @@ class API:
         """
         ...
     async def data_role_roleInfo(self, *, server: str, name: str) -> Response:
+        """
+        说明:
+            搜索某个角色的信息。
+
+        参数:
+            * `server`：服务器名
+            * `name`：角色名
+        """
+        ...
+    async def data_save_roleInfo(self, *, server: str, roleId: str, ticket:str) -> Response:
         """
         说明:
             搜索某个角色的信息。

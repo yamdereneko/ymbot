@@ -7,9 +7,7 @@
 @Time : 2021/09/29 22:39:29
 @Docs : 请求推栏战绩例子
 """
-import asyncio
 import time
-import matplotlib.pyplot as plt
 import nonebot
 import src.Data.jxDatas as jxData
 from src.internal.jx3api import API
@@ -51,26 +49,41 @@ class GetDaily:
         today = data.get("date") + " 星期" + data.get("week")
         war = data.get("war")
         battle = data.get("battle")
-        five_persons_instance = "\n".join(str(data.get("team")[1]).split(';'))
-        ten_persons_instance = "\n".join(str(data.get("team")[2]).split(';'))
+        five_persons_instance_respective = str(data.get("team")[1]).split(';')
+        ten_persons_instance_respective = str(data.get("team")[2]).split(';')
 
-        daily_font = ImageFont.truetype("src/fonts/pingfang_regular.ttf", size=100)
-        fill_color = (0, 0, 0)
+        images_width = images.width
+        # 倍数
+        redouble = 4
+        daily_font = ImageFont.truetype("src/fonts/pingfang_regular.ttf", size=31 * redouble)
+        fill_color = (69, 75, 84)
 
         # 时间设置
-        draw.text((69 * 4, 143 * 4), today, font=daily_font, fill=fill_color)
+        today_text_width = daily_font.getlength(today)
+        today_size_width = (images_width - today_text_width) / 2
+        draw.text((today_size_width, 165 * redouble), today, font=daily_font, fill=fill_color)
 
         # 大战
-        draw.text((69 * 4, 299 * 4), war, font=daily_font, fill=fill_color)
+        war_text_width = daily_font.getlength(war)
+        war_size_width = (images_width - war_text_width) / 2
+        draw.text((war_size_width, 315.68 * redouble), war, font=daily_font, fill=fill_color)
 
         # 大战
-        draw.text((69 * 4, 459 * 4), battle, font=daily_font, fill=fill_color)
+        battle_text_width = daily_font.getlength(battle)
+        battle_size_width = (images_width - battle_text_width) / 2
+        draw.text((battle_size_width, 469.37 * redouble), battle, font=daily_font, fill=fill_color)
 
         # 五人周常
-        draw.text((69 * 4, 619 * 4), five_persons_instance, font=daily_font, fill=fill_color)
+        for floor, element in enumerate(five_persons_instance_respective):
+            five_persons_instance_text_width = daily_font.getlength(element)
+            five_persons_instance_size_width = (images_width - five_persons_instance_text_width) / 2
+            draw.text((five_persons_instance_size_width, 624.06 * redouble + floor * 127), element, font=daily_font, fill=fill_color)
 
         # 十人周常
-        draw.text((69 * 4, 862 * 4), ten_persons_instance, font=daily_font, fill=fill_color)
+        for floor, element in enumerate(ten_persons_instance_respective):
+            ten_persons_instance_text_width = daily_font.getlength(element)
+            ten_persons_instance_size_width = (images_width - ten_persons_instance_text_width) / 2
+            draw.text((ten_persons_instance_size_width, 858.11 * redouble + floor * 127), element, font=daily_font, fill=fill_color)
 
         dpi = (1000, 1000)
 

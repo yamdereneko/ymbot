@@ -7,6 +7,7 @@
 @Docs : 请求推栏战绩例子
 """
 import asyncio
+import random
 import re
 import time
 import traceback
@@ -20,7 +21,8 @@ from src.internal.jx3api import API as jx3API
 from rich import print
 from PIL import ImageFont
 from io import BytesIO
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image, ImageDraw
+import src.Data.jx3_Redis as redis
 
 # 请求头
 
@@ -49,6 +51,12 @@ class GetRoleEquip:
             print(response)
             self.globalRoleId = response.data["globalRoleId"]
             self.role_id = response.data["roleId"]
+            red = redis.Redis()
+            ticket_list = await red.query_list("ticket_list")
+            response = await jx3api.data_save_roleInfo(server=self.server, roleId=self.role_id,
+                                                       ticket=random.choice(ticket_list))
+            print(response)
+
             response = await api.role_indicator(role_id=self.role_id, server=self.server, zone=self.zone)
             if response.code != 0:
                 nonebot.logger.error("API接口role_indicator获取信息失败，请查看错误")
@@ -363,6 +371,6 @@ class GetRoleEquip:
         return datetime
 
 
-role_equip = GetRoleEquip("小丛兰", "姨妈")
-# asyncio.run(role_equip.get_Fig())
-asyncio.run(role_equip.create_images())
+role_equip = GetRoleEquip("小疏竹", "姨妈")
+asyncio.run(role_equip.equips())
+# asyncio.run(role_equip.create_images())

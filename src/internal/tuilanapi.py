@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
+import random
 from typing import Any
-
 from functools import partial
 import hashlib
 import hmac
@@ -10,7 +10,7 @@ from loguru import logger
 from typing_extensions import Protocol
 from pydantic import BaseModel
 from httpx import AsyncClient
-from src.Data.jxDatas import headers
+import src.Data.jx3_Redis as redis
 
 
 class _ApiCall(Protocol):
@@ -50,8 +50,25 @@ class API:
 
     async def call_api(self, url: str, **data: Any) -> Response:
         """请求api网站数据"""
-
         try:
+            red = redis.Redis()
+            ticket_list = await red.query_list("ticket_list")
+            headers = {
+                "accept": "application/json",
+                "platform": "ios",
+                "gamename": "jx3",
+                "clientkey": "1",
+                "cache-control": "no-cache",
+                "apiversion": "1",
+                "sign": "true",
+                "Content-Type": "application/json",
+                "Host": "m.pvp.xoyo.com",
+                "Connection": "Keep-Alive",
+                "Accept-Encoding": "gzip",
+                "token": random.choice(ticket_list),
+                "User-Agent": "SeasunGame/193 CFNetwork/1333.0.4 Darwin/21.5.0",
+                "X-Sk": None
+            }
             data['ts'] = await gen_ts()
             param = await format_body(data)
             headers['X-Sk'] = await gen_xsk(param)

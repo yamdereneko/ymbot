@@ -60,5 +60,5 @@ class GetJJCTopInfo:
 
         plt.xticks(df.index, df.index.str.upper(), rotation=60, horizontalalignment='right', fontsize=22)
         datetime = int(time.time())
-        plt.savefig(f"/tmp/top{datetime}.png")
+        plt.savefig(f"/tmp/top_{datetime}.png")
         return datetime

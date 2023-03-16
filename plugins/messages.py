@@ -57,6 +57,24 @@ CreateJJCTopDataToDataBase = on_command("CreateJJCTopDataToDataBase", rule=keywo
 Chutianshe = on_command("Chutianshe", rule=keyword("楚天社", "行侠"), aliases={"楚天社", "行侠"}, priority=5)
 Serverd_Group = on_command("Serverd_Group", rule=keyword("群组"), aliases={"群组"}, priority=5)
 
+
+async def redis_check_operation(frame, frame_name, data, image_frame):
+    red = redis.Redis()
+    red_data = await red.query(frame_name)
+    if red_data:
+        if json.loads(red_data) == data:
+            await red.get_image(frame_name + '_image', frame)
+            msg = MessageSegment.image('file:' + frame)
+            return msg
+        else:
+            await red.delete(frame_name)
+            await red.delete(frame_name + '_image')
+    await red.add(frame_name, data)
+    await red.insert_image(frame_name + '_image', image_frame)
+    msg = MessageSegment.image('file:' + image_frame)
+    return msg
+
+
 @RoleJJCRecord.handle()
 async def onMessage_RoleJJCRecord(matcher: Matcher, args: Message = CommandArg()):
     plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
@@ -72,24 +90,11 @@ async def onMessage_RoleJJCRecord(matcher: Matcher, args: Message = CommandArg()
         jjc_record = JJCRecord.GetPersonRecord(role_name, server)
         record = await jjc_record.get_person_record()
         if record:
-            red = redis.Redis()
             frame = f"/tmp/record_{role_name}.png"
-            redis_record_data = await red.query('record_' + role_name)
-            if redis_record_data:
-                res = json.loads(redis_record_data)
-                if res == record:
-                    await red.get_image('record_' + role_name + '_image', frame)
-                    msg = MessageSegment.image('file:' + frame)
-                    await RoleJJCRecord.finish(msg)
-                else:
-                    await red.delete('record_' + role_name)
-                    await red.delete('record_' + role_name + '_image')
-
-            await red.add('record_' + role_name, record)
+            frame_name = 'record_' + role_name
             record_image = await jjc_record.get_person_record_figure()
-            frame = f"/tmp/record_{record_image}.png"
-            await red.insert_image('record_' + role_name + '_image', frame)
-            msg = MessageSegment.image('file:' + frame)
+            image_frame = f"/tmp/record_{record_image}.png"
+            msg = await redis_check_operation(frame, frame_name, record, image_frame)
             await RoleJJCRecord.finish(msg)
         else:
             nonebot.logger.error(f"{role_name} JJC战绩查询不存在,请重试")
@@ -98,9 +103,6 @@ async def onMessage_RoleJJCRecord(matcher: Matcher, args: Message = CommandArg()
         nonebot.logger.error(f"{server} 大区不存在,请重试")
 
 
-# 接收 JJC趋势图
-# JJC趋势图 31或者门派 ==> 调用存储在/tmp目录下得图片
-# 图片形式发送
 @JJCTop.handle()
 async def onMessage_JJCTop(matcher: Matcher, args: Message = CommandArg()):
     plain_text = args.extract_plain_text()
@@ -113,24 +115,11 @@ async def onMessage_JJCTop(matcher: Matcher, args: Message = CommandArg()):
             school_type = plain_text.split(" ")[2]
 
             jjc_info = jx3JJCInfo.GetJJCTopInfo(table=int(top_type), weekly=int(week), school_type=school_type)
-            record = await jjc_info.from_sql_create_figure()
+            jjc_data = await jjc_info.from_sql_create_figure()
 
-            red = redis.Redis()
-            frame = f"/tmp/top{record}.png"
-            redis_record_data = await red.query('top_' + top_type + '_' + week)
-            if redis_record_data:
-                res = json.loads(redis_record_data)
-                if res == record:
-                    await red.get_image('top_' + top_type + '_image_' + week, frame)
-                    msg = MessageSegment.image('file:' + frame)
-                    await JJCTop.finish(msg)
-                else:
-                    await red.delete('top_' + top_type + '_' + week)
-                    await red.delete('top_' + top_type + '_image_' + week)
-
-            await red.add('top_' + top_type + '_' + week, record)
-            await red.insert_image('top_' + top_type + '_image_' + week, frame)
-            msg = MessageSegment.image('file:' + frame)
+            frame = f"/tmp/top_{jjc_data}.png"
+            frame_name = 'top_' + top_type + '_' + week + '_' + school_type
+            msg = await redis_check_operation(frame, frame_name, jjc_data, frame)
             await JJCTop.finish(msg)
 
 
@@ -211,24 +200,11 @@ async def onMessage_AllServerState(matcher: Matcher, args: Message = CommandArg(
 async def onMessage_Daily():
     daily = DailyInfo.GetDaily()
     daily_data = await daily.get_daily()
-    red = redis.Redis()
-    frame = f"/tmp/daily.png"
-    redis_daily_data = await red.query('daily')
-    if redis_daily_data:
-        res = json.loads(redis_daily_data)
-        if res == daily_data:
-            await red.get_image('daily_image', frame)
-            msg = MessageSegment.image('file:' + frame)
-            await Daily.finish(msg)
-        else:
-            await red.delete('daily')
-            await red.delete('daily_image')
-
-    await red.add('daily', daily_data)
     daily_image = await daily.query_daily_figure()
-    frame = f"/tmp/daily_{daily_image}.png"
-    await red.insert_image('daily_image', frame)
-    msg = MessageSegment.image('file:' + frame)
+    frame = f"/tmp/daily.png"
+    frame_name = "daily"
+    image_frame = f"/tmp/daily_{daily_image}.png"
+    msg = await redis_check_operation(frame, frame_name, daily_data, image_frame)
     await Daily.finish(msg)
 
 
@@ -245,25 +221,15 @@ async def onMessage_Adventure(matcher: Matcher, args: Message = CommandArg()):
         adventure = jx3_Adventure.Adventure(server, user)
         user_adventure_data = await adventure.query_user_info()
         if user_adventure_data is None:
-            await Adventure.reject('数据异常，请联系管理员')
+            await Adventure.reject('该用户未被收录')
         nonebot.logger.info(user_adventure_data)
-        red = redis.Redis()
+
         frame = f"/tmp/adventure_{user}.png"
-        redis_adventure_data = await red.query('adventure_' + user)
-        if redis_adventure_data:
-            res = json.loads(redis_adventure_data)
-            if res == user_adventure_data:
-                await red.get_image('adventure_' + user + '_image', frame)
-                msg = MessageSegment.image('file:' + frame)
-                await Adventure.finish(msg)
-            else:
-                await red.delete('adventure_' + user)
-                await red.delete('adventure_' + user + '_image')
-        await red.add('adventure_' + user, user_adventure_data)
+        frame_name = 'adventure_' + user
         user_adventure_image = await adventure.create_figure()
-        frame = f"/tmp/adventure_{user_adventure_image}.png"
-        await red.insert_image('adventure_' + user + '_image', frame)
-        msg = MessageSegment.image('file:' + frame)
+        image_frame = f"/tmp/adventure_{user_adventure_image}.png"
+
+        msg = await redis_check_operation(frame, frame_name, user_adventure_data, image_frame)
         await Adventure.finish(msg)
     else:
         nonebot.logger.error("请求错误,请参考: 奇遇 区服 角色名")
@@ -282,24 +248,11 @@ async def onMessage_Fireworks(matcher: Matcher, args: Message = CommandArg()):
             user = plain_text
         fireworks = jx3_Fireworks.Fireworks(server, user)
         user_fireworks_data = await fireworks.query_user_firework_info()
-        red = redis.Redis()
-        frame = f"/tmp/fireworks{user}.png"
-        redis_fireworks_data = await red.query('fireworks_' + user)
-        if redis_fireworks_data:
-            res = json.loads(redis_fireworks_data)
-            if res == user_fireworks_data:
-                await red.get_image('fireworks_' + user + '_image', frame)
-                msg = MessageSegment.image('file:' + frame)
-                await Fireworks.finish(msg)
-            else:
-                await red.delete('fireworks_' + user)
-                await red.delete('fireworks_' + user + '_image')
-
-        await red.add('fireworks_' + user, user_fireworks_data)
+        frame = f"/tmp/fireworks_{user}.png"
+        frame_name = 'fireworks_' + user
         user_fireworks_image = await fireworks.get_Fig()
-        frame = f"/tmp/fireworks{user_fireworks_image}.png"
-        await red.insert_image('fireworks_' + user + '_image', frame)
-        msg = MessageSegment.image('file:' + frame)
+        image_frame = f"/tmp/fireworks{user_fireworks_image}.png"
+        msg = await redis_check_operation(frame, frame_name, user_fireworks_data, image_frame)
         await Fireworks.finish(msg)
 
     else:
@@ -454,24 +407,12 @@ async def onMessage_Price(args: Message = CommandArg()):
         plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
         price = jx3_Price.Price(plain_text)
         price_data = await price.query_mono_price()
-        red = redis.Redis()
-        frame = f"/tmp/price.png"
-        redis_price_data = await red.query('price_' + plain_text)
-        if redis_price_data:
-            res = json.loads(redis_price_data)
-            if res == price_data.data:
-                await red.get_image('price_image_' + plain_text, frame)
-                msg = MessageSegment.image('file:' + frame)
-                await Price.finish(msg)
-            else:
-                await red.delete('price')
-                await red.delete('price_image_' + plain_text)
 
-        await red.add('price_' + plain_text, price_data.data)
+        frame = f"/tmp/price.png"
+        frame_name = "price"
         price_image = await price.create_price_figure()
-        frame = f"/tmp/price{price_image}.png"
-        await red.insert_image('price_image_' + plain_text, frame)
-        msg = MessageSegment.image('file:' + frame)
+        image_frame = f"/tmp/price_{price_image}.png"
+        msg = await redis_check_operation(frame, frame_name, price_data, image_frame)
         await Price.finish(msg)
     else:
         nonebot.logger.error("物价信息填写失败，请重试")
@@ -514,6 +455,7 @@ async def onMessage_CreateJJCTopDataToDataBase(args: Message = CommandArg()):
     else:
         await CreateJJCTopDataToDataBase.finish("1111")
 
+
 @Serverd_Group.handle()
 async def onMessage_Serverd_Group(args: Message = CommandArg()):
     plain_text = args.extract_plain_text()
@@ -544,31 +486,3 @@ async def onMessage_Serverd_Group(args: Message = CommandArg()):
         await Serverd_Group.finish(msg)
     else:
         await Serverd_Group.reject("命令失败，请重试")
-
-# @roleJJCRecord.got("role", prompt="你想查询哪个角色信息呢？")
-# async def handle_city(role: Message = Arg(), roleName: str = ArgPlainText("role")):
-#     await roleJJCRecord.reject(role.template("你想查询的角色 {role} 暂不支持，请重新输入！"))
-
-
-#
-# @roleJJCRecord.got("role", prompt="你想查询哪个角色信息呢？")
-# async def handle_city(role: Message = Arg(), roleName: str = ArgPlainText("role")):
-#     nonebot.logger.info(role)
-#     if roleName not in ["笋笋"]:  # 如果参数不符合要求，则提示用户重新输入
-#         # 可以使用平台的 Message 类直接构造模板消息
-#         await roleJJCRecord.reject(role.template("你想查询的角色 {role} 暂不支持，请重新输入！"))
-#     role_info = await get_roleInfo(roleName)
-#     await roleJJCRecord.finish(role_info)
-#
-
-# 在这里编写获取JJC信息的函数
-# async def get_roleJJCInfo(role: str) -> str:
-#     # params = {'Role_name': role}
-#     # JJCInfo = httpx.get('https://localhost:8080/jjc', params=params).json()
-#     data = await jx3API.get_jjc_Record(role)
-#     if data is None:
-#         await roleJJCRecord.reject(f"你想查询的角色{role}不存在")
-#     for i in data:
-#         match_id = i.get("match_id")
-#         print(i)
-#     return f"{data}"

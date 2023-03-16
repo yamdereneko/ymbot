@@ -1,8 +1,8 @@
 import asyncio
-import random
 import redis
 from pydantic import BaseModel, Extra, Field
 from nonebot import get_driver
+
 
 #
 config = get_driver().config
@@ -61,11 +61,6 @@ path_config = PathConfig.parse_obj(config)
     推栏token连接池
 """
 
-ticket = ['966925c532564a26bdcae0062f1d0519:yandereneko:kingsoft::Nzc3Y2pkNHkxZmU3a2JpdA==',
-          '8b0be03e42824a1ca262cc051cc2d248:yamdereneko:kingsoft::OG43ZmZheWZ5cmsyZ3hyZw==',
-          'a6268a43bb2549a19bf9fdd6a42d273c:yandereneko1:kingsoft::aW52djM3NXo4NTd1N2x4eg==',
-          'acd21e7af47948599dfac9f8b813aa14:yandereneko2:kingsoft::bXlxaWZqdDY0Mnk4anI3aw==']
-
 server_binding = "斗转星移"
 
 redis_config = redis.Redis(
@@ -76,23 +71,6 @@ redis_config = redis.Redis(
     password="qinhao123"
     # 设置为True存的数据格式就是str类型
 )
-
-headers = {
-    "accept": "application/json",
-    "platform": "ios",
-    "gamename": "jx3",
-    "clientkey": "1",
-    "cache-control": "no-cache",
-    "apiversion": "1",
-    "sign": "true",
-    "Content-Type": "application/json",
-    "Host": "m.pvp.xoyo.com",
-    "Connection": "Keep-Alive",
-    "Accept-Encoding": "gzip",
-    "token": random.choice(ticket),
-    "User-Agent": "SeasunGame/193 CFNetwork/1333.0.4 Darwin/21.5.0",
-    "X-Sk": None
-}
 
 
 class Jx3ApiConfig(BaseModel, extra=Extra.ignore):

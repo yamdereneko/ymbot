@@ -73,11 +73,12 @@ class Redis:
 
 #
 # red = Redis()
-# my_list = ["736734387", "642668185"]
-# # res = asyncio.run(red.insert_list("group_list", my_list))
-# res = asyncio.run(red.query_list("group_list"))
-# print(res)
-#
+# # for _ in ticket:
+# #     asyncio.run(red.insert_list("ticket_list", _))
+# # print(res)
+# #
+# ticket_list = asyncio.run(red.query_list("ticket_list"))
+# print(ticket_list)
 
 # print(res)
 # print(res)

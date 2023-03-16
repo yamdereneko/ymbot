@@ -17,8 +17,6 @@ from matplotlib import pyplot as plt
 
 api = API()
 # 请求头
-headers = jxData.headers
-
 
 class ServerState:
     def __init__(self, server=None):

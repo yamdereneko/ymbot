@@ -8,6 +8,7 @@ from src.internal.tuilanapi import API
 from src.internal.jx3api import API as jx3API
 from src.jx3_TopnRoles import GetTopnRoles
 from PIL import Image, ImageDraw, ImageFont
+from src.Data.jx3_Redis import Redis
 
 api = API()
 jx3api = jx3API()
@@ -26,10 +27,12 @@ class Adventure:
         self.user = user
 
     async def query_user_info(self):
-        response = await jx3api.data_lucky_serendipity(server=self.server, name=self.user,
-                                                       ticket=random.choice(jxData.ticket))
+        red = Redis()
+        ticket_list = await red.query_list("ticket_list")
+        response = await jx3api.data_luck_adventure(server=self.server, name=self.user,
+                                                    ticket=random.choice(ticket_list))
         if response.code != 200:
-            nonebot.logger.error("API接口next_serendipity获取信息失败，请查看错误")
+            nonebot.logger.error("API接口data_luck_adventure获取信息失败，请查看错误")
             return None
         adventure_info = []
         for _ in response.data:
@@ -46,7 +49,6 @@ class Adventure:
         if response.code != 200:
             nonebot.logger.error("API接口role_roleInfo获取信息失败，请查看错误")
             return None
-        force_id = response.data.get('forceId')
         # 设置总体比例
         flag = 2
 
@@ -96,7 +98,7 @@ class Adventure:
         # 逐个字符添加文本
         for h, element in enumerate(task):
             # 定义
-            adventure_name = element.get('serendipity')
+            adventure_name = element.get('event')
             level = element.get('level')
             adventure_time = element.get('time')
 
