@@ -26,7 +26,7 @@ class Recruit:
         self.keyword = keyword
 
     async def query_server_recruit(self):
-        response = await api.data_team_member_recruit(server=self.server, keyword=self.keyword)
+        response = await api.data_member_recruit(server=self.server, keyword=self.keyword)
         print(response)
         if response.code != 200:
             nonebot.logger.error("API接口next_recruit获取信息失败，请查看错误")
