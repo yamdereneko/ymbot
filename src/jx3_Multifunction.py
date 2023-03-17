@@ -65,9 +65,9 @@ async def get_sand_map(server: str):
 
 
 async def get_chutianshe():
-    response = await api.data_active_chutianshe()
+    response = await api.data_active_chivalrous()
     if response.code != 200:
-        nonebot.logger.error("API接口data_active_chutianshe获取信息失败，请查看错误")
+        nonebot.logger.error("API接口data_active_chivalrous获取信息失败，请查看错误")
         return None
     text_now_list = ["目前", "地图：" + response.data['now']['map'], "名称：" + response.data['now']['name'],
                      "地点：" + response.data['now']['site'], "任务：" + response.data['now']['desc'],

@@ -221,13 +221,12 @@ class API:
         """
         ...
 
-    async def data_active_chutianshe(self) -> Response:
+    async def data_active_chivalrous(self) -> Response:
         """
         说明:
-            搜索外观物品最新价格，统计了各个来源的数据，补充了更多的关键字。
+            楚天社，行侠。
 
-        参数:
-            * `name`： 外观简称
+        参数: None
         """
         ...
 
@@ -414,7 +413,7 @@ class API:
             * `name`：角色名
         """
         ...
-    async def data_team_member_recruit(self, *, server: str, keyword: str = ...) -> Response:
+    async def data_member_recruit(self, *, server: str, keyword: str = ...) -> Response:
         """
         说明:
             查询指定区服的团队招募信息。
