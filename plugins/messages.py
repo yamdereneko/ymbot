@@ -407,13 +407,16 @@ async def onMessage_Price(args: Message = CommandArg()):
         plain_text = args.extract_plain_text()  # 首次发送命令时跟随的参数，例：/天气 上海，则args为上海
         price = jx3_Price.Price(plain_text)
         price_data = await price.query_mono_price()
-
-        frame = f"/tmp/Price_{plain_text}.png"
-        frame_name = "Price_" + plain_text
-        price_image = await price.create_price_figure()
-        image_frame = f"/tmp/Price_{price_image}.png"
-        msg = await redis_check_operation(frame, frame_name, price_data, image_frame)
-        await Price.finish(msg)
+        if price_data:
+            frame = f"/tmp/Price_{plain_text}.png"
+            frame_name = "Price_" + plain_text
+            price_image = await price.create_price_figure()
+            image_frame = f"/tmp/Price_{price_image}.png"
+            msg = await redis_check_operation(frame, frame_name, price_data, image_frame)
+            await Price.finish(msg)
+        else:
+            msg = "该物价不存在，请重新填写"
+            await Price.reject(msg)
     else:
         nonebot.logger.error("物价信息填写失败，请重试")
         await Price.reject("物价信息填写失败，请重试")
