@@ -408,10 +408,10 @@ async def onMessage_Price(args: Message = CommandArg()):
         price = jx3_Price.Price(plain_text)
         price_data = await price.query_mono_price()
 
-        frame = f"/tmp/price.png"
-        frame_name = "price"
+        frame = f"/tmp/Price_{plain_text}.png"
+        frame_name = "Price_" + plain_text
         price_image = await price.create_price_figure()
-        image_frame = f"/tmp/price_{price_image}.png"
+        image_frame = f"/tmp/Price_{price_image}.png"
         msg = await redis_check_operation(frame, frame_name, price_data, image_frame)
         await Price.finish(msg)
     else:
