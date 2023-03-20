@@ -7,6 +7,7 @@
 @Time : 2021/09/29 22:39:29
 @Docs : 请求推栏战绩例子
 """
+import asyncio
 import time
 import nonebot
 import src.Data.jxDatas as jxData
@@ -61,35 +62,38 @@ class GetDaily:
         # 时间设置
         today_text_width = daily_font.getlength(today)
         today_size_width = (images_width - today_text_width) / 2
-        draw.text((today_size_width, 165 * redouble), today, font=daily_font, fill=fill_color)
+        draw.text((today_size_width, 212 * redouble), today, font=daily_font, fill=fill_color)
 
         # 大战
         war_text_width = daily_font.getlength(war)
         war_size_width = (images_width - war_text_width) / 2
-        draw.text((war_size_width, 315.68 * redouble), war, font=daily_font, fill=fill_color)
+        draw.text((war_size_width, 384.16 * redouble), war, font=daily_font, fill=fill_color)
 
-        # 大战
+        # 战场
         battle_text_width = daily_font.getlength(battle)
         battle_size_width = (images_width - battle_text_width) / 2
-        draw.text((battle_size_width, 469.37 * redouble), battle, font=daily_font, fill=fill_color)
+        draw.text((battle_size_width, 555.18 * redouble), battle, font=daily_font, fill=fill_color)
 
         # 五人周常
         for floor, element in enumerate(five_persons_instance_respective):
             five_persons_instance_text_width = daily_font.getlength(element)
             five_persons_instance_size_width = (images_width - five_persons_instance_text_width) / 2
-            draw.text((five_persons_instance_size_width, 624.06 * redouble + floor * 127), element, font=daily_font, fill=fill_color)
+            draw.text((five_persons_instance_size_width, 726.18 * redouble + floor * 51 * 4), element, font=daily_font,
+                      fill=fill_color)
 
         # 十人周常
         for floor, element in enumerate(ten_persons_instance_respective):
             ten_persons_instance_text_width = daily_font.getlength(element)
             ten_persons_instance_size_width = (images_width - ten_persons_instance_text_width) / 2
-            draw.text((ten_persons_instance_size_width, 858.11 * redouble + floor * 127), element, font=daily_font, fill=fill_color)
+            draw.text((ten_persons_instance_size_width, 992.18 * redouble + floor * 51 * 4), element, font=daily_font,
+                      fill=fill_color)
 
         dpi = (1000, 1000)
 
         # # 保存图像
         datetime = int(time.time())
         images.save(f"/tmp/daily_{datetime}.png", dpi=dpi)
+        # images.save(f"images/daily_new.png", dpi=dpi)
         return datetime
 
     async def query_weekly_daily(self):
@@ -98,3 +102,4 @@ class GetDaily:
             nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
             return None
         return response.data
+
