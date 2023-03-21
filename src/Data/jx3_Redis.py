@@ -12,14 +12,15 @@ class Redis:
     def __init__(self):
         self.conn = redis_config
 
+    async def add_all(self, key, data):
+        self.conn.set(key, data)  # 添加
+        nonebot.logger.info(f"Redis添加成功!:{key}")
+        return True
+
     async def add(self, key, data):
-        if await self.query(key):
-            nonebot.logger.warning(f"Redis该数据已存在！{key}")
-            return False
-        else:
-            self.conn.set(key, json.dumps(data))  # 添加
-            nonebot.logger.info(f"Redis添加成功!:{key}")
-            return True
+        self.conn.set(key, json.dumps(data))  # 添加
+        nonebot.logger.info(f"Redis添加成功!:{key}")
+        return True
 
     async def exist(self, key):
         if self.conn.exists(key) == 1:
@@ -64,6 +65,11 @@ class Redis:
         base64_data = base64.b64encode(image)
         self.conn.set(frame_id, base64_data)
 
+    async def get_image_decode(self, frame_id):
+        var = self.conn.get(frame_id)
+        image_data = base64.b64decode(var)
+        return image_data
+
     async def get_image_encode(self, frame_id):
         # 从redis中取出序列化的图片并进行反序列化
         # im = pickle.loads(self.conn.get(frame_id))
@@ -71,6 +77,12 @@ class Redis:
         image = Image.open(io.BytesIO(image_data))
         return image
 
+    async def get_image_buff(self, key):
+        # 从redis中取出序列化的图片并进行反序列化
+        # im = pickle.loads(self.conn.get(frame_id))
+        image_data = self.conn.get(key).encode()
+        new_buffer = io.BytesIO(image_data)
+        return new_buffer
 #
 # red = Redis()
 # # for _ in ticket:

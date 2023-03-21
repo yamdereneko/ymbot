@@ -8,12 +8,15 @@
 @Docs : 请求推栏战绩例子
 """
 import asyncio
+import json
 import time
+from io import BytesIO
 import nonebot
 import src.Data.jxDatas as jxData
 from src.internal.jx3api import API
 from PIL import ImageFont
 from PIL import Image, ImageDraw
+import src.Data.jx3_Redis as redis
 
 # 请求头
 api = API()
@@ -30,8 +33,21 @@ class GetDaily:
         self.server = jxData.mainServer(server)
         self.zone = jxData.mainZone(self.server)
         self.daily_next = daily_next
+        self.red = redis.Redis()
         if self.daily_next is None:
             self.daily_next = 0
+
+    async def redis_check(self, data, respective_data, respective_data_image):
+        red_data = await self.red.query(respective_data)
+        if red_data is not None:
+            if json.loads(red_data) == data:
+                red_data_image = await self.red.get_image_decode(respective_data_image)
+                new_buffer = BytesIO(red_data_image)
+                new_buffer_contents = new_buffer.getvalue()
+                # Read the contents of the new buffer
+                return new_buffer_contents
+        await self.red.add(respective_data, data)
+        return None
 
     async def get_daily(self):
         response = await api.data_active_current(server=self.server, next=self.daily_next)
@@ -45,6 +61,13 @@ class GetDaily:
         if data is None:
             nonebot.logger.error(self.server + "日常未得到，将返回None")
             return None
+
+        respective_data = f"Daily"
+        respective_data_image = f"Daily_image"
+        redis_check = await self.redis_check(data, respective_data, respective_data_image)
+        if redis_check is not None:
+            return redis_check
+
         images = await image_prospect(Image.open("src/images/daily.png").convert("RGBA"))
         draw = ImageDraw.Draw(images)
         today = data.get("date") + " 星期" + data.get("week")
@@ -91,10 +114,12 @@ class GetDaily:
         dpi = (1000, 1000)
 
         # # 保存图像
-        datetime = int(time.time())
-        images.save(f"/tmp/daily_{datetime}.png", dpi=dpi)
+        buffer = BytesIO()
+        buffer.seek(0)
+        images.save(buffer, dpi=dpi, format='PNG')
         # images.save(f"images/daily_new.png", dpi=dpi)
-        return datetime
+        await self.red.insert_image_encode(respective_data_image, buffer.getvalue())
+        return buffer
 
     async def query_weekly_daily(self):
         response = await api.app_calculate(count=7)

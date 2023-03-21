@@ -8,6 +8,7 @@
 @Docs : 请求推栏战绩例子
 """
 import asyncio
+import json
 import time
 import nonebot
 import src.Data.jxDatas as jxData
@@ -16,6 +17,8 @@ from src.internal.jx3api import API as jx3API
 from src.Data.database import DataBase as database
 from PIL import ImageFont
 from PIL import Image, ImageDraw
+from io import BytesIO
+import src.Data.jx3_Redis as redis
 
 # 请求头
 api = tuilanAPI()
@@ -36,6 +39,8 @@ class GetPersonRecord:
         self.zone = jxData.mainZone(self.server)
         self.database = database(config)
         self.global_role_id = None
+        self.red = redis.Redis()
+
 
     async def get_person_record(self):
         response = await jx3api.data_role_roleInfo(server=self.server, name=self.role)
@@ -50,15 +55,35 @@ class GetPersonRecord:
             return None
         return response.data
 
+    async def redis_check(self, data, respective_data, respective_data_image):
+        red_data = await self.red.query(respective_data)
+        if red_data is not None:
+            if json.loads(red_data) == data:
+                red_data_image = await self.red.get_image_decode(respective_data_image)
+                new_buffer = BytesIO(red_data_image)
+                new_buffer_contents = new_buffer.getvalue()
+                # Read the contents of the new buffer
+                return new_buffer_contents
+        await self.red.add(respective_data, data)
+        return None
+
     async def get_person_record_figure(self):
+
         data = await self.get_person_record()
         if data is None:
             return None
 
-        # images = Image.open("src/images/record.png").convert("RGBA")
+        respective_data = f"Record_{self.server}_{self.role}"
+        respective_data_image = f"Record_{self.server}_{self.role}_image"
+        redis_check = await self.redis_check(data, respective_data, respective_data_image)
+        if redis_check is not None:
+            return redis_check
+
         flag = 2
+
         image = Image.new("RGB", (1363 * flag, 1063 * flag), "white").convert("RGBA")
         draw = ImageDraw.Draw(image)
+
         title_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=53 * flag)
         small_title_font = ImageFont.truetype("src/fonts/pingfang_regular.ttf", size=32 * flag)
         logo_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=18 * flag)
@@ -78,7 +103,8 @@ class GetPersonRecord:
         # Set Small title
         small_title_text_width = small_title_font.getlength(self.zone + " " + self.server)
         small_title_width = (images_width - small_title_text_width) / 2
-        draw.text((small_title_width, 102 * flag), self.zone + " " + self.server, font=small_title_font, fill=title_color)
+        draw.text((small_title_width, 102 * flag), self.zone + " " + self.server, font=small_title_font,
+                  fill=title_color)
 
         # Set data title
         draw.line((0, 158 * flag, 1363 * flag, 158 * flag), fill=(143, 151, 163), width=2 * flag)
@@ -136,18 +162,21 @@ class GetPersonRecord:
                 prime_team = None
                 backup_team = None
             team_flag = 0
+
             # 主队伍
             prime_team_list = sorted(list(prime_team.values()), key=lambda x: 0 if x == kungfu else 1)
             for kungfu_team in prime_team_list:
                 if kungfu_team in jxData.treat_pinyin:
                     rescue_image = await image_prospect(
-                        Image.open(f"src/images/KungfuIcon/{kungfu_team}.png").convert("RGBA").resize((41 * flag, 41 * flag)))
+                        Image.open(f"src/images/KungfuIcon/{kungfu_team}.png").convert("RGBA").resize(
+                            (41 * flag, 41 * flag)))
                     rescue_x = 358
                     rescue_y = 265
                     image.paste(rescue_image, (rescue_x * flag, rescue_y * flag + floor * 80 * flag))
                 else:
                     dps_image = await image_prospect(
-                        Image.open(f"src/images/KungfuIcon/{kungfu_team}.png").convert("RGBA").resize((41 * flag, 41 * flag)))
+                        Image.open(f"src/images/KungfuIcon/{kungfu_team}.png").convert("RGBA").resize(
+                            (41 * flag, 41 * flag)))
                     dps_x = 260 + team_flag * 49
                     dps_y = 265
                     image.paste(dps_image, (dps_x * flag, dps_y * flag + floor * 80 * flag))
@@ -161,13 +190,15 @@ class GetPersonRecord:
             for kungfu_team in list(backup_team.values()):
                 if kungfu_team in jxData.treat_pinyin:
                     rescue_image = await image_prospect(
-                        Image.open(f"src/images/KungfuIcon/{kungfu_team}.png").convert("RGBA").resize((41 * flag, 41 * flag)))
+                        Image.open(f"src/images/KungfuIcon/{kungfu_team}.png").convert("RGBA").resize(
+                            (41 * flag, 41 * flag)))
                     rescue_x = 580
                     rescue_y = 265
                     image.paste(rescue_image, (rescue_x * flag, rescue_y * flag + floor * 80 * flag))
                 else:
                     dps_image = await image_prospect(
-                        Image.open(f"src/images/KungfuIcon/{kungfu_team}.png").convert("RGBA").resize((41 * flag, 41 * flag)))
+                        Image.open(f"src/images/KungfuIcon/{kungfu_team}.png").convert("RGBA").resize(
+                            (41 * flag, 41 * flag)))
                     dps_x = 482 + team_flag * 49
                     dps_y = 267
                     image.paste(dps_image, (dps_x * flag, dps_y * flag + floor * 80 * flag))
@@ -236,8 +267,9 @@ class GetPersonRecord:
         dpi = (1000, 1000)
 
         # # 保存图像
-        datetime = int(time.time())
-        image.save(f"/tmp/record_{datetime}.png", dpi=dpi)
+        buffer = BytesIO()
+        buffer.seek(0)
+        image.save(buffer, dpi=dpi, format='PNG')
+        await self.red.insert_image_encode(respective_data_image, buffer.getvalue())
         # image.save(f"images/record_image.png", dpi=dpi)
-        # 使用系统默认的图像查看器显示图像
-        return datetime
+        return buffer

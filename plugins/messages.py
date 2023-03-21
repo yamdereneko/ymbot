@@ -90,11 +90,8 @@ async def onMessage_RoleJJCRecord(matcher: Matcher, args: Message = CommandArg()
         jjc_record = JJCRecord.GetPersonRecord(role_name, server)
         record = await jjc_record.get_person_record()
         if record:
-            frame = f"/tmp/record_{role_name}.png"
-            frame_name = 'record_' + role_name
             record_image = await jjc_record.get_person_record_figure()
-            image_frame = f"/tmp/record_{record_image}.png"
-            msg = await redis_check_operation(frame, frame_name, record, image_frame)
+            msg = MessageSegment.image(record_image)
             await RoleJJCRecord.finish(msg)
         else:
             nonebot.logger.error(f"{role_name} JJC战绩查询不存在,请重试")
@@ -199,12 +196,8 @@ async def onMessage_AllServerState(matcher: Matcher, args: Message = CommandArg(
 @Daily.handle()
 async def onMessage_Daily():
     daily = DailyInfo.GetDaily()
-    daily_data = await daily.get_daily()
     daily_image = await daily.query_daily_figure()
-    frame = f"/tmp/daily.png"
-    frame_name = "daily"
-    image_frame = f"/tmp/daily_{daily_image}.png"
-    msg = await redis_check_operation(frame, frame_name, daily_data, image_frame)
+    msg = MessageSegment.image(daily_image)
     await Daily.finish(msg)
 
 
