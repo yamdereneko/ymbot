@@ -42,85 +42,123 @@ class Price:
         if task is None:
             nonebot.logger.error("获取物价信息失败，请查看报错信息")
             return None
-
         flag = 2
 
-        publication_type = 1
-        on_sale_type = 2
         task_name = task.get('name')
-        wangbaolou = WangBaoLouAPI()
-        response = await wangbaolou.call_api(task_name, 0)
 
         # 定义字体
-        master_title_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=24 * flag)
-        slave_title_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=18 * flag)
-        total_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=20 * flag)
+        master_title_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=90 * flag)
+        slave_title_font = ImageFont.truetype("src/fonts/pingfang_regular.ttf", size=22 * flag)
+        total_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=30 * flag)
         data_title_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=18 * flag)
-        data_font = ImageFont.truetype("src/fonts/pingfang_regular.ttf", size=14 * flag)
+        data_font = ImageFont.truetype("src/fonts/pingfang_regular.ttf", size=24 * flag)
+        emoji_font = ImageFont.truetype("src/fonts/seguiemj.ttf", size=24 * flag)
 
         # 设置画布
-        image = Image.new("RGB", (1043 * flag, 477 * flag + len(response.data.get('list')) * 56 * flag),
-                          "white").convert("RGBA")
+        image = Image.new("RGB", (1200 * flag, 1900 * flag), "white").convert("RGBA")
         draw = ImageDraw.Draw(image)
         image_width, _ = image.size
 
+        # logo
+        draw.text((25 * flag, 20 * flag), 'YMNeko.', fill=(10, 0, 71), font=data_title_font)
+
         # 标题设置
-        current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        draw.text((24 * flag, 26 * flag), '物价', fill=(59, 62, 69), font=master_title_font)
-        draw.text((24 * flag, 67 * flag), current_time, fill=(59, 62, 69), font=slave_title_font)
+        title_width = master_title_font.getlength(task_name)
+        title_x = (image_width - title_width) / 2
+        draw.text((title_x, 175 * flag), task_name, fill=(26, 33, 81), font=master_title_font)
 
         # 图片生成
         url = task.get('view')
         res = await self.client.get(url=url, timeout=3000)
         title_image = await image_prospect(
-            Image.open(BytesIO(res.content)).convert("RGBA").resize((459 * flag, 259 * flag)))
-        image.paste(title_image, (442 * flag, 119 * flag))
+            Image.open(BytesIO(res.content)).convert("RGBA").resize((600 * flag, 370 * flag)))
+        image.paste(title_image, (300 * flag, 280 * flag))
 
-        # 总数
-        total = response.data.get('total_record')
-        draw.text((28 * flag, 386 * flag), f"目前在楼总数: {total}", fill=(9, 44, 76), font=total_font)
+        # 设置圆角矩形的左上角和右下角坐标，以及圆角半径
+        x1, y1 = 300 * flag, 700 * flag
+        x2, y2 = 900 * flag, 795 * flag
+        radius = 10
 
-        # 价格标题
-        data_title_height = 449
-        draw.text((55 * flag, data_title_height * flag), f"名字", fill=(59, 62, 69), font=data_title_font)
-        draw.text((248.2 * flag, data_title_height * flag), f"价格", fill=(59, 62, 69), font=data_title_font)
-        draw.text((441.4 * flag, data_title_height * flag), f"时间", fill=(59, 62, 69), font=data_title_font)
-        draw.text((634.6 * flag, data_title_height * flag), f"状态", fill=(59, 62, 69), font=data_title_font)
-        draw.text((827.8 * flag, data_title_height * flag), f"关注", fill=(59, 62, 69), font=data_title_font)
+        # 绘制圆角矩形框
+        radius_color = (211, 217, 243)
+        draw.line([(x1 + radius, y1), (x2 - radius, y1)], fill=radius_color, width=2 * flag)
+        draw.line([(x2, y1 + radius), (x2, y2 - radius)], fill=radius_color, width=2 * flag)
+        draw.line([(x1 + radius, y2), (x2 - radius, y2)], fill=radius_color, width=2 * flag)
+        draw.line([(x1, y1 + radius), (x1, y2 - radius)], fill=radius_color, width=2 * flag)
+        draw.arc([(x1, y1), (x1 + 2 * radius, y1 + 2 * radius)], 180, 270, fill=radius_color, width=2 * flag)
+        draw.arc([(x2 - 2 * radius, y1), (x2, y1 + 2 * radius)], 270, 360, fill=radius_color, width=2 * flag)
+        draw.arc([(x2 - 2 * radius, y2 - 2 * radius), (x2, y2)], 0, 90, fill=radius_color, width=2 * flag)
+        draw.arc([(x1, y2 - 2 * radius), (x1 + 2 * radius, y2)], 90, 180, fill=radius_color, width=2 * flag)
+
+        # 销售内容
+        desc = task.get('desc')
+        desc_width = slave_title_font.getlength(desc)
+        desc_x = (image_width - desc_width) / 2
+        draw.text((desc_x, 734 * flag), desc, fill=(26, 33, 81), font=slave_title_font)
+
+        # 销售背景
+        draw.rounded_rectangle((90 * flag, 900 * flag, 570 * flag, 1820 * flag), radius=20, fill=(254, 255, 255),
+                               outline=(211, 217, 243), width=2 * flag)
+        draw.rounded_rectangle((90 * flag, 900 * flag, 570 * flag, 979 * flag), radius=20, fill=(246, 250, 253),
+                               outline=(211, 217, 243), width=2 * flag)
+
+        draw.rounded_rectangle((630 * flag, 900 * flag, 1110 * flag, 1820 * flag), radius=20, fill=(254, 255, 255),
+                               outline=(211, 217, 243), width=2 * flag)
+        draw.rounded_rectangle((630 * flag, 900 * flag, 1110 * flag, 979 * flag), radius=20, fill=(246, 250, 253),
+                               outline=(211, 217, 243), width=2 * flag)
+
+        # 销售类型
+        draw.text((285 * flag, 924 * flag), f"公示期", fill=(26, 33, 81), font=total_font)
+        draw.text((825 * flag, 924 * flag), f"开售期", fill=(26, 33, 81), font=total_font)
+
+        publication_type = 1
+        on_sale_type = 2
+        wangbaolou = WangBaoLouAPI()
+        response = await wangbaolou.call_api(task_name, publication_type)
+        if response.code != 1:
+            nonebot.logger.error("官方万宝楼接口获取失败，请查看错误代码")
+            nonebot.logger.error(response.msg)
+            return None
+
+        # 公示期
 
         for floor, element in enumerate(response.data.get('list')):
             single_unit_price = element.get('single_unit_price') // 100
             remaining_time = element.get('remaining_time')
-            state = element.get('state')
             followed_num = element.get('followed_num')
             hours = remaining_time // 3600
             minutes = (remaining_time // 60) % 60
 
-            task_name_bbox = data_font.getbbox(task_name)
-            text_height = task_name_bbox[3] - task_name_bbox[1]
+            text_y = 1003.1 * flag + floor * 83 * flag
+            text_color = (26, 33, 81)
+            draw.text((140.5 * flag, text_y), f"{hours}小时{minutes}分钟", fill=text_color, font=data_font)
+            draw.text((349.5 * flag, text_y), f"¥{single_unit_price}", fill=text_color, font=data_font)
+            draw.text((468.5 * flag, text_y + 7 * flag), f"❤ {followed_num}", fill=text_color, font=emoji_font)
 
-            text_y = 493 * flag + floor * 54 * flag
-            line_text_y = text_y + text_height * flag
+        # 在售期
+        response = await wangbaolou.call_api(task_name, on_sale_type)
+        if response.code != 1:
+            nonebot.logger.error("官方万宝楼接口获取失败，请查看错误代码")
+            nonebot.logger.error(response.msg)
+            return None
 
-            draw.text((55 * flag, text_y), task_name, fill=(59, 62, 69), font=data_font)
-            draw.text((248.2 * flag, text_y), str(single_unit_price), fill=(59, 62, 69), font=data_font)
-            draw.text((441.4 * flag, text_y), f"{hours}小时{minutes}分钟", fill=(59, 62, 69), font=data_font)
-            if state == 3:
-                sale_state = "公示期"
-            else:
-                sale_state = "在售期"
-            draw.text((634.6 * flag, text_y), sale_state, fill=(59, 62, 69), font=data_font)
-            draw.text((827.8 * flag, text_y), str(followed_num), fill=(59, 62, 69), font=data_font)
+        # 公示期
+        for floor, element in enumerate(response.data.get('list')):
+            single_unit_price = element.get('single_unit_price') // 100
+            remaining_time = element.get('remaining_time')
+            followed_num = element.get('followed_num')
+            hours = remaining_time // 3600
+            minutes = (remaining_time // 60) % 60
 
-            draw.line((39 * flag, line_text_y, 1015 * flag, line_text_y), width=2, fill=(220, 223, 227))
+            text_y = 1003.1 * flag + floor * 83 * flag
+            text_color = (26, 33, 81)
+            draw.text((680.5 * flag, text_y), f"{hours}小时{minutes}分钟", fill=text_color, font=data_font)
+            draw.text((889.5 * flag, text_y), f"¥{single_unit_price}", fill=text_color, font=data_font)
+            draw.text((1008.5 * flag, text_y + 7 * flag), f"❤ {followed_num}", fill=text_color, font=emoji_font)
 
-        dpi = (2000, 2000)
+        dpi = (1000, 1000)
         # 保存图像
         datetime = int(time.time())
         image.save(f"/tmp/Price_{datetime}.png", dpi=dpi)
         # image.save(f"images/Price_Test.png", dpi=dpi)
         return datetime
-
-
-# price = Price("狐金")
-# asyncio.run(price.create_price_figure())
