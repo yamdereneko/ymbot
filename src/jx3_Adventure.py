@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import asyncio
+import json
 import time
+from io import BytesIO
 import nonebot
 import random
 import src.Data.jxDatas as jxData
@@ -8,7 +10,7 @@ from src.internal.tuilanapi import API
 from src.internal.jx3api import API as jx3API
 from src.jx3_TopnRoles import GetTopnRoles
 from PIL import Image, ImageDraw, ImageFont
-from src.Data.jx3_Redis import Redis
+import src.Data.jx3_Redis as redis
 
 api = API()
 jx3api = jx3API()
@@ -25,10 +27,10 @@ class Adventure:
         self.server = jxData.mainServer(server)
         self.zone = jxData.mainZone(self.server)
         self.user = user
+        self.red = redis.Redis()
 
     async def query_user_info(self):
-        red = Redis()
-        ticket_list = await red.query_list("ticket_list")
+        ticket_list = await self.red.query_list("ticket_list")
         response = await jx3api.data_luck_adventure(server=self.server, name=self.user,
                                                     ticket=random.choice(ticket_list))
         if response.code != 200:
@@ -147,8 +149,9 @@ class Adventure:
                 draw.text((ago_time_x - indentation * 20, ago_time_y), war_time, font=font, fill="black")
 
         dpi = (2000, 2000)
-        # 保存图像
-        datetime = int(time.time())
-        image.save(f"/tmp/adventure_{datetime}.png", dpi=dpi)
-        # image.save(f"images/adventure.png", dpi=dpi)
-        return datetime
+        # # 保存图像
+        buffer = BytesIO()
+        buffer.seek(0)
+        image.save(buffer, dpi=dpi, format='PNG')
+        # image.save(f"images/record_image.png", dpi=dpi)
+        return buffer

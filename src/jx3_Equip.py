@@ -7,6 +7,7 @@
 @Docs : 请求推栏战绩例子
 """
 import asyncio
+import json
 import time
 import traceback
 import httpx
@@ -17,8 +18,9 @@ from src.internal.tuilanapi import API
 from src.internal.jx3api import API as jx3API
 from rich import print
 from PIL import ImageFont
-from io import BytesIO
 from PIL import Image, ImageDraw
+from io import BytesIO
+import src.Data.jx3_Redis as redis
 
 # 请求头
 
@@ -37,6 +39,19 @@ class GetRoleEquip:
         self.person_id = None
         self.role_name = None
         self.globalRoleId = None
+        self.red = redis.Redis()
+
+    async def redis_check(self, data, respective_data, respective_data_image):
+        red_data = await self.red.query(respective_data)
+        if red_data is not None:
+            if json.loads(red_data) == data:
+                red_data_image = await self.red.get_image_decode(respective_data_image)
+                new_buffer = BytesIO(red_data_image)
+                new_buffer_contents = new_buffer.getvalue()
+                # Read the contents of the new buffer
+                return new_buffer_contents
+        await self.red.add(respective_data, data)
+        return None
 
     async def equips(self):
         try:
@@ -108,6 +123,13 @@ class GetRoleEquip:
         data = await self.equips()
         if data is None:
             return None
+
+        respective_data = f"Equip_{self.server}_{self.role}"
+        respective_data_image = f"Equip_{self.server}_{self.role}_image"
+        redis_check = await self.redis_check(data, respective_data, respective_data_image)
+        if redis_check is not None:
+            return redis_check
+
         kungfu = data.get("Kungfu").get("Name")
         equip_score = data.get("MatchDetail").get("score")
 
@@ -320,9 +342,10 @@ class GetRoleEquip:
 
         # 将文本添加到图像中
 
-        # # 保存图像
-        datetime = int(time.time())
-        images.save(f"/tmp/equip_image_{datetime}.png", dpi=dpi)
+        buffer = BytesIO()
+        buffer.seek(0)
+        images.save(buffer, dpi=dpi, format='PNG')
+        await self.red.insert_image_encode(respective_data_image, buffer.getvalue())
+        # image.save(f"images/record_image.png", dpi=dpi)
+        return buffer
 
-        # 使用系统默认的图像查看器显示图像
-        return datetime

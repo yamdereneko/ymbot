@@ -216,13 +216,8 @@ async def onMessage_Adventure(matcher: Matcher, args: Message = CommandArg()):
         if user_adventure_data is None:
             await Adventure.reject('该用户未被收录')
         nonebot.logger.info(user_adventure_data)
-
-        frame = f"/tmp/adventure_{user}.png"
-        frame_name = 'adventure_' + user
         user_adventure_image = await adventure.create_figure()
-        image_frame = f"/tmp/adventure_{user_adventure_image}.png"
-
-        msg = await redis_check_operation(frame, frame_name, user_adventure_data, image_frame)
+        msg = MessageSegment.image(user_adventure_image)
         await Adventure.finish(msg)
     else:
         nonebot.logger.error("请求错误,请参考: 奇遇 区服 角色名")
@@ -241,13 +236,16 @@ async def onMessage_Fireworks(matcher: Matcher, args: Message = CommandArg()):
             user = plain_text
         fireworks = jx3_Fireworks.Fireworks(server, user)
         user_fireworks_data = await fireworks.query_user_firework_info()
-        frame = f"/tmp/fireworks_{user}.png"
-        frame_name = 'fireworks_' + user
-        user_fireworks_image = await fireworks.get_Fig()
-        image_frame = f"/tmp/fireworks{user_fireworks_image}.png"
-        msg = await redis_check_operation(frame, frame_name, user_fireworks_data, image_frame)
-        await Fireworks.finish(msg)
-
+        if user_fireworks_data:
+            frame = f"/tmp/fireworks_{user}.png"
+            frame_name = 'fireworks_' + user
+            user_fireworks_image = await fireworks.get_Fig()
+            image_frame = f"/tmp/fireworks{user_fireworks_image}.png"
+            msg = await redis_check_operation(frame, frame_name, user_fireworks_data, image_frame)
+            await Fireworks.finish(msg)
+        else:
+            msg = "该用户不存在"
+            await Fireworks.reject(msg)
     else:
         nonebot.logger.error("请求错误,请参考: 烟花 区服 角色名")
         await Fireworks.reject("请求错误,请参考: 烟花 区服 角色名")
@@ -383,8 +381,7 @@ async def onMessage_Equip(matcher: Matcher, args: Message = CommandArg()):
             equip_info = jx3_Equip.GetRoleEquip(server, role_name)
             equip_info_time = await equip_info.create_images()
             if equip_info_time:
-                equip_image = f"/tmp/equip_image_{equip_info_time}.png"
-                msg = MessageSegment.image('file:' + equip_image)
+                msg = MessageSegment.image(equip_info_time)
                 await Equip.finish(msg)
         else:
             nonebot.logger.error("格式错误，请尝试: 装备 大区 名字")
@@ -401,11 +398,8 @@ async def onMessage_Price(args: Message = CommandArg()):
         price = jx3_Price.Price(plain_text)
         price_data = await price.query_mono_price()
         if price_data:
-            frame = f"/tmp/Price_{plain_text}.png"
-            frame_name = "Price_" + plain_text
             price_image = await price.create_price_figure()
-            image_frame = f"/tmp/Price_{price_image}.png"
-            msg = await redis_check_operation(frame, frame_name, price_data, image_frame)
+            msg = MessageSegment.image(price_image)
             await Price.finish(msg)
         else:
             msg = "该物价不存在，请重新填写"

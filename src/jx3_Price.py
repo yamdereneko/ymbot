@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import asyncio
+import json
 import time
 import nonebot
 from src.internal.jx3api import API
@@ -7,6 +8,7 @@ from src.internal.wanbaolouAPI import WangBaoLouAPI
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
 from httpx import AsyncClient
+import src.Data.jx3_Redis as redis
 
 api = API()
 
@@ -28,6 +30,7 @@ class Price:
     def __init__(self, mono):
         self.mono = mono
         self.client = AsyncClient()
+        self.red = redis.Redis()
 
     async def query_mono_price(self):
         response = await api.data_trade_record(name=self.mono)
@@ -42,9 +45,10 @@ class Price:
         if task is None:
             nonebot.logger.error("获取物价信息失败，请查看报错信息")
             return None
-        flag = 2
 
         task_name = task.get('name')
+
+        flag = 2
 
         # 定义字体
         master_title_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=90 * flag)
@@ -158,7 +162,8 @@ class Price:
 
         dpi = (1000, 1000)
         # 保存图像
-        datetime = int(time.time())
-        image.save(f"/tmp/Price_{datetime}.png", dpi=dpi)
-        # image.save(f"images/Price_Test.png", dpi=dpi)
-        return datetime
+        buffer = BytesIO()
+        buffer.seek(0)
+        image.save(buffer, dpi=dpi, format='PNG')
+        # image.save(f"images/record_image.png", dpi=dpi)
+        return buffer

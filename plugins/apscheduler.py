@@ -28,6 +28,7 @@ def retry(attempt: int = 3) -> Callable:
                 await asyncio.sleep(c)
 
         return warpper
+
     return decorator
 
 
@@ -99,18 +100,10 @@ async def main(servers: List[str]):
 
     return msg
 
-
 async def run_daily():
     daily = jx3_Daily.GetDaily()
-
-    daily_data = await daily.get_daily()
-    red = redis.Redis()
-
-    await red.add('daily', daily_data)
     daily_image = await daily.query_daily_figure()
-    frame = f"/tmp/daily_{daily_image}.png"
-    await red.insert_image('daily_image', frame)
-    msg = MessageSegment.image('file:' + frame)
+    msg = MessageSegment.image(daily_image)
     return msg
 
 
