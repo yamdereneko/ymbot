@@ -80,7 +80,11 @@ class GetDaily:
         # 倍数
         redouble = 4
         daily_font = ImageFont.truetype("src/fonts/pingfang_regular.ttf", size=31 * redouble)
+        logo_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=18 * redouble)
         fill_color = (69, 75, 84)
+
+        # logo
+        draw.text((25 * redouble, 20 * redouble), 'YMNeko.', fill=(10, 0, 71), font=logo_font)
 
         # 时间设置
         today_text_width = daily_font.getlength(today)

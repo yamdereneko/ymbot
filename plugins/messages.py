@@ -113,10 +113,7 @@ async def onMessage_JJCTop(matcher: Matcher, args: Message = CommandArg()):
 
             jjc_info = jx3JJCInfo.GetJJCTopInfo(table=int(top_type), weekly=int(week), school_type=school_type)
             jjc_data = await jjc_info.from_sql_create_figure()
-
-            frame = f"/tmp/top_{jjc_data}.png"
-            frame_name = 'top_' + top_type + '_' + week + '_' + school_type
-            msg = await redis_check_operation(frame, frame_name, jjc_data, frame)
+            msg = MessageSegment.image(jjc_data)
             await JJCTop.finish(msg)
 
 
@@ -237,11 +234,8 @@ async def onMessage_Fireworks(matcher: Matcher, args: Message = CommandArg()):
         fireworks = jx3_Fireworks.Fireworks(server, user)
         user_fireworks_data = await fireworks.query_user_firework_info()
         if user_fireworks_data:
-            frame = f"/tmp/fireworks_{user}.png"
-            frame_name = 'fireworks_' + user
-            user_fireworks_image = await fireworks.get_Fig()
-            image_frame = f"/tmp/fireworks{user_fireworks_image}.png"
-            msg = await redis_check_operation(frame, frame_name, user_fireworks_data, image_frame)
+            user_fireworks_image = await fireworks.create_figure_from_firework()
+            msg = MessageSegment.image(user_fireworks_image)
             await Fireworks.finish(msg)
         else:
             msg = "该用户不存在"
@@ -351,24 +345,20 @@ async def onMessage_Recruit(matcher: Matcher, args: Message = CommandArg()):
             recruit_text = plain_text
 
         recruit = jx3_Recruit.Recruit(server, recruit_text)
-        recruit_total = await recruit.get_Fig()
-        if recruit_total:
-            recruit_image = f"/tmp/recruit{recruit_total}.png"
-            msg = MessageSegment.image('file:' + recruit_image)
+        recruit_image = await recruit.create_recruit_image()
+        if recruit_image:
+            msg = MessageSegment.image(recruit_image)
             await Recruit.finish(msg)
         else:
-            msg = MessageSegment.text("获取不到招募信息，请稍后再试")
-            await Recruit.reject(msg)
+            await Recruit.reject("招募出错，请重新尝试")
     else:
         recruit = jx3_Recruit.Recruit(server_binding)
-        recruit_total = await recruit.get_Fig()
-        if recruit_total:
-            recruit_image = f"/tmp/recruit{recruit_total}.png"
-            msg = MessageSegment.image('file:' + recruit_image)
+        recruit_image = await recruit.create_recruit_image()
+        if recruit_image:
+            msg = MessageSegment.image(recruit_image)
             await Recruit.finish(msg)
-        nonebot.logger.error("招募获取大区信息失败，请重试")
-        await Recruit.reject("招募获取大区填写失败，请重试")
-
+        else:
+            await Recruit.reject("招募出错，请重新尝试")
 
 @Equip.handle()
 async def onMessage_Equip(matcher: Matcher, args: Message = CommandArg()):
@@ -399,8 +389,12 @@ async def onMessage_Price(args: Message = CommandArg()):
         price_data = await price.query_mono_price()
         if price_data:
             price_image = await price.create_price_figure()
-            msg = MessageSegment.image(price_image)
-            await Price.finish(msg)
+            if price_image:
+                msg = MessageSegment.image(price_image)
+                await Price.finish(msg)
+            else:
+                msg = "万宝楼正在维护中"
+                await Price.reject(msg)
         else:
             msg = "该物价不存在，请重新填写"
             await Price.reject(msg)

@@ -59,6 +59,7 @@ class Adventure:
         bold_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=29 * flag)
         id_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=52 * flag)
         server_font = ImageFont.truetype("src/fonts/pingfang_regular.ttf", size=32 * flag)
+        logo_font = ImageFont.truetype("src/fonts/pingfang_bold.ttf", size=18 * flag)
 
         # 创建一个空白的图像对象
         image = Image.new("RGB", (800 * flag, 337 * flag + len(task) * 62 * flag), "white").convert("RGBA")
@@ -68,6 +69,9 @@ class Adventure:
         # total_kungfu_icon = await image_prospect(
         #     Image.open(f"images/TotalKungfu/{force_id}.png").convert("RGBA").resize((75 * flag, 50 * flag)))
         # image.paste(total_kungfu_icon, (269 * flag, 80 * flag))
+
+        # logo
+        draw.text((25 * flag, 20 * flag), 'YMNeko.', fill=(10, 0, 71), font=logo_font)
 
         # ID
         id_text_width = id_font.getlength(self.user)

@@ -45,7 +45,6 @@ class Price:
         if task is None:
             nonebot.logger.error("获取物价信息失败，请查看报错信息")
             return None
-
         task_name = task.get('name')
 
         flag = 2
@@ -73,9 +72,14 @@ class Price:
 
         # 图片生成
         url = task.get('view')
-        res = await self.client.get(url=url, timeout=3000)
-        title_image = await image_prospect(
-            Image.open(BytesIO(res.content)).convert("RGBA").resize((600 * flag, 370 * flag)))
+        if url:
+            res = await self.client.get(url=url, timeout=3000)
+            title_image = await image_prospect(
+                Image.open(BytesIO(res.content)).convert("RGBA").resize((600 * flag, 370 * flag)))
+
+        else:
+            title_image = await image_prospect(
+                Image.open(f"src/images/error_view.png").convert("RGBA").resize((600 * flag, 370 * flag)))
         image.paste(title_image, (300 * flag, 280 * flag))
 
         # 设置圆角矩形的左上角和右下角坐标，以及圆角半径
