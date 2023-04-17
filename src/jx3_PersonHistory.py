@@ -49,8 +49,8 @@ class GetPersonInfo:
             if response.code != 0:
                 nonebot.logger.error("API接口Daily获取信息失败，请查看错误")
                 return None
-            # self.person_id = response.data['person_info']['person_id']
 
+            self.person_id = response.data['person_info']['person_id']
             response = await api.mine_match_person9history(person_id=str(self.person_id), size=10, cursor=0)
             print(response)
             if response.code != 0:
@@ -110,3 +110,6 @@ class GetPersonInfo:
             nonebot.logger.error("获取用户信息失败，请查看报错.")
             traceback.print_exc()
             return None
+
+# person_infomation = GetPersonInfo('潇潇凌千烨','双梦')
+# asyncio.run(person_infomation.get_person_info())

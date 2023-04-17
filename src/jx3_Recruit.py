@@ -52,7 +52,7 @@ class Recruit:
             font = ImageFont.truetype("src/fonts/pingfang_regular.ttf", size=18 * flag)
 
             # 创建一个空白的图像对象
-            image = Image.new("RGB", (1360 * flag, 281 * flag + len(data) * 45 * flag), "white").convert("RGBA")
+            image = Image.new("RGB", (1360 * flag, 291 * flag + len(data) * 45 * flag), "white").convert("RGBA")
             draw = ImageDraw.Draw(image)
             images_width, _ = image.size
 

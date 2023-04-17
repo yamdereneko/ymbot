@@ -79,6 +79,19 @@ async def f2002(data):
         await bot.send_group_msg(group_id=group_id, message=text + msg)
 
 
+async def f2003(data):
+    bot, = get_bots().values()
+    old_version = data["data"]['old_version']
+    new_version = data["data"]['new_version']
+    package_num = data["data"]['package_num']
+    package_size = data["data"]['package_size']
+    text = f'补丁包推送信息\n{old_version} -> {new_version}\n包数量: {package_num}\n包大小: {package_size}'
+    red = redis.Redis()
+    group_list = await red.query_list("group_list")
+    for group_id in group_list:
+        await bot.send_group_msg(group_id=group_id, message=text)
+
+
 class WebSocket:
     connect: Optional[WebSocketClientProtocol] = None
     """ws链接"""

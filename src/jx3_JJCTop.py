@@ -92,6 +92,9 @@ class GetJJCTopRecord:
                         failure_list.append(element)
                         continue
                     #
+                    if response.data is None:
+                        print('该数据有问题')
+                        continue
                     if len(response.data) == 1:
                         kungfu = response.data[0]['name']
                     else:
@@ -163,5 +166,5 @@ class GetJJCTopRecord:
 
 
 # # # #
-# Record = GetJJCTopRecord(12, 50)
+# Record = GetJJCTopRecord(15, 50)
 # asyncio.run(Record.create_top_history_to_database())
