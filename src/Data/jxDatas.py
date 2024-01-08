@@ -5,7 +5,7 @@ from nonebot import get_driver
 
 
 #
-config = get_driver().config
+# config = get_driver().config
 
 
 class DefaultConfig(BaseModel, extra=Extra.ignore):
@@ -53,8 +53,8 @@ class PathConfig(BaseModel, extra=Extra.ignore):
 
 
 #
-default_config = DefaultConfig.parse_obj(config)
-path_config = PathConfig.parse_obj(config)
+# default_config = DefaultConfig.parse_obj(config)
+# path_config = PathConfig.parse_obj(config)
 """路径设置"""
 
 """
@@ -64,7 +64,7 @@ path_config = PathConfig.parse_obj(config)
 server_binding = "斗转星移"
 
 redis_config = redis.Redis(
-    host='114.115.181.82',  # ip地址
+    host='42.194.234.236',  # ip地址
     port=6379,  # 端口号
     db=0,
     decode_responses=True,
@@ -89,9 +89,9 @@ class Jx3ApiConfig(BaseModel, extra=Extra.ignore):
 
 
 config = {
-    'host': '114.115.181.82',  # 连接主机名。
+    'host': '42.194.234.236',  # 连接主机名。
     'user': 'root',  # 用户账号
-    'password': 'Qinhao123.',  # 用户密码
+    'password': 'Qinhao123',  # 用户密码
     'db': 'farbnamen',  # 数据库名
     'port': 3306,  # 连接端口
     'charset': 'utf8',  # 数据编码
@@ -101,9 +101,9 @@ config = {
 }
 
 sql_config = {
-    'host': '114.115.181.82',  # 连接主机名。
+    'host': '42.194.234.236',  # 连接主机名。
     'user': 'root',  # 用户账号
-    'password': 'Qinhao123.',  # 用户密码
+    'password': 'Qinhao123',  # 用户密码
     'db': 'farbnamen',  # 数据库名
     'port': 3306,  # 连接端口
     'charset': 'utf8',  # 数据编码
@@ -113,7 +113,7 @@ sql_config = {
 }
 
 all_school = {'霸刀': 0, '少林': 0, '补天': 0, '蓬莱': 0, '紫霞': 0, '藏剑': 0, '明教': 0, '云裳': 0, '花间': 0, '丐帮': 0,
-              '凌雪阁': 0, '田螺': 6, '惊羽': 0, '相知': 0, '胎虚': 0, '苍云': 0, '天策': 0, '无方': 0, '灵素': 0, '冰心': 0, '毒经': 0,
+              '凌雪阁': 0, '田螺': 0, '惊羽': 0, '相知': 0, '太虚': 0, '苍云': 0, '天策': 0, '无方': 0, '灵素': 0, '冰心': 0, '毒经': 0,
               '衍天宗': 0, '莫问': 0, '离经': 0, '刀宗': 0}
 
 bodyType = {
@@ -167,7 +167,7 @@ school_pinyin = {
     "dujing": "毒经",
     "butian": "补天",
     "zixia": "紫霞",
-    "taixu": "胎虚",
+    "taixu": "太虚",
 }
 
 treat_pinyin = {

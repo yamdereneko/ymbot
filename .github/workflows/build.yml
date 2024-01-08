@@ -3,7 +3,7 @@ name: Docker Hub Release
 on:
   push:
     branches:
-        - master #只在master推送时执行
+        # - master 只在master推送时执行
 
 jobs:
   docker:

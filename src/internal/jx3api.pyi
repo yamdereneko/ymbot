@@ -88,6 +88,20 @@ class API:
             * `flower`：可选， 用于筛选鲜花
         """
         ...
+
+    async def data_role_detailed(self, *, server: str, name: str = ...
+    ) -> Response:
+        """
+        说明:
+            检查当天鲜花最高价格收购线路。
+
+        参数:
+            * `server`：服务器名
+            * `map`：可选，用于筛选地图
+            * `flower`：可选， 用于筛选鲜花
+        """
+        ...
+
     async def app_furniture(self, *, name: str) -> Response:
         """
         说明:
